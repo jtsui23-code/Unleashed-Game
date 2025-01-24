@@ -1,6 +1,7 @@
 import pygame
 import sys
 
+
 class Game:
     
     def __init__(self):
@@ -17,3 +18,12 @@ class Game:
         self.screen = pygame.display.set_mode((1280 , 720 ))
 
         self.display = pygame.Surface((640, 360))
+
+        self.assets = {
+
+        }
+
+    
+    def run(self):
+        while True:
+            pass
