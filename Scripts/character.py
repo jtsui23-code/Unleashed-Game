@@ -34,6 +34,7 @@ class Player(Character):
 
         self.maxHp = 80
         self.currentHp = self.maxHp
+        self.skillCooldowns = []
 
     def takeDmg(self, amount):
 
@@ -51,6 +52,7 @@ class Player(Character):
         # Have to use min(eslf.maxHp, ...) or the player's health 
         # will eventually overcap.
         self.currentHp = min(self.maxHp, self.currentHp + amount)
+
 
     
 
