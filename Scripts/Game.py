@@ -23,7 +23,34 @@ class Game:
 
         }
 
+
+
+
     
     def run(self):
         while True:
-            pass
+            
+            # Event loop
+            for event in pygame.event.get():
+
+                # Exit the game when pressing the close button on window.
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+            
+            # Fill the screen with black
+            self.screen.fill((0, 0, 0))
+
+            # Display the screen
+            pygame.display.flip()
+
+            # Limit the frame rate to 60 FPS
+            pygame.time.Clock().tick(60)
+
+if __name__ == "__main__":
+    game = Game()
+    game.run()
+    
+
+
+
