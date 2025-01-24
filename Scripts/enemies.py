@@ -6,6 +6,10 @@ class Enemy(Character):
     def __init__(self, game, pos, size):
         super().__init__(game, 'Enemy', pos, size)
 
+
+        self.attackstat = 0.8
+
+        # How much the attack 
         self.attackDmg = 10
         self.maxHp = 100
         self.currentHp = self.maxHp
@@ -29,5 +33,18 @@ class Enemy(Character):
         # Have to use min(eslf.maxHp, ...) or the enemy's health 
         # will eventually overcap.
         self.currentHp = min(self.maxHp, self.currentHp + amount)
+
+    def basicAttack(self):
+        self.attackDmg = 10 * self.attackstat
+        return self.attackDmg
+    
+    def skillAttack(self):
+        self.attackDmg = 30 * self.attackstat
+        return self.attackDmg
+
+    def skillAttack2(self):
+        self.attackDmg = 50 * self.attackstat
+        return self.attackDmg        
+
 
     

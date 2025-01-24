@@ -23,6 +23,7 @@ class Player(Character):
 
         self.attacking = False
         self.maxSp = 100
+        self.attackstat = 0.8
 
         # Skill points will be the unit expensed when using a skill.
         self.currentSp = self.maxSp
