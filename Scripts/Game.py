@@ -23,10 +23,6 @@ class Game:
 
         }
 
-
-
-
-    
     def run(self):
         while True:
             
@@ -50,7 +46,7 @@ class Game:
 if __name__ == "__main__":
     game = Game()
     game.run()
-    
+
 
 
 
