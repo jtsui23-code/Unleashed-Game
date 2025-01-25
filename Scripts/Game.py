@@ -25,7 +25,11 @@ class Game:
             'Exit': Button(500, 400, 280, 50, 'Exit')
         }
 
-        self.gameStates = ['main', 'shop', 'battle', 'intermission', 'gameOver']
+        self.gameStates = {
+            'main': True, 'shop': False, 
+            'battle': False, 'intermission': False, 
+            'gameOver': False
+        }
 
         # Stores the selected button by the player.
         self.selectedOption = None
@@ -43,8 +47,10 @@ class Game:
     def run(self):
         while True:
             
-            # Draws the Main Menu when the game is in the main menu state.
-            self.drawMenu()
+            if self.gameStates['main']:
+                # Draws the Main Menu when the game is in the main menu state.
+                self.drawMenu()
+            
 
             
             # Event loop
