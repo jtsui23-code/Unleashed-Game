@@ -1,5 +1,6 @@
 import pygame
 import sys
+from Scripts.ui import TextBox, Button
 
 
 class Game:
@@ -17,12 +18,34 @@ class Game:
         # Treat the (_,_) as order pairs inside of ( (_,_) )
         self.screen = pygame.display.set_mode((1280 , 720 ))
 
+        # Stores the Buttons objects for the main menu.
+        self.menuState = "main"
+        self.menuOptions = {
+            'Start': Button(500, 300, 280, 50, 'Start'),
+            'Exit': Button(500, 400, 280, 50, 'Exit')
+        }
+
+        self.gameStates = ['main', 'shop', 'battle', 'intermission', 'gameOver']
+
+        # Stores the selected button by the player.
+        self.selectedOption = None
+
         self.assets = {
 
         }
+    
+    def drawMenu(self):
+        # Draw the menu options for the main menu.
+        for option in self.menuOptions.values():
+            option.draw(self.screen)
+
 
     def run(self):
         while True:
+            
+            # Draws the Main Menu when the game is in the main menu state.
+            self.drawMenu()
+
             
             # Event loop
             for event in pygame.event.get():
