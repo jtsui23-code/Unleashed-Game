@@ -1,5 +1,6 @@
 import pygame
 import sys
+from Scripts.ui import TextBox
 
 
 class Game:
@@ -17,9 +18,21 @@ class Game:
         # Treat the (_,_) as order pairs inside of ( (_,_) )
         self.screen = pygame.display.set_mode((1280 , 720 ))
 
+        self.menuState = "main"
+        self.menuOptions = {
+            'Start': TextBox(500, 300, 280, 50, 'Start'),
+            'Exit': TextBox(500, 400, 280, 50, 'Exit')
+        }
+
+        self.selectedOption = None
+
         self.assets = {
 
         }
+    
+    def drawMenu(self):
+        for option in self.menuOptions.values():
+            option.update(0.016)
 
     def run(self):
         while True:

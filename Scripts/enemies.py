@@ -1,5 +1,5 @@
 import pygame
-from character import Character
+from Scripts.character import Character
 
 class Enemy(Character):
 
