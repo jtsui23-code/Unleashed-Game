@@ -17,8 +17,6 @@ class Game:
         # Treat the (_,_) as order pairs inside of ( (_,_) )
         self.screen = pygame.display.set_mode((1280 , 720 ))
 
-        self.display = pygame.Surface((640, 360))
-
         self.assets = {
 
         }
