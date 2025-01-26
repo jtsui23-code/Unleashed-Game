@@ -35,9 +35,11 @@ class Game:
         }
 
         self.shopOptions = {
+            'Box': Button(50, 100, 1075, 500, ''),
             'Title': Text(500, 100, 280, 50, 'Upgrades', self.fonts['shopTitle'], self.titleColor),
-            'Upgrade': Button(500, 375, 280, 50, 'Upgrade'),
-            'Back': Button(500, 525, 280, 50, 'Back')
+            'Infection': Button(700, 450, 140, 50, 'Upgrade'),
+            'SP': Button(1000, 450, 140, 50, 'Upgrade'),
+            'Back': Button(100, 600, 140, 50, 'Back')
         }
 
         self.gameStates = {
