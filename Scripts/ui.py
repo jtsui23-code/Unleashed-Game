@@ -44,8 +44,8 @@ class Button:
         self.rect = pygame.Rect(x, y, width, height)
         self.text = text
         self.action = action
-        self.color = WHITE
-        self.hoverColor = BLACK
+        self.color = GRAY
+        self.hoverColor = WHITE
         self.isHovered = False
 
     def draw(self, surface):
@@ -70,15 +70,13 @@ class Button:
                     self.action()
 
 class Text:
-    def __init__(self, x, y, width, height, text, font, color):
+    def __init__(self, x, y, width, height, text, font,  color):
         self.rect = pygame.Rect(x, y, width, height)
         self.text = text
         self.font = font
         self.color = color
     
     def draw(self, surface):
-        pygame.draw.rect(surface, WHITE, self.rect)
-        pygame.draw.rect(surface, BLACK, self.rect, 2)
-        text_surf = self.font.render(self.text, True, BLACK)
+        text_surf = self.font.render(self.text, True, self.color)
         text_rect = text_surf.get_rect(center=self.rect.center)
         surface.blit(text_surf, text_rect)

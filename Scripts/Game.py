@@ -1,6 +1,6 @@
 import pygame
 import sys
-from ui import Button
+from ui import Button, Text
 
 
 class Game:
@@ -18,11 +18,21 @@ class Game:
         # Treat the (_,_) as order pairs inside of ( (_,_) )
         self.screen = pygame.display.set_mode((1280 , 720 ))
 
+        self.titleColor = (175, 23, 189)
+        self.titleFont = pygame.font.Font(None, 150)
         # Stores the Buttons objects for the main menu.
         self.menuState = "main"
-        self.menuOptions = {
-            'Start': Button(500, 300, 280, 50, 'Start'),
-            'Exit': Button(500, 400, 280, 50, 'Exit')
+        self.mainMenuOptions = {
+            'Title': Text(500, 200, 280, 50, 'Title of the Game', self.titleFont, self.titleColor),
+            'Start': Button(500, 375, 280, 50, 'Start'),
+            'Shop': Button(500, 450, 280, 50, 'Shop'),
+            'Exit': Button(500, 525, 280, 50, 'Exit')
+        }
+
+        self.shopOptions = {
+            'Title': Text(500, 200, 280, 50, 'Upgrades', self.titleFont, self.titleColor),
+            'Upgrade': Button(500, 375, 280, 50, 'Upgrade'),
+            'Back': Button(500, 525, 280, 50, 'Back')
         }
 
         self.gameStates = {
@@ -38,9 +48,9 @@ class Game:
 
         }
     
-    def drawMenu(self):
+    def drawMenu(self, menu):
         # Draw the menu options for the main menu.
-        for option in self.menuOptions.values():
+        for option in menu.values():
             option.draw(self.screen)
 
 
@@ -63,11 +73,11 @@ class Game:
 
                 # Get mouse position for hover effect on buttons.
                 mousePos = pygame.mouse.get_pos()
-                for button in self.menuOptions.values():
+                for button in self.mainMenuOptions.values():
                     button.isHovered = button.rect.collidepoint(mousePos)
-                    
+
                 # Draws the Main Menu when the game is in the main menu state.
-                self.drawMenu()
+                self.drawMenu(self.mainMenuOptions)
 
             # Display the screen
             pygame.display.flip()
