@@ -65,6 +65,21 @@ class Game:
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
+
+                # Check if the mouse button is pressed.
+                if event.type == pygame.MOUSEBUTTONDOWN:
+
+                    # Checks if the left mouse button is pressed.
+                    if event.button == 1:
+                        mousePos = pygame.mouse.get_pos()
+
+                        # Switches to the shop menu when the shop button is clicked.
+                        if self.gameStates['main']:
+                            if self.mainMenuOptions['Shop'].rect.collidepoint(mousePos):
+                                self.gameStates['main'] = False
+                                self.gameStates['shop'] = True
+                                self.drawMenu(self.shopOptions)
+
             
             # Fill the screen with black
             self.screen.fill((0, 0, 0))
