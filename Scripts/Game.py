@@ -60,6 +60,12 @@ class Game:
             self.screen.fill((0, 0, 0))
 
             if self.gameStates['main']:
+
+                # Get mouse position for hover effect on buttons.
+                mousePos = pygame.mouse.get_pos()
+                for button in self.menuOptions.values():
+                    button.isHovered = button.rect.collidepoint(mousePos)
+                    
                 # Draws the Main Menu when the game is in the main menu state.
                 self.drawMenu()
 
