@@ -2,9 +2,10 @@ import pygame
 import sys
 import os
 
+pygame.init()
 #Fonts
-TEXT_FOUNT = pygame.font.Font()
-BUTTON_FONT = pygame.font.Font()
+TEXT_FONT = pygame.font.Font(None,36)
+BUTTON_FONT = pygame.font.Font(None, 48)
 
 # Colors
 WHITE = (255, 255, 255)
@@ -35,7 +36,7 @@ class TextBox:
         pygame.draw.rect(surface, WHITE, self.rect)
         pygame.draw.rect(surface, BLACK, self.rect, 2)
         
-        text_surf = TEXT_FOUNT.render(self.animated_text, True, BLACK)
+        text_surf = TEXT_FONT.render(self.animated_text, True, BLACK)
         surface.blit(text_surf, (self.rect.x + 10, self.rect.y + 10))
 
 class Button:
