@@ -19,18 +19,23 @@ class Game:
         self.screen = pygame.display.set_mode((1280 , 720 ))
 
         self.titleColor = (175, 23, 189)
-        self.titleFont = pygame.font.Font(None, 150)
+
+        self.fonts = {
+            'title': pygame.font.Font(None, 150),
+            'shopTitle': pygame.font.Font(None, 100)
+        }
+        
         # Stores the Buttons objects for the main menu.
         self.menuState = "main"
         self.mainMenuOptions = {
-            'Title': Text(500, 200, 280, 50, 'Title of the Game', self.titleFont, self.titleColor),
+            'Title': Text(500, 200, 280, 50, 'Title of the Game', self.fonts['title'], self.titleColor),
             'Start': Button(500, 375, 280, 50, 'Start'),
             'Shop': Button(500, 450, 280, 50, 'Shop'),
             'Exit': Button(500, 525, 280, 50, 'Exit')
         }
 
         self.shopOptions = {
-            'Title': Text(500, 200, 280, 50, 'Upgrades', self.titleFont, self.titleColor),
+            'Title': Text(500, 100, 280, 50, 'Upgrades', self.fonts['shopTitle'], self.titleColor),
             'Upgrade': Button(500, 375, 280, 50, 'Upgrade'),
             'Back': Button(500, 525, 280, 50, 'Back')
         }
@@ -78,7 +83,19 @@ class Game:
                             if self.mainMenuOptions['Shop'].rect.collidepoint(mousePos):
                                 self.gameStates['main'] = False
                                 self.gameStates['shop'] = True
-                                self.drawMenu(self.shopOptions)
+
+                            # Exits the game when the exit button is clicked.
+                            if self.mainMenuOptions['Exit'].rect.collidepoint(mousePos):
+                                pygame.quit()
+                                sys.exit()
+
+                        # Switches back to the main menu when the back button is clicked.
+                        if self.gameStates['shop']:
+                            if self.shopOptions['Back'].rect.collidepoint(mousePos):
+                                self.gameStates['shop'] = False
+                                self.gameStates['main'] = True
+                        
+                        
 
             
             # Fill the screen with black
@@ -93,6 +110,11 @@ class Game:
 
                 # Draws the Main Menu when the game is in the main menu state.
                 self.drawMenu(self.mainMenuOptions)
+
+            # Draws the Shop Menu when the game is in the shop state.
+            elif self.gameStates['shop']:
+                self.drawMenu(self.shopOptions)
+
 
             # Display the screen
             pygame.display.flip()
