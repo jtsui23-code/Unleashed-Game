@@ -45,9 +45,12 @@ class Button:
         self.text = text
         self.action = action
         self.color = WHITE
-        self.hover_color = BLACK
+        self.hoverColor = BLACK
+        self.isHovered = False
 
     def draw(self, surface):
+
+        color = self.hoverColor if self.isHovered else self.color  
         pygame.draw.rect(surface, self.color, self.rect)
         pygame.draw.rect(surface, BLACK, self.rect, 2)
         text_surf = BUTTON_FONT.render(self.text, True, BLACK)
@@ -57,7 +60,7 @@ class Button:
     def handle_event(self, event):
         if event.type == pygame.MOUSEMOTION:
             if self.rect.collidepoint(event.pos):
-                self.color = self.hover_color
+                self.color = self.hoverColor
             else:
                 self.color = GRAY
         
