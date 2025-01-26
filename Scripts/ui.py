@@ -51,7 +51,7 @@ class Button:
     def draw(self, surface):
 
         color = self.hoverColor if self.isHovered else self.color  
-        pygame.draw.rect(surface, self.color, self.rect)
+        pygame.draw.rect(surface, color, self.rect)
         pygame.draw.rect(surface, BLACK, self.rect, 2)
         text_surf = BUTTON_FONT.render(self.text, True, BLACK)
         text_rect = text_surf.get_rect(center=self.rect.center)

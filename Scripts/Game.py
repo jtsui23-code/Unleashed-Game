@@ -65,6 +65,7 @@ class Game:
                 mousePos = pygame.mouse.get_pos()
                 for button in self.menuOptions.values():
                     button.isHovered = button.rect.collidepoint(mousePos)
+                    
                 # Draws the Main Menu when the game is in the main menu state.
                 self.drawMenu()
 
