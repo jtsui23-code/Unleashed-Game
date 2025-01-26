@@ -1,6 +1,6 @@
 import pygame
 import sys
-from Scripts.ui import TextBox, Button
+from ui import Button
 
 
 class Game:
@@ -47,11 +47,6 @@ class Game:
     def run(self):
         while True:
             
-            if self.gameStates['main']:
-                # Draws the Main Menu when the game is in the main menu state.
-                self.drawMenu()
-            
-
             
             # Event loop
             for event in pygame.event.get():
@@ -63,6 +58,10 @@ class Game:
             
             # Fill the screen with black
             self.screen.fill((0, 0, 0))
+
+            if self.gameStates['main']:
+                # Draws the Main Menu when the game is in the main menu state.
+                self.drawMenu()
 
             # Display the screen
             pygame.display.flip()
