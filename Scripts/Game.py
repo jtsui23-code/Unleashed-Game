@@ -18,7 +18,7 @@ class Game:
         # Treat the (_,_) as order pairs inside of ( (_,_) )
         self.screen = pygame.display.set_mode((1280 , 720 ))
 
-        self.titleColor = (175, 23, 189)
+        self.titleColor = (200, 50, 50)
 
         self.fonts = {
             'title': pygame.font.Font(None, 150),
@@ -34,13 +34,14 @@ class Game:
             'Shop': Button(500, 450, 280, 50, 'Shop'),
             'Exit': Button(500, 525, 280, 50, 'Exit')
         }
-
+        
         self.shopOptions = {
             'Box': Button(200, 75, 900, 600, ''),
             'Title': Text(500, 100, 280, 50, 'Upgrades', self.fonts['shopTitle'], self.titleColor),
-            'Infection': Button(700, 450, 140, 50, 'Upgrade'),
-            'SP': Button(1000, 450, 140, 50, 'Upgrade'),
-            'Back': Button(580, 600, 140, 50, 'Back')
+            'Attack':Button(275, 500, 140,50, 'Attack'),
+            'Infection': Button(575, 500, 140, 50, 'Infect'),
+            'SP': Button(875, 500, 140, 50, 'SP'),
+            'Back': Button(20, 620, 140, 50, 'Back')
         }
 
         self.gameStates = {
