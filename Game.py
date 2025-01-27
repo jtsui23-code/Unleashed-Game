@@ -1,7 +1,7 @@
 import pygame
 import sys
-from ui import Button, Text
-
+from Scripts.ui import Button, Text
+from Scripts.util import loadImage
 
 class Game:
     
@@ -55,6 +55,7 @@ class Game:
         self.selectedOption = None
 
         self.assets = {
+            'titleBackground':pygame.transform.scale(loadImage('/background/otherTitle.png').convert_alpha(), (1280, 720))
 
         }
     
@@ -103,8 +104,7 @@ class Game:
                         
 
             
-            # Fill the screen with black
-            self.screen.fill((0, 0, 0))
+            
 
             if self.gameStates['main']:
 
@@ -113,8 +113,12 @@ class Game:
                 for button in self.mainMenuOptions.values():
                     button.isHovered = button.rect.collidepoint(mousePos)
 
+                # Fill the title screen background.
+                self.screen.blit(self.assets['titleBackground'],(0, 0))
+
                 # Draws the Main Menu when the game is in the main menu state.
                 self.drawMenu(self.mainMenuOptions)
+                
 
             # Draws the Shop Menu when the game is in the shop state.
             elif self.gameStates['shop']:
