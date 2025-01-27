@@ -27,6 +27,7 @@ class Game:
         
         # Stores the Buttons objects for the main menu.
         self.menuState = "main"
+
         self.mainMenuOptions = {
             'Title': Text(500, 200, 280, 50, 'Title of the Game', self.fonts['title'], self.titleColor),
             'Start': Button(500, 375, 280, 50, 'Start'),
@@ -35,15 +36,16 @@ class Game:
         }
 
         self.shopOptions = {
-            'Box': Button(50, 100, 1075, 500, ''),
+            'Box': Button(200, 75, 900, 600, ''),
             'Title': Text(500, 100, 280, 50, 'Upgrades', self.fonts['shopTitle'], self.titleColor),
             'Infection': Button(700, 450, 140, 50, 'Upgrade'),
             'SP': Button(1000, 450, 140, 50, 'Upgrade'),
-            'Back': Button(100, 600, 140, 50, 'Back')
+            'Back': Button(580, 600, 140, 50, 'Back')
         }
 
         self.gameStates = {
             'main': True, 'shop': False, 
+            'startGame':False,
             'battle': False, 'intermission': False, 
             'gameOver': False
         }
