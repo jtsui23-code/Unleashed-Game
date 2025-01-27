@@ -25,6 +25,7 @@ class Game:
             'shopTitle': pygame.font.Font(None, 100)
         }
         
+        # Stores the TextBox objects for the introduction exposition.
         self.startingText = {
             'Intro': TextBox(200, 75, 900, 600, text="Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah")
         }
@@ -32,6 +33,7 @@ class Game:
         # Stores the Buttons objects for the main menu.
         self.menuState = "main"
 
+        # Stores the Button objects for the main menu.
         self.mainMenuOptions = {
             'Title': Text(500, 200, 280, 50, 'Title of the Game', self.fonts['title'], self.titleColor),
             'Start': Button(500, 375, 280, 50, 'Start'),
@@ -39,6 +41,7 @@ class Game:
             'Exit': Button(500, 525, 280, 50, 'Exit')
         }
         
+        # Stores the Button objects for the shop menu.
         self.shopOptions = {
             'Box': Button(200, 75, 900, 600, ''),
             'Title': Text(500, 100, 280, 50, 'Upgrades', self.fonts['shopTitle'], self.titleColor),
@@ -48,6 +51,7 @@ class Game:
             'Back': Button(20, 620, 140, 50, 'Back')
         }
 
+        # Maintains the game state to determine which menu to display.
         self.gameStates = {
             'main': True, 'shop': False, 
             'startGame':False,

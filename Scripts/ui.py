@@ -25,24 +25,36 @@ class TextBox:
         self.current_char = 0
         self.line_height = TEXT_FONT.get_linesize()
         self.max_chars_per_line = (width - 20) // TEXT_FONT.size('A')[0]
+
+        # Wrap text to fit in the box.
         self.lines = self.wrap_text()
 
     def wrap_text(self):
+
+        # Split text into words to allow for repositioning them
+        # to lower lines if they don't fit in the current line.
         words = self.text.split()
         lines = []
         current_line = []
         current_width = 0
 
         for word in words:
+
+            # Check if the word fits in the current line.
             word_width = TEXT_FONT.size(word + ' ')[0]
+
+            # If the word fits, add it to the current line.
             if current_width + word_width <= self.rect.width - 20:
                 current_line.append(word)
                 current_width += word_width
+
+            # If the word doesn't fit, start a new line.
             else:
                 lines.append(' '.join(current_line))
                 current_line = [word]
                 current_width = word_width
-        
+                
+        # Add the last line to the list of lines.
         if current_line:
             lines.append(' '.join(current_line))
         return lines
