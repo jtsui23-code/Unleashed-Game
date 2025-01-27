@@ -75,6 +75,10 @@ class TextBox:
 
     def isTyping(self):
         return self.isFinished
+    
+    def skipTyping(self):
+        self.animated_text = self.text
+        self.isFinished = True
 
     def draw(self, surface):
         pygame.draw.rect(surface, WHITE, self.rect)
