@@ -29,6 +29,8 @@ class TextBox:
         # Wrap text to fit in the box.
         self.lines = self.wrap_text()
 
+        self.isFinished = False
+
     def wrap_text(self):
 
         # Split text into words to allow for repositioning them
@@ -53,7 +55,7 @@ class TextBox:
                 lines.append(' '.join(current_line))
                 current_line = [word]
                 current_width = word_width
-                
+
         # Add the last line to the list of lines.
         if current_line:
             lines.append(' '.join(current_line))
@@ -68,6 +70,11 @@ class TextBox:
                 self.animated_text += self.text[self.current_char]
                 self.current_char += 1
                 self.animation_timer = 0
+        else:
+            self.isFinished = True
+
+    def isTyping(self):
+        return self.isFinished
 
     def draw(self, surface):
         pygame.draw.rect(surface, WHITE, self.rect)

@@ -59,14 +59,22 @@ class Game:
             'gameOver': False
         }
 
+       
+
         # Stores the selected button by the player.
         self.selectedOption = None
 
         self.assets = {
-            'titleBackground':pygame.transform.scale(loadImage('/background/otherTitle.png').convert_alpha(), (1280, 720))
+            'titleBackground':pygame.transform.scale(loadImage('/background/otherTitle.png').convert_alpha(), (1280, 720)),
+            'intermission': pygame.transform.scale(loadImage('/background/intermission.png').convert_alpha(), (1280, 720))
 
         }
-    
+
+        self.intermission = {
+            'left': Button(100, 300, 200, 100, 'Left'),
+            'right': Button(1000, 300, 200, 100, 'Right')
+        }
+
     def drawMenu(self, menu):
         # Draw the menu options for the main menu.
         for option in menu.values():
@@ -149,6 +157,15 @@ class Game:
                 # Writes the introduction exposition with the typing animation.
                 self.startingText['Intro'].update(dt) # Adds next character from text
                 self.drawMenu(self.startingText)  # Draw the text box
+
+                if self.startingText['Intro'].isTyping():
+                    self.gameStates['Start'] = False
+                    self.gameStates['intermission'] = True
+
+                    # Draws the intermission background and the buttons within the 
+                    # intermission screen.
+                    self.screen.blit(self.assets['intermission'], (0, 0))
+                    self.drawMenu(self.intermission)
 
             # Display the screen
             pygame.display.flip()
