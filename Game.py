@@ -159,20 +159,21 @@ class Game:
                 self.drawMenu(self.startingText)  # Draw the text box
 
                 if self.startingText['Intro'].isTyping():
+                    
+                    for event in pygame.event.get():
+                        if event.type == pygame.MOUSEBUTTONDOWN:
+                            if event.button == 1:
+                                # If the text is not finsihed typing, 
+                                # and the user clicks the screen, skip the typing animation.
+                                if not self.startingText['Intro'].isTyping():
+                                    self.startingText['Intro'].skipTyping()
 
-                    for event in pygame.MOUSEBUTTONDOWN:
-                        if event.button == 1:
-                            # If the text is not finsihed typing, 
-                            # and the user clicks the screen, skip the typing animation.
-                            if not self.startingText['Intro'].isTyping():
-                                self.startingText['Intro'].skipTyping()
-
-                            # If the text is finished typing, performs an
-                            # additional click which will exist the 
-                            # exposition.
-                            else:
-                                self.gameStates['Start'] = False
-                                self.gameStates['intermission'] = True
+                                # If the text is finished typing, performs an
+                                # additional click which will exist the 
+                                # exposition.
+                                else:
+                                    self.gameStates['Start'] = False
+                                    self.gameStates['intermission'] = True
 
                     # Draws the intermission background and the buttons within the 
                     # intermission screen.
