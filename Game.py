@@ -1,6 +1,6 @@
 import pygame
 import sys
-from Scripts.ui import Button, Text
+from Scripts.ui import Button, Text, TextBox
 from Scripts.util import loadImage
 
 class Game:
@@ -25,6 +25,10 @@ class Game:
             'shopTitle': pygame.font.Font(None, 100)
         }
         
+        self.startingText = {
+            'Intro': TextBox(200, 75, 900, 600, text="Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah")
+        }
+
         # Stores the Buttons objects for the main menu.
         self.menuState = "main"
 
@@ -67,7 +71,8 @@ class Game:
 
     def run(self):
         while True:
-            
+            clock = pygame.time.Clock() # Initiates clock
+
             
             # Event loop
             for event in pygame.event.get():
@@ -94,6 +99,12 @@ class Game:
                             if self.mainMenuOptions['Exit'].rect.collidepoint(mousePos):
                                 pygame.quit()
                                 sys.exit()
+
+                            # Starts game when start button is hit.
+                            if self.mainMenuOptions['Start'].rect.collidepoint(mousePos):
+                                self.gameStates['Start'] = True
+                                self.gameStates['main'] = False
+                                self.gameStates['shop'] = False
 
                         # Switches back to the main menu when the back button is clicked.
                         if self.gameStates['shop']:
@@ -124,6 +135,16 @@ class Game:
             elif self.gameStates['shop']:
                 self.drawMenu(self.shopOptions)
 
+            
+            elif self.gameStates['Start']:
+                # Changes the background when the intro exposition starts.
+                self.screen.fill((0,0,0))
+
+                dt = clock.tick(60) / 1#500.0  # Time in seconds since last frame
+
+                # Writes the introduction exposition with the typing animation.
+                self.startingText['Intro'].update(dt) # Adds next character from text
+                self.drawMenu(self.startingText)  # Draw the text box
 
             # Display the screen
             pygame.display.flip()

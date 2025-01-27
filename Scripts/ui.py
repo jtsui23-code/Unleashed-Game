@@ -1,6 +1,7 @@
 import pygame
 import sys
 import os
+import textwrap
 
 pygame.init()
 #Fonts
@@ -22,6 +23,30 @@ class TextBox:
         self.animation_speed = 0.2  # Characters per frame
         self.animation_timer = 0    
         self.current_char = 0
+        self.line_height = TEXT_FONT.get_linesize()
+        self.max_chars_per_line = (width - 20) // TEXT_FONT.size('A')[0]
+        self.lines = self.wrap_text()
+
+    def wrap_text(self):
+        words = self.text.split()
+        lines = []
+        current_line = []
+        current_width = 0
+
+        for word in words:
+            word_width = TEXT_FONT.size(word + ' ')[0]
+            if current_width + word_width <= self.rect.width - 20:
+                current_line.append(word)
+                current_width += word_width
+            else:
+                lines.append(' '.join(current_line))
+                current_line = [word]
+                current_width = word_width
+        
+        if current_line:
+            lines.append(' '.join(current_line))
+        return lines
+
 
     def update(self, dt): # dt is the amount of time between letters appearing 
         # animated text must be less than the full text to prevent overflow
@@ -36,9 +61,26 @@ class TextBox:
         pygame.draw.rect(surface, WHITE, self.rect)
         pygame.draw.rect(surface, BLACK, self.rect, 2)
         
-        text_surf = TEXT_FONT.render(self.animated_text, True, BLACK)
-        surface.blit(text_surf, (self.rect.x + 10, self.rect.y + 10))
-
+        y = self.rect.y + 10
+        visible_text = self.animated_text
+        
+        for line in self.lines:
+            if not visible_text:
+                break
+            if len(visible_text) > len(line):
+                text_to_render = line
+                visible_text = visible_text[len(line):]
+            else:
+                text_to_render = visible_text
+                visible_text = ''
+            
+            text_surf = TEXT_FONT.render(text_to_render, True, BLACK)
+            surface.blit(text_surf, (self.rect.x + 10, y))
+            y += self.line_height
+            
+            if y + self.line_height > self.rect.bottom - 10:
+                break
+            
 class Button:
     def __init__(self, x, y, width, height, text, action=None):
         self.rect = pygame.Rect(x, y, width, height)
