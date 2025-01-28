@@ -74,10 +74,12 @@ class TextBox:
             self.isFinished = True
 
     def isTyping(self):
-        return self.isFinished
+        return not self.isFinished
     
     def skipTyping(self):
         self.animated_text = self.text
+        self.current_char = len(self.text) # Ensure that the current_char is the last character
+        self.animation_timer = 0 # Reset the animation timer
         self.isFinished = True
 
     def draw(self, surface):
