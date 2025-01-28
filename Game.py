@@ -206,8 +206,7 @@ class Game:
                 self.drawMenu(self.itemReward)
 
                 dt = clock.tick(60) / 1
-            if not self.gameStates['main'] or not self.gameStates['Start']:
-                self.assets['titleSong'].stop()
+            
 
             # Fill the screen with black
             self.screen.fill((0, 0, 0))
