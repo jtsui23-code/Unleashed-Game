@@ -1,5 +1,6 @@
 import pygame
 import sys
+import random
 from Scripts.ui import Button, Text, TextBox
 from Scripts.util import loadImage
 
@@ -115,6 +116,26 @@ class Game:
                     # Checks if the left mouse button is pressed.
                     if event.button == 1:
                         mousePos = pygame.mouse.get_pos()
+                        if self.gameStates['intermission']:
+                            if self.intermission['right'].rect.collidepoint(mousePos):
+                                random.seed(42)
+                                if random.random() < .5:
+                                    self.gameStates['battle'] = False
+                                    self.gameStates['intermission'] = True
+                                else:
+                                    self.gameStates['intermission'] = False
+                                    self.gameStates['battle'] = True
+
+                            
+                        elif self.intermission['left'].rect.collidepoint(mousePos):
+                            random.seed(42)
+                            if random.random() < .5:
+                                self.gameStates['battle'] = False
+                                self.gameStates['intermission'] = True
+                            else:
+                                self.gameStates['intermission'] = False
+                                self.gameStates['battle'] = True
+
 
                         # Switches to the shop menu when the shop button is clicked.
                         if self.gameStates['main']:
@@ -189,6 +210,7 @@ class Game:
                                 self.gameStates['Start'] = False
                                 self.gameStates['intermission'] = True
                                 self.assets['intermissionSong'].play(-1)
+
 
             if self.gameStates['intermission']:
 
