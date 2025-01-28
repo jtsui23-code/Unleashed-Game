@@ -152,7 +152,7 @@ class Game:
                 # Changes the background when the intro exposition starts.
                 self.screen.fill((0,0,0))
 
-                dt = clock.tick(60) / 1#500.0  # Time in seconds since last frame
+                dt = clock.tick(60) / 1  # Time in seconds since last frame
 
                 # Writes the introduction exposition with the typing animation.
                 self.startingText['Intro'].update(dt) # Adds next character from text
@@ -161,11 +161,12 @@ class Game:
                 if self.startingText['Intro'].isTyping():
                     
                     for event in pygame.event.get():
+
                         if event.type == pygame.MOUSEBUTTONDOWN:
                             if event.button == 1:
                                 # If the text is not finsihed typing, 
                                 # and the user clicks the screen, skip the typing animation.
-                                if not self.startingText['Intro'].isTyping():
+                                if self.startingText['Intro'].isTyping():
                                     self.startingText['Intro'].skipTyping()
 
                                 # If the text is finished typing, performs an
@@ -175,10 +176,12 @@ class Game:
                                     self.gameStates['Start'] = False
                                     self.gameStates['intermission'] = True
 
-                    # Draws the intermission background and the buttons within the 
-                    # intermission screen.
-                    self.screen.blit(self.assets['intermission'], (0, 0))
-                    self.drawMenu(self.intermission)
+                    if self.gameStates['intermission']:
+                        # Draws the intermission background and the buttons within the 
+                        # intermission screen.
+                        self.screen.blit(self.assets['intermission'], (0, 0))
+                        self.drawMenu(self.intermission)
+
 
             # Display the screen
             pygame.display.flip()
