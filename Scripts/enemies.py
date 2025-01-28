@@ -60,6 +60,9 @@ class Enemy(Character):
         else:
             return self.basicAttack()
         
+    def infected(self, defaultInfectionRate):
+        pass
+        
 #    def skillAttack(self):
 #        self.attackDmg = 30 * self.attacksta
 #        return self.attackDmg
