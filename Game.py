@@ -115,8 +115,7 @@ class Game:
                     if event.button == 1:
                         mousePos = pygame.mouse.get_pos()
 
-                        # After pressing left or right button,
-                        # create a 75% chance for a battle and a 25% chance for a bonus intermission
+                        # After pressing left or right button, create a 75% chance for a battle and a 25% chance for a bonus intermission
                         if self.gameStates['intermission']:
                             if self.intermission['right'].rect.collidepoint(mousePos):
                                 random.seed(42)
