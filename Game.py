@@ -30,12 +30,12 @@ class Game:
             'Intro': TextBox(200, 75, 900, 600, text="Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah")
         }
 
-        # Stores the Buttons objects for the main menu.
+        # Stores the Buttons objects for the main menu
         self.menuState = "main"
 
         # Stores the Button objects for the main menu.
         self.mainMenuOptions = {
-            'Title': Text(500, 200, 280, 50, 'Title of the Game', self.fonts['title'], self.titleColor),
+            'Title': Text(500, 200, 280, 50, 'Unleeched', self.fonts['title'], self.titleColor),
             'Start': Button(500, 375, 280, 50, 'Start'),
             'Shop': Button(500, 450, 280, 50, 'Shop'),
             'Exit': Button(500, 525, 280, 50, 'Exit')
@@ -63,7 +63,8 @@ class Game:
 
         # Maintains the game state to determine which menu to display.
         self.gameStates = {
-            'main': True, 'shop': False, 
+            'main': True, 
+            'shop': False, 
             'startGame':False,
             'battle': False, 'intermission': False, 
             'gameOver': False
