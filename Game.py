@@ -33,7 +33,7 @@ class Game:
             'Intro': TextBox(200, 75, 900, 600, text="Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah")
         }
 
-        # Stores the Buttons objects for the main menu
+        # Stores the Buttons objects for the main menu.
         self.menuState = "main"
 
         # Stores the Button objects for the main menu.
