@@ -40,6 +40,16 @@ class Game:
             'Shop': Button(500, 450, 280, 50, 'Shop'),
             'Exit': Button(500, 525, 280, 50, 'Exit')
         }
+
+        # Stores the Button objects for the battle menu.
+        self.battle = {
+            # The text box is at the beginning of the map because it will be the first thing to be drawn.
+            'Text': TextBox(200, 75, 900, 600, text=''),
+            'Attack': Button(500, 500, 280, 50, 'Attack'),
+            'Skill': Button(500, 575, 280, 50, 'Skill'),
+            'Guard': Button(500, 575, 280, 50, 'Guard'),
+            'Inventory': Button(500, 650, 280, 50, 'Inventory')
+        }
         
         # Stores the Button objects for the shop menu.
         self.shopOptions = {
@@ -66,7 +76,8 @@ class Game:
 
         self.assets = {
             'titleBackground':pygame.transform.scale(loadImage('/background/otherTitle.png').convert_alpha(), (1280, 720)),
-            'intermission': pygame.transform.scale(loadImage('/background/intermission.png').convert_alpha(), (1280, 720))
+            'intermission': pygame.transform.scale(loadImage('/background/intermission.png').convert_alpha(), (1280, 720)),
+            'intermissionSong': pygame.mixer.Sound('Media/Music/intermission.mp3')
 
         }
 
@@ -173,8 +184,16 @@ class Game:
                             else:
                                 self.gameStates['Start'] = False
                                 self.gameStates['intermission'] = True
+                                self.assets['intermissionSong'].play(-1)
 
             if self.gameStates['intermission']:
+
+                # Get mouse position for hover effect on buttons.
+                mousePos = pygame.mouse.get_pos()
+                for button in self.intermission.values():
+                    button.isHovered = button.rect.collidepoint(mousePos)
+
+                
                 # Draws the intermission background and the buttons within the 
                 # intermission screen.
                 self.screen.blit(self.assets['intermission'], (0, 0))
