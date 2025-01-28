@@ -63,6 +63,12 @@ class Game:
             'Back': Button(20, 620, 140, 50, 'Back')
         }
 
+        #self.upgrades = {
+        #    'attack': 0,
+        #    'infection': 0,
+        #    'sp': 0
+        #}
+
         # Maintains the game state to determine which menu to display.
         self.gameStates = {
             'main': True, 
@@ -159,6 +165,12 @@ class Game:
                             if self.shopOptions['Back'].rect.collidepoint(mousePos):
                                 self.gameStates['shop'] = False
                                 self.gameStates['main'] = True
+                         #   elif self.shopOptions['Attack'].rect.collidepoint(mousePos):
+                         #       self.gameStates['attack' + 1]
+                         #   elif self.shopOptions['Infection'].rect.collidepoint(mousePos):
+                         #       self.gameStates['infection' + 1]
+                         #   elif self.shopOptions['SP'].rect.collidepoint(mousePos):
+                         #       self.gameStates['sp' + 1]
                         
                         
 
