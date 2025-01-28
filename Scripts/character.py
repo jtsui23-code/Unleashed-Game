@@ -80,16 +80,16 @@ class Player(Character):
 
     # Upgrades the states of the player based on number of purchased 
     # upgrades in the shop.
-    # def stateUpgrade(self, state=''):
+    def stateUpgrade(self, state=''):
         
-    #     if state == 'Attack':
-    #         self.attackstat += 0.2
+        if state == 'Attack':
+            self.attackstat += 0.2
 
-    #     if state == 'SP':
-    #         self.maxSP += 10
+        if state == 'SP':
+            self.maxSP += 10
 
-    #     if state == 'Infection':
-    #         self.infectRate += 0.5
+        if state == 'Infection':
+            self.infectRate += 0.5
 
 
     
