@@ -21,7 +21,7 @@ class Game:
         self.titleColor = (200, 50, 50)
 
         self.fonts = {
-            'title': pygame.font.Font(None, 150),
+            'title': pygame.font.Font('Media/Assets/Fonts/fantasy.ttf', 100),
             'shopTitle': pygame.font.Font(None, 100)
         }
         
@@ -158,29 +158,27 @@ class Game:
                 self.startingText['Intro'].update(dt) # Adds next character from text
                 self.drawMenu(self.startingText)  # Draw the text box
 
-                if self.startingText['Intro'].isTyping():
-                    
-                    for event in pygame.event.get():
+                for event in pygame.event.get():
 
-                        if event.type == pygame.MOUSEBUTTONDOWN:
-                            if event.button == 1:
-                                # If the text is not finsihed typing, 
-                                # and the user clicks the screen, skip the typing animation.
-                                if self.startingText['Intro'].isTyping():
-                                    self.startingText['Intro'].skipTyping()
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                        if event.button == 1:
+                            # If the text is not finsihed typing, 
+                            # and the user clicks the screen, skip the typing animation.
+                            if self.startingText['Intro'].isTyping():
+                                self.startingText['Intro'].skipTyping()
 
-                                # If the text is finished typing, performs an
-                                # additional click which will exist the 
-                                # exposition.
-                                else:
-                                    self.gameStates['Start'] = False
-                                    self.gameStates['intermission'] = True
+                            # If the text is finished typing, performs an
+                            # additional click which will exist the 
+                            # exposition.
+                            else:
+                                self.gameStates['Start'] = False
+                                self.gameStates['intermission'] = True
 
-                    if self.gameStates['intermission']:
-                        # Draws the intermission background and the buttons within the 
-                        # intermission screen.
-                        self.screen.blit(self.assets['intermission'], (0, 0))
-                        self.drawMenu(self.intermission)
+            if self.gameStates['intermission']:
+                # Draws the intermission background and the buttons within the 
+                # intermission screen.
+                self.screen.blit(self.assets['intermission'], (0, 0))
+                self.drawMenu(self.intermission)
 
 
             # Display the screen
