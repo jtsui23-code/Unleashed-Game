@@ -1,5 +1,28 @@
 import pygame
 import math
+from ui import TextBox, Text
+
+class skill:
+    def __init__(self, name, dmg, cooldown, cost):
+        self.name = name
+        self.damage = dmg
+        self.cooldown = cooldown
+        self.currentCD = 0
+        self.sp = cost
+        self.text = Text(200, 75, 900, 600, name + '!')
+
+    def use(self):
+        self.text.print # Prints message declaring skill
+        self.currentCD = self.cooldown
+        return self.damage
+    
+    def cooldown(self):
+        return self.currentCD
+
+    def reduceCD(self):
+        if self.currentCD:
+            self.currentCD - 1
+
 
 class Character:
 
