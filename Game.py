@@ -17,10 +17,7 @@ class Game:
         # Creating a screen variable with the window dimension variables set above
         # when setting window dimensions have to do .set_mode( (_,_) )
         # Treat the (_,_) as order pairs inside of ( (_,_) ).
-<<<<<<< HEAD
-=======
         
->>>>>>> f88e681fc3788ee67362f48724165ccceb3f8b28
         self.screen = pygame.display.set_mode((1280 , 720 ))
 
         self.titleColor = (200, 50, 50)
@@ -97,6 +94,14 @@ class Game:
             'left': Button(100, 300, 200, 100, 'Left'),
             'right': Button(1000, 300, 200, 100, 'Right')
         }
+        
+        # Maintains and increments the numbers of upgrades purchased in
+        # the shop.
+        self.upgrades = {
+            'Attack':0,
+            'SP': 0, 
+            'Infection': 0
+        }
 
     def drawMenu(self, menu):
         # Draw the menu options for the main menu.
@@ -168,12 +173,18 @@ class Game:
                             if self.shopOptions['Back'].rect.collidepoint(mousePos):
                                 self.gameStates['shop'] = False
                                 self.gameStates['main'] = True
-                         #   elif self.shopOptions['Attack'].rect.collidepoint(mousePos):
-                         #       self.gameStates['attack' + 1]
-                         #   elif self.shopOptions['Infection'].rect.collidepoint(mousePos):
-                         #       self.gameStates['infection' + 1]
-                         #   elif self.shopOptions['SP'].rect.collidepoint(mousePos):
-                         #       self.gameStates['sp' + 1]
+
+                            elif self.shopOptions['Attack'].rect.collidepoint(mousePos):
+                                if self.upgrades['Attack'] < 4:
+                                    self.upgrades['Attack']+= 1
+
+                            elif self.shopOptions['Infection'].rect.collidepoint(mousePos):
+                                if self.upgrades['Infection'] < 4:
+                                    self.upgrades['Infection'] += 1
+
+                            elif self.shopOptions['SP'].rect.collidepoint(mousePos):
+                                  if self.upgrades['SP'] < 4:
+                                    self.upgrades['SP']+= 1
                         
                         
 
@@ -188,6 +199,8 @@ class Game:
                 for button in self.mainMenuOptions.values():
                     button.isHovered = button.rect.collidepoint(mousePos)
 
+
+                self.screen.blit((self.assets['titleBackground']), (0,0))
                 # Draws the Main Menu when the game is in the main menu state.
                 self.drawMenu(self.mainMenuOptions)
 
