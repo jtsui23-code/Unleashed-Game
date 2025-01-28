@@ -228,8 +228,6 @@ class Game:
 
             if self.gameStates['main']:
 
-                self.assets['titleSong'].play(-1)
-
                 # Get mouse position for hover effect on buttons.
                 mousePos = pygame.mouse.get_pos()
                 for button in self.mainMenuOptions.values():
@@ -270,8 +268,6 @@ class Game:
                             else:
                                 self.gameStates['Start'] = False
                                 self.gameStates['intermission'] = True
-                                pygame.mixer.music.stop()
-                                self.assets['intermissionSong'].play(-1)
 
 
             if self.gameStates['intermission']:
