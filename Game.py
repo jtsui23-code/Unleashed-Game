@@ -1,5 +1,6 @@
 import pygame
 import sys
+import random
 from Scripts.ui import Button, Text, TextBox
 from Scripts.util import loadImage
 
@@ -16,6 +17,10 @@ class Game:
         # Creating a screen variable with the window dimension variables set above
         # when setting window dimensions have to do .set_mode( (_,_) )
         # Treat the (_,_) as order pairs inside of ( (_,_) ).
+<<<<<<< HEAD
+=======
+        
+>>>>>>> f88e681fc3788ee67362f48724165ccceb3f8b28
         self.screen = pygame.display.set_mode((1280 , 720 ))
 
         self.titleColor = (200, 50, 50)
@@ -60,6 +65,12 @@ class Game:
             'SP': Button(875, 500, 140, 50, 'SP'),
             'Back': Button(20, 620, 140, 50, 'Back')
         }
+
+        #self.upgrades = {
+        #    'attack': 0,
+        #    'infection': 0,
+        #    'sp': 0
+        #}
 
         # Maintains the game state to determine which menu to display.
         self.gameStates = {
@@ -113,6 +124,28 @@ class Game:
                     if event.button == 1:
                         mousePos = pygame.mouse.get_pos()
 
+                        # After pressing left or right button, create a 75% chance for a battle and a 25% chance for a bonus intermission
+                        if self.gameStates['intermission']:
+                            if self.intermission['right'].rect.collidepoint(mousePos):
+                                random.seed(42)
+                                if random.random() < .25:
+                                    self.gameStates['battle'] = False
+                                    self.gameStates['intermission'] = True
+                                else:
+                                    self.gameStates['intermission'] = False
+                                    self.gameStates['battle'] = True
+
+                            
+                        elif self.intermission['left'].rect.collidepoint(mousePos):
+                            random.seed(42)
+                            if random.random() < .25:
+                                self.gameStates['battle'] = False
+                                self.gameStates['intermission'] = True
+                            else:
+                                self.gameStates['intermission'] = False
+                                self.gameStates['battle'] = True
+
+
                         # Switches to the shop menu when the shop button is clicked.
                         if self.gameStates['main']:
                             if self.mainMenuOptions['Shop'].rect.collidepoint(mousePos):
@@ -135,11 +168,18 @@ class Game:
                             if self.shopOptions['Back'].rect.collidepoint(mousePos):
                                 self.gameStates['shop'] = False
                                 self.gameStates['main'] = True
+                         #   elif self.shopOptions['Attack'].rect.collidepoint(mousePos):
+                         #       self.gameStates['attack' + 1]
+                         #   elif self.shopOptions['Infection'].rect.collidepoint(mousePos):
+                         #       self.gameStates['infection' + 1]
+                         #   elif self.shopOptions['SP'].rect.collidepoint(mousePos):
+                         #       self.gameStates['sp' + 1]
                         
                         
 
             
-            
+            # Fill the screen with black
+            self.screen.fill((0, 0, 0))
 
             if self.gameStates['main']:
 
@@ -148,12 +188,8 @@ class Game:
                 for button in self.mainMenuOptions.values():
                     button.isHovered = button.rect.collidepoint(mousePos)
 
-                # Fill the title screen background.
-                self.screen.blit(self.assets['titleBackground'],(0, 0))
-
                 # Draws the Main Menu when the game is in the main menu state.
                 self.drawMenu(self.mainMenuOptions)
-                
 
             # Draws the Shop Menu when the game is in the shop state.
             elif self.gameStates['shop']:
@@ -186,6 +222,7 @@ class Game:
                                 self.gameStates['Start'] = False
                                 self.gameStates['intermission'] = True
                                 self.assets['intermissionSong'].play(-1)
+
 
             if self.gameStates['intermission']:
 
