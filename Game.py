@@ -63,11 +63,16 @@ class Game:
             'Back': Button(20, 620, 140, 50, 'Back')
         }
 
-        #self.upgrades = {
-        #    'attack': 0,
-        #    'infection': 0,
-        #    'sp': 0
-        #}
+        self.upgrades = {
+           'attack': 0,
+           'infection': 0,
+           'sp': 0
+        }
+
+        self.itemReward = {
+            'Intro': TextBox(200, 400, 900, 200, text="Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah")
+
+        }
 
         # Maintains the game state to determine which menu to display.
         self.gameStates = {
@@ -75,7 +80,9 @@ class Game:
             'shop': False, 
             'startGame':False,
             'battle': False, 'intermission': False, 
-            'gameOver': False
+            'gameOver': False,
+            'itemReward': False,
+            
         }
 
        
@@ -86,8 +93,8 @@ class Game:
         self.assets = {
             'titleBackground':pygame.transform.scale(loadImage('/background/otherTitle.png').convert_alpha(), (1280, 720)),
             'intermission': pygame.transform.scale(loadImage('/background/intermission.png').convert_alpha(), (1280, 720)),
-            'intermissionSong': pygame.mixer.Sound('Media/Music/intermission.mp3')
-
+            'intermissionSong': pygame.mixer.Sound('Media/Music/intermission.mp3'),
+            'titleSong': pygame.mixer.Sound('Media/Music/title.mp3')
         }
 
         self.intermission = {
@@ -111,6 +118,10 @@ class Game:
 
     def run(self):
         while True:
+
+            if not self.gameStates['intermission']:
+                self.assets['intermissionSong'].stop()
+
             clock = pygame.time.Clock() # Initiates clock
 
             
@@ -129,30 +140,31 @@ class Game:
                     if event.button == 1:
                         mousePos = pygame.mouse.get_pos()
 
-                        # After pressing left or right button, create a 75% chance for a battle and a 25% chance for a bonus intermission
+                        # After pressing left or right button, create a 50% chance for a battle and a 50% chance for a bonus intermission
                         if self.gameStates['intermission']:
                             if self.intermission['right'].rect.collidepoint(mousePos):
-                                random.seed(42)
-                                if random.random() < .25:
-                                    self.gameStates['battle'] = False
-                                    self.gameStates['intermission'] = True
-                                else:
+                                
+                                self.gameStates['intermission'] = False
+                                self.gameStates['itemReward'] = True
+                                # if random.random() < .5:
+                                #     self.gameStates['intermission'] = False
+                                #     self.gameStates['battle'] = True
+                                # else:
+                                #     self.gameStates['intermission'] = False
+                                #     self.gameStates['itemReward'] = True
+                            
+                            elif self.intermission['left'].rect.collidepoint(mousePos):
+
+                                if random.random() < .5:
                                     self.gameStates['intermission'] = False
                                     self.gameStates['battle'] = True
-
-                            
-                        elif self.intermission['left'].rect.collidepoint(mousePos):
-                            random.seed(42)
-                            if random.random() < .25:
-                                self.gameStates['battle'] = False
-                                self.gameStates['intermission'] = True
-                            else:
-                                self.gameStates['intermission'] = False
-                                self.gameStates['battle'] = True
-
+                                else:
+                                    self.gameStates['intermission'] = False
+                                    self.gameStates['itemReward'] = True
 
                         # Switches to the shop menu when the shop button is clicked.
                         if self.gameStates['main']:
+
                             if self.mainMenuOptions['Shop'].rect.collidepoint(mousePos):
                                 self.gameStates['main'] = False
                                 self.gameStates['shop'] = True
@@ -187,12 +199,22 @@ class Game:
                                     self.upgrades['SP']+= 1
                         
                         
+            if self.gameStates['itemReward']:
+                # Changes the background when the item reward screen starts.
+                print('Got reward')
+                self.screen.fill((0,0,0))
+                self.drawMenu(self.itemReward)
 
-            
+                dt = clock.tick(60) / 1
+            if not self.gameStates['main'] or not self.gameStates['Start']:
+                self.assets['titleSong'].stop()
+
             # Fill the screen with black
             self.screen.fill((0, 0, 0))
 
             if self.gameStates['main']:
+
+                self.assets['titleSong'].play(-1)
 
                 # Get mouse position for hover effect on buttons.
                 mousePos = pygame.mouse.get_pos()
@@ -238,7 +260,7 @@ class Game:
 
 
             if self.gameStates['intermission']:
-
+                
                 # Get mouse position for hover effect on buttons.
                 mousePos = pygame.mouse.get_pos()
                 for button in self.intermission.values():
