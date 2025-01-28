@@ -93,8 +93,8 @@ class Game:
         self.assets = {
             'titleBackground':pygame.transform.scale(loadImage('/background/otherTitle.png').convert_alpha(), (1280, 720)),
             'intermission': pygame.transform.scale(loadImage('/background/intermission.png').convert_alpha(), (1280, 720)),
-            'intermissionSong': pygame.mixer.Sound('Media/Music/intermission.mp3'),
-            'titleSong': pygame.mixer.Sound('Media/Music/title.mp3')
+            'intermissionSong': pygame.mixer.Sound('Media/Music/intermission.wav'),
+            'titleSong': pygame.mixer.Sound('Media/Music/title.wav')
         }
 
         self.intermission = {
@@ -110,6 +110,10 @@ class Game:
             'Infection': 0
         }
 
+         # Flags to track if certain music are playing.
+        self.intermissionMusicPlaying = False
+        self.titleMusicPlaying = False
+
     def drawMenu(self, menu):
         # Draw the menu options for the main menu.
         for option in menu.values():
@@ -119,10 +123,21 @@ class Game:
     def run(self):
         while True:
 
-            if not self.gameStates['intermission']:
-                self.assets['intermissionSong'].stop()
-
             clock = pygame.time.Clock() # Initiates clock
+            
+            # Plays the intermission song after the intro exposition.
+            if self.gameStates['intermission'] and not self.intermissionMusicPlaying:
+                self.assets['titleSong'].stop()
+                self.assets['intermissionSong'].play(-1)
+                self.intermissionMusicPlaying = True
+                self.titleMusicPlaying = False
+
+            # Plays the title song when in the main menu and the exposition state.
+            elif (self.gameStates['main'] or self.gameStates['Start']) and not self.titleMusicPlaying:
+                self.assets['intermissionSong'].stop()
+                self.assets['titleSong'].play(-1)
+                self.titleMusicPlaying = True
+                self.intermissionMusicPlaying = False
 
             
             # Event loop
@@ -255,6 +270,7 @@ class Game:
                             else:
                                 self.gameStates['Start'] = False
                                 self.gameStates['intermission'] = True
+                                pygame.mixer.music.stop()
                                 self.assets['intermissionSong'].play(-1)
 
 
