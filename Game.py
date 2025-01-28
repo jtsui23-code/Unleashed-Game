@@ -16,6 +16,9 @@ class Game:
         # Creating a screen variable with the window dimension variables set above
         # when setting window dimensions have to do .set_mode( (_,_) )
         # Treat the (_,_) as order pairs inside of ( (_,_) ).
+        # Creating a screen variable with the window dimension variables set above
+        # when setting window dimensions have to do .set_mode( (_,_) )
+        # Treat the (_,_) as order pairs inside of ( (_,_) ).
         self.screen = pygame.display.set_mode((1280 , 720 ))
 
         self.titleColor = (200, 50, 50)
@@ -30,7 +33,7 @@ class Game:
             'Intro': TextBox(200, 75, 900, 600, text="Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah")
         }
 
-        # Stores the Buttons objects for the main menu.
+        # Stores the Buttons objects for the main menu
         self.menuState = "main"
 
         # Stores the Button objects for the main menu.
