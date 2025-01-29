@@ -26,10 +26,15 @@ class Game:
             'title': pygame.font.Font('Media/Assets/Fonts/fantasy.ttf', 100),
             'shopTitle': pygame.font.Font('Media/Assets/Fonts/fantasy.ttf', 100)
         }
+
+        self.preBattle = {
+            'fight': Button(500, 375, 280, 50, 'Fight'),
+            'infect': Button(500, 460, 280, 50, 'Infect')
+        }
         
         self.dialouge = DialogueManager()
 
-        self.dialouge.addDialogue('intro', TextBox(200, 75, 900, 600, text="Welcome to the game!"))
+        self.dialouge.addDialogue('intro', TextBox(200, 75, 900, 600, text="Welcome to the game!Welcome to the game!Welcome to the game!Welcome to the game!Welcome to the game!"))
         self.dialouge.addDialogue('reward', TextBox(200, 600, 900, 200, text="You found a potion!"))
         
 
@@ -81,6 +86,7 @@ class Game:
             'battle': False, 'intermission': False, 
             'gameOver': False,
             'itemReward': False,
+            'nextStage': False
             
         }
 
@@ -94,7 +100,10 @@ class Game:
             'intermission': pygame.transform.scale(loadImage('/background/intermission.png').convert_alpha(), (1280, 720)),
             'intermissionSong': pygame.mixer.Sound('Media/Music/intermission.wav'),
             'titleSong': pygame.mixer.Sound('Media/Music/title.wav'),
-            'shopBackground': pygame.transform.scale(loadImage('/background/shop.png'), (1280, 720))
+            'shopBackground': pygame.transform.scale(loadImage('/background/shop.png'), (1280, 720)),
+            'enemy1': pygame.transform.scale(loadImage('/enemies/1.jpg').convert_alpha(), (100, 100)),
+            'enemy2': pygame.transform.scale(loadImage('/enemies/2.jpg').convert_alpha(), (100, 100)),
+
         }
 
         self.intermission = {
@@ -159,20 +168,19 @@ class Game:
                         if self.gameStates['intermission']:
                             if self.intermission['right'].rect.collidepoint(mousePos):
                                 
-                                self.gameStates['intermission'] = False
-                                self.gameStates['itemReward'] = True
-                                # if random.random() < .5:
-                                #     self.gameStates['intermission'] = False
-                                #     self.gameStates['battle'] = True
-                                # else:
-                                #     self.gameStates['intermission'] = False
-                                #     self.gameStates['itemReward'] = True
+                                
+                                if random.random() < .5:
+                                    self.gameStates['intermission'] = False
+                                    self.gameStates['nextStage'] = True
+                                else:
+                                    self.gameStates['intermission'] = False
+                                    self.gameStates['itemReward'] = True
                             
                             elif self.intermission['left'].rect.collidepoint(mousePos):
 
                                 if random.random() < .5:
                                     self.gameStates['intermission'] = False
-                                    self.gameStates['battle'] = True
+                                    self.gameStates['nextStage'] = True
                                 else:
                                     self.gameStates['intermission'] = False
                                     self.gameStates['itemReward'] = True
@@ -222,7 +230,6 @@ class Game:
                         
             if self.gameStates['itemReward']:
                 # Changes the background when the item reward screen starts.
-                print('Got reward')
 
                 # Need for creating the typing animation for the text box.
                 dt = clock.tick(60) / 1  
@@ -235,9 +242,32 @@ class Game:
                 self.drawMenu(self.intermission)
 
                 # Draw the text box.
-                self.dialouge['reward'].draw(self.screen)  
+                self.dialouge.draw(self.screen)
 
-            
+                # Checks for mouse clicks to skip the typing animation or progress the dialogue.
+                if self.dialouge.is_active and self.dialouge.current_dialogue.isTyping():
+                                self.dialouge.handleEvent(event)
+                else:
+                    self.gameStates['itemReward'] = False
+                    self.gameStates['nextStage'] = True  
+
+            if self.gameStates['nextStage']:
+                self.screen.fill((0,0,0))
+                
+                # Draws the menu to prompt the user to 
+                # fight or infect the enemies on the floor.
+                self.drawMenu(self.preBattle)
+
+                # Draws the enemies on the screen.
+                self.screen.blit(self.assets['enemy1'], (200, 200))
+                self.screen.blit(self.assets['enemy2'], (500, 200))
+
+                # Handles hover effect on the buttons.
+                mousePos = pygame.mouse.get_pos()
+                for button in self.preBattle.values():
+                    button.isHovered = button.rect.collidepoint(mousePos)
+
+                
 
 
             if self.gameStates['main']:
@@ -279,7 +309,7 @@ class Game:
                         if event.button == 1:
                             # If the text is not finsihed typing, 
                             # and the user clicks the screen, skip the typing animation.
-                            if self.dialouge.isActive():
+                            if self.dialouge.is_active and self.dialouge.current_dialogue.isTyping():
                                 self.dialouge.handleEvent(event)
 
                             # If the text is finished typing, performs an
