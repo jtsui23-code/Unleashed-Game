@@ -91,6 +91,8 @@ class Player(Character):
         if state == 'Infection':
             self.infectRate += 0.5
 
+    def TakeTurn(self):
+        pass
 
     
 
