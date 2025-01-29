@@ -251,7 +251,7 @@ class Game:
                 # Changes the background when the intro exposition starts.
                 self.screen.fill((0,0,0))
 
-                dt = clock.tick(60) / 1  # Time in seconds since last frame
+                dt = clock.tick(60) / 1  # Time in seconds since last frame.
 
                 # Writes the introduction exposition with the typing animation.
                 self.startingText['Intro'].update(dt) # Adds next character from text
