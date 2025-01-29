@@ -12,19 +12,18 @@ class Game:
         pygame.init()
 
         # Sets the name of the window icon to "Rogue-like"
-        pygame.display.set_caption("Rogue")
+        pygame.display.set_caption("Unleached")
 
         # Creating a screen variable with the window dimension variables set above
         # when setting window dimensions have to do .set_mode( (_,_) )
         # Treat the (_,_) as order pairs inside of ( (_,_) ).
-        
         self.screen = pygame.display.set_mode((1280 , 720 ))
 
         self.titleColor = (200, 50, 50)
 
         self.fonts = {
             'title': pygame.font.Font('Media/Assets/Fonts/fantasy.ttf', 100),
-            'shopTitle': pygame.font.Font(None, 100)
+            'shopTitle': pygame.font.Font('Media/Assets/Fonts/fantasy.ttf', 100)
         }
         
         # Stores the TextBox objects for the introduction exposition.
@@ -32,7 +31,7 @@ class Game:
             'Intro': TextBox(200, 75, 900, 600, text="Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah")
         }
 
-        # Stores the Buttons objects for the main menu.
+        # Stores the Buttons objects for the main menu
         self.menuState = "main"
 
         # Stores the Button objects for the main menu.
@@ -55,19 +54,24 @@ class Game:
         
         # Stores the Button objects for the shop menu.
         self.shopOptions = {
-            'Box': Button(200, 75, 900, 600, ''),
-            'Title': Text(500, 100, 280, 50, 'Upgrades', self.fonts['shopTitle'], self.titleColor),
+            'Box': TextBox(200, 75, 900, 600, '', (43, 44, 58, 160)),
+            'Title': Text(500, 120, 280, 50, 'Upgrades', self.fonts['shopTitle'], self.titleColor),
             'Attack':Button(275, 500, 140,50, 'Attack'),
             'Infection': Button(575, 500, 140, 50, 'Infect'),
             'SP': Button(875, 500, 140, 50, 'SP'),
             'Back': Button(20, 620, 140, 50, 'Back')
         }
 
-        #self.upgrades = {
-        #    'attack': 0,
-        #    'infection': 0,
-        #    'sp': 0
-        #}
+        self.upgrades = {
+           'attack': 0,
+           'infection': 0,
+           'sp': 0
+        }
+
+        self.itemReward = {
+            'Reward': TextBox(200, 600, 900, 200, text="Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah")
+
+        }
 
         # Maintains the game state to determine which menu to display.
         self.gameStates = {
@@ -75,7 +79,9 @@ class Game:
             'shop': False, 
             'startGame':False,
             'battle': False, 'intermission': False, 
-            'gameOver': False
+            'gameOver': False,
+            'itemReward': False,
+            
         }
 
        
@@ -86,14 +92,27 @@ class Game:
         self.assets = {
             'titleBackground':pygame.transform.scale(loadImage('/background/otherTitle.png').convert_alpha(), (1280, 720)),
             'intermission': pygame.transform.scale(loadImage('/background/intermission.png').convert_alpha(), (1280, 720)),
-            'intermissionSong': pygame.mixer.Sound('Media/Music/intermission.mp3')
-
+            'intermissionSong': pygame.mixer.Sound('Media/Music/intermission.wav'),
+            'titleSong': pygame.mixer.Sound('Media/Music/title.wav'),
+            'shopBackground': pygame.transform.scale(loadImage('/background/shop.png'), (1280, 720))
         }
 
         self.intermission = {
             'left': Button(100, 300, 200, 100, 'Left'),
             'right': Button(1000, 300, 200, 100, 'Right')
         }
+        
+        # Maintains and increments the numbers of upgrades purchased in
+        # the shop.
+        self.upgrades = {
+            'Attack':0,
+            'SP': 0, 
+            'Infection': 0
+        }
+
+         # Flags to track if certain music are playing.
+        self.intermissionMusicPlaying = False
+        self.titleMusicPlaying = False
 
     def drawMenu(self, menu):
         # Draw the menu options for the main menu.
@@ -103,7 +122,22 @@ class Game:
 
     def run(self):
         while True:
+
             clock = pygame.time.Clock() # Initiates clock
+            
+            # Plays the intermission song after the intro exposition.
+            if self.gameStates['intermission'] and not self.intermissionMusicPlaying:
+                self.assets['titleSong'].stop()
+                self.assets['intermissionSong'].play(-1)
+                self.intermissionMusicPlaying = True
+                self.titleMusicPlaying = False
+
+            # Plays the title song when in the main menu and the exposition state.
+            elif (self.gameStates['main'] or self.gameStates['startGame'] or self.gameStates['shop']) and not self.titleMusicPlaying:
+                self.assets['intermissionSong'].stop()
+                self.assets['titleSong'].play(-1)
+                self.titleMusicPlaying = True
+                self.intermissionMusicPlaying = False
 
             
             # Event loop
@@ -121,30 +155,31 @@ class Game:
                     if event.button == 1:
                         mousePos = pygame.mouse.get_pos()
 
-                        # After pressing left or right button, create a 75% chance for a battle and a 25% chance for a bonus intermission
+                        # After pressing left or right button, create a 50% chance for a battle and a 50% chance for a bonus intermission
                         if self.gameStates['intermission']:
                             if self.intermission['right'].rect.collidepoint(mousePos):
-                                random.seed(42)
-                                if random.random() < .25:
-                                    self.gameStates['battle'] = False
-                                    self.gameStates['intermission'] = True
-                                else:
+                                
+                                self.gameStates['intermission'] = False
+                                self.gameStates['itemReward'] = True
+                                # if random.random() < .5:
+                                #     self.gameStates['intermission'] = False
+                                #     self.gameStates['battle'] = True
+                                # else:
+                                #     self.gameStates['intermission'] = False
+                                #     self.gameStates['itemReward'] = True
+                            
+                            elif self.intermission['left'].rect.collidepoint(mousePos):
+
+                                if random.random() < .5:
                                     self.gameStates['intermission'] = False
                                     self.gameStates['battle'] = True
-
-                            
-                        elif self.intermission['left'].rect.collidepoint(mousePos):
-                            random.seed(42)
-                            if random.random() < .25:
-                                self.gameStates['battle'] = False
-                                self.gameStates['intermission'] = True
-                            else:
-                                self.gameStates['intermission'] = False
-                                self.gameStates['battle'] = True
-
+                                else:
+                                    self.gameStates['intermission'] = False
+                                    self.gameStates['itemReward'] = True
 
                         # Switches to the shop menu when the shop button is clicked.
                         if self.gameStates['main']:
+
                             if self.mainMenuOptions['Shop'].rect.collidepoint(mousePos):
                                 self.gameStates['main'] = False
                                 self.gameStates['shop'] = True
@@ -162,20 +197,37 @@ class Game:
 
                         # Switches back to the main menu when the back button is clicked.
                         if self.gameStates['shop']:
+
+                            # Changes color of shop buttons if hovering over them.
+                            for button in self.shopOptions.values():
+                                button.isHovered = button.rect.collidepoint(mousePos)
+
                             if self.shopOptions['Back'].rect.collidepoint(mousePos):
                                 self.gameStates['shop'] = False
                                 self.gameStates['main'] = True
-                         #   elif self.shopOptions['Attack'].rect.collidepoint(mousePos):
-                         #       self.gameStates['attack' + 1]
-                         #   elif self.shopOptions['Infection'].rect.collidepoint(mousePos):
-                         #       self.gameStates['infection' + 1]
-                         #   elif self.shopOptions['SP'].rect.collidepoint(mousePos):
-                         #       self.gameStates['sp' + 1]
-                        
-                        
 
+                            elif self.shopOptions['Attack'].rect.collidepoint(mousePos):
+                                if self.upgrades['Attack'] < 4:
+                                    self.upgrades['Attack']+= 1
+
+                            elif self.shopOptions['Infection'].rect.collidepoint(mousePos):
+                                if self.upgrades['Infection'] < 4:
+                                    self.upgrades['Infection'] += 1
+
+                            elif self.shopOptions['SP'].rect.collidepoint(mousePos):
+                                  if self.upgrades['SP'] < 4:
+                                    self.upgrades['SP']+= 1
+                        
+                        
+            if self.gameStates['itemReward']:
+                # Changes the background when the item reward screen starts.
+                print('Got reward')
+                self.drawMenu(self.intermission)
+                self.drawMenu(self.itemReward)
+
+                dt = clock.tick(60) / 1
             
-            
+
 
             if self.gameStates['main']:
 
@@ -184,15 +236,14 @@ class Game:
                 for button in self.mainMenuOptions.values():
                     button.isHovered = button.rect.collidepoint(mousePos)
 
-                # Fill the title screen background.
-                self.screen.blit(self.assets['titleBackground'],(0, 0))
 
+                self.screen.blit((self.assets['titleBackground']), (0,0))
                 # Draws the Main Menu when the game is in the main menu state.
                 self.drawMenu(self.mainMenuOptions)
-                
 
             # Draws the Shop Menu when the game is in the shop state.
             elif self.gameStates['shop']:
+                self.screen.blit(self.assets['shopBackground'], (0, 0))
                 self.drawMenu(self.shopOptions)
 
             
@@ -221,11 +272,10 @@ class Game:
                             else:
                                 self.gameStates['Start'] = False
                                 self.gameStates['intermission'] = True
-                                self.assets['intermissionSong'].play(-1)
 
 
             if self.gameStates['intermission']:
-
+                
                 # Get mouse position for hover effect on buttons.
                 mousePos = pygame.mouse.get_pos()
                 for button in self.intermission.values():

@@ -1,5 +1,28 @@
 import pygame
 import math
+from ui import TextBox, Text
+
+class skill:
+    def __init__(self, name, dmg, cooldown, cost):
+        self.name = name
+        self.damage = dmg
+        self.cooldown = cooldown
+        self.currentCD = 0
+        self.sp = cost
+        self.text = Text(200, 75, 900, 600, name + '!')
+
+    def use(self):
+        self.text.print # Prints message declaring skill
+        self.currentCD = self.cooldown
+        return self.damage
+    
+    def cooldown(self):
+        return self.currentCD
+
+    def reduceCD(self):
+        if self.currentCD:
+            self.currentCD - 1
+
 
 class Character:
 
@@ -54,6 +77,22 @@ class Player(Character):
         # will eventually overcap.
         self.currentHp = min(self.maxHp, self.currentHp + amount)
 
+
+    # Upgrades the states of the player based on number of purchased 
+    # upgrades in the shop.
+    def stateUpgrade(self, state=''):
+        
+        if state == 'Attack':
+            self.attackstat += 0.2
+
+        if state == 'SP':
+            self.maxSP += 10
+
+        if state == 'Infection':
+            self.infectRate += 0.5
+
+    def TakeTurn(self):
+        pass
 
     
 

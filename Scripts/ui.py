@@ -10,13 +10,14 @@ BUTTON_FONT = pygame.font.Font(None, 48)
 
 # Colors
 WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
+TBLACK = (0, 0, 0, 0) # Transparent black
 GRAY = (200, 200, 200)
+BLACK = (0, 0, 0)
 LIGHT_GRAY = (220, 220, 220)
 
 
 class TextBox:
-    def __init__(self, x, y, width, height, text=''):
+    def __init__(self, x, y, width, height, text='', bgColor=(0, 0, 0, 128)):
         self.rect = pygame.Rect(x, y, width, height)
         self.text = text
         self.animated_text = ''     # Characters that have been drawn
@@ -28,6 +29,7 @@ class TextBox:
 
         # Wrap text to fit in the box.
         self.lines = self.wrap_text()
+        self.boxColor = bgColor
 
         self.isFinished = False
 
@@ -83,8 +85,9 @@ class TextBox:
         self.isFinished = True
 
     def draw(self, surface):
-        pygame.draw.rect(surface, WHITE, self.rect)
-        pygame.draw.rect(surface, BLACK, self.rect, 2)
+
+        pygame.draw.rect(surface, self.boxColor, self.rect)
+        pygame.draw.rect(surface, WHITE, self.rect, 2)
         
         y = self.rect.y + 10
         visible_text = self.animated_text
@@ -99,28 +102,36 @@ class TextBox:
                 text_to_render = visible_text
                 visible_text = ''
             
-            text_surf = TEXT_FONT.render(text_to_render, True, BLACK)
+            text_surf = TEXT_FONT.render(text_to_render, True, LIGHT_GRAY)
             surface.blit(text_surf, (self.rect.x + 10, y))
             y += self.line_height
             
             if y + self.line_height > self.rect.bottom - 10:
                 break
+
+    # Inverts the color of the text box for outline of the text box.
+    def invertColor(self, color):
+        r, g, b, t = color
+        return (255 - r, 255 - g, 255 - b, 255-t)
             
 class Button:
     def __init__(self, x, y, width, height, text, action=None):
         self.rect = pygame.Rect(x, y, width, height)
         self.text = text
         self.action = action
-        self.color = GRAY
+        self.color = TBLACK
         self.hoverColor = WHITE
         self.isHovered = False
-
     def draw(self, surface):
-
+        
+        # Changes the color of the button and text if the mouse is hovering over it.
         color = self.hoverColor if self.isHovered else self.color  
+        textColor = BLACK if self.isHovered else LIGHT_GRAY
+
         pygame.draw.rect(surface, color, self.rect)
-        pygame.draw.rect(surface, BLACK, self.rect, 2)
-        text_surf = BUTTON_FONT.render(self.text, True, BLACK)
+        pygame.draw.rect(surface, WHITE, self.rect, 2)
+
+        text_surf = BUTTON_FONT.render(self.text, True, textColor)
         text_rect = text_surf.get_rect(center=self.rect.center)
         surface.blit(text_surf, text_rect)
 
