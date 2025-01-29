@@ -12,7 +12,7 @@ class Game:
         pygame.init()
 
         # Sets the name of the window icon to "Rogue-like"
-        pygame.display.set_caption("Rogue")
+        pygame.display.set_caption("Unleached")
 
         # Creating a screen variable with the window dimension variables set above
         # when setting window dimensions have to do .set_mode( (_,_) )
@@ -23,7 +23,7 @@ class Game:
 
         self.fonts = {
             'title': pygame.font.Font('Media/Assets/Fonts/fantasy.ttf', 100),
-            'shopTitle': pygame.font.Font(None, 100)
+            'shopTitle': pygame.font.Font('Media/Assets/Fonts/fantasy.ttf', 100)
         }
         
         # Stores the TextBox objects for the introduction exposition.
@@ -54,8 +54,8 @@ class Game:
         
         # Stores the Button objects for the shop menu.
         self.shopOptions = {
-            'Box': TextBox(200, 75, 900, 600, '', (93, 29, 117, 160)),
-            'Title': Text(500, 100, 280, 50, 'Upgrades', self.fonts['shopTitle'], self.titleColor),
+            'Box': TextBox(200, 75, 900, 600, '', (43, 44, 58, 160)),
+            'Title': Text(500, 120, 280, 50, 'Upgrades', self.fonts['shopTitle'], self.titleColor),
             'Attack':Button(275, 500, 140,50, 'Attack'),
             'Infection': Button(575, 500, 140, 50, 'Infect'),
             'SP': Button(875, 500, 140, 50, 'SP'),
@@ -93,7 +93,8 @@ class Game:
             'titleBackground':pygame.transform.scale(loadImage('/background/otherTitle.png').convert_alpha(), (1280, 720)),
             'intermission': pygame.transform.scale(loadImage('/background/intermission.png').convert_alpha(), (1280, 720)),
             'intermissionSong': pygame.mixer.Sound('Media/Music/intermission.wav'),
-            'titleSong': pygame.mixer.Sound('Media/Music/title.wav')
+            'titleSong': pygame.mixer.Sound('Media/Music/title.wav'),
+            'shopBackground': pygame.transform.scale(loadImage('/background/shop.png'), (1280, 720))
         }
 
         self.intermission = {
@@ -242,6 +243,7 @@ class Game:
 
             # Draws the Shop Menu when the game is in the shop state.
             elif self.gameStates['shop']:
+                self.screen.blit(self.assets['shopBackground'], (0, 0))
                 self.drawMenu(self.shopOptions)
 
             
