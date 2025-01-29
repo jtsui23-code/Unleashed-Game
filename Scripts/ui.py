@@ -86,9 +86,8 @@ class TextBox:
 
     def draw(self, surface):
 
-        outlineColor = self.invertColor(self.boxColor)
         pygame.draw.rect(surface, self.boxColor, self.rect)
-        pygame.draw.rect(surface, outlineColor, self.rect, 2)
+        pygame.draw.rect(surface, WHITE, self.rect, 2)
         
         y = self.rect.y + 10
         visible_text = self.animated_text
