@@ -62,6 +62,7 @@ class Game:
             'Back': Button(20, 620, 140, 50, 'Back')
         }
 
+        # Manages the upgrades the players have
         self.upgrades = {
            'attack': 0,
            'infection': 0,
@@ -69,7 +70,7 @@ class Game:
         }
 
         self.itemReward = {
-            'Reward': TextBox(200, 600, 900, 200, text="Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah")
+            'reward': TextBox(200, 600, 900, 200, text="Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah")
 
         }
 
@@ -184,6 +185,7 @@ class Game:
                                 self.gameStates['main'] = False
                                 self.gameStates['shop'] = True
 
+
                             # Exits the game when the exit button is clicked.
                             if self.mainMenuOptions['Exit'].rect.collidepoint(mousePos):
                                 pygame.quit()
@@ -222,10 +224,15 @@ class Game:
             if self.gameStates['itemReward']:
                 # Changes the background when the item reward screen starts.
                 print('Got reward')
+
+                # Need for creating the typing animation for the text box.
+                dt = clock.tick(60) / 1  
+
+                # Writes the intermiision dialogue with the typing animation.
+                self.itemReward['reward'].update(dt) # Adds next character from text
                 self.drawMenu(self.intermission)
                 self.drawMenu(self.itemReward)
 
-                dt = clock.tick(60) / 1
             
 
 
@@ -272,7 +279,13 @@ class Game:
                             else:
                                 self.gameStates['Start'] = False
                                 self.gameStates['intermission'] = True
-
+            
+            # Needed for creating hover effect on the buttons in the shop menu
+            # and for adding functionality to the upgrade buttons.
+            if self.gameStates['shop']:
+                mousePos = pygame.mouse.get_pos()
+                for button in self.shopOptions.values():
+                    button.isHovered = button.rect.collidepoint(mousePos)
 
             if self.gameStates['intermission']:
                 
