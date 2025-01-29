@@ -3,6 +3,7 @@ import sys
 import random
 from Scripts.ui import Button, Text, TextBox
 from Scripts.util import loadImage
+from Scripts.dialogue import DialogueManager
 
 class Game:
     
@@ -26,10 +27,11 @@ class Game:
             'shopTitle': pygame.font.Font('Media/Assets/Fonts/fantasy.ttf', 100)
         }
         
-        # Stores the TextBox objects for the introduction exposition.
-        self.startingText = {
-            'Intro': TextBox(200, 75, 900, 600, text="Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah")
-        }
+        self.dialouge = DialogueManager()
+
+        self.dialouge.addDialogue('intro', TextBox(200, 75, 900, 600, text="Welcome to the game!"))
+        self.dialouge.addDialogue('reward', TextBox(200, 600, 900, 200, text="You found a potion!"))
+        
 
         # Stores the Buttons objects for the main menu
         self.menuState = "main"
@@ -69,10 +71,7 @@ class Game:
            'sp': 0
         }
 
-        self.itemReward = {
-            'reward': TextBox(200, 600, 900, 200, text="Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah")
-
-        }
+        
 
         # Maintains the game state to determine which menu to display.
         self.gameStates = {
@@ -228,10 +227,15 @@ class Game:
                 # Need for creating the typing animation for the text box.
                 dt = clock.tick(60) / 1  
 
-                # Writes the intermiision dialogue with the typing animation.
-                self.itemReward['reward'].update(dt) # Adds next character from text
+                # Picks the reward dialogue and starts the typing animation.
+                self.dialouge.startDialogue('reward')
+
+                 # Adds next character from text.
+                self.dialouge.update(dt)
                 self.drawMenu(self.intermission)
-                self.drawMenu(self.itemReward)
+
+                # Draw the text box.
+                self.dialouge['reward'].draw(self.screen)  
 
             
 
@@ -260,9 +264,14 @@ class Game:
 
                 dt = clock.tick(60) / 1  # Time in seconds since last frame.
 
-                # Writes the introduction exposition with the typing animation.
-                self.startingText['Intro'].update(dt) # Adds next character from text
-                self.drawMenu(self.startingText)  # Draw the text box
+                # Picks the intro dialogue and starts the typing animation.
+                self.dialouge.startDialogue('intro')
+
+                # Adds next character from text
+                self.dialouge.update(dt) 
+
+                # Draw the text box
+                self.dialouge.draw(self.screen)  
 
                 for event in pygame.event.get():
 
@@ -270,8 +279,8 @@ class Game:
                         if event.button == 1:
                             # If the text is not finsihed typing, 
                             # and the user clicks the screen, skip the typing animation.
-                            if self.startingText['Intro'].isTyping():
-                                self.startingText['Intro'].skipTyping()
+                            if self.dialouge.isActive():
+                                self.dialouge.handleEvent(event)
 
                             # If the text is finished typing, performs an
                             # additional click which will exist the 

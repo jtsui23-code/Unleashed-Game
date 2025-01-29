@@ -1,40 +1,45 @@
 import pygame
-from character import Character
-from enemies import Enemy, RSoldier, Orc, Rat, FFaith, Ghoul, Carrion, wiz
-from ui import TextBox, Text
-import sys
-import os
-import textwrap
 
-class Dialogue(Character):
+class DialogueManager:
+    def __init__(self):
+        self.current_dialogue = None # Will store the current dialogue.
+        self.dialogues = {}  # Stores all dialogues
+        self.is_active = False  # Checks whether a dialogue is currently active.
 
-    def __init__(self, player, enemy):
+    def addDialogue(self, name, textBox):
+        # Add a dialogue to the manager.
+        self.dialogues[name] = textBox
+
+    def startDialogue(self, name):
         
-        self.player = player
-        self.enemy = enemy
+        # Start a specific dialogue by name.
+        if name in self.dialogues:
+            self.current_dialogue = self.dialogues[name]
+            self.is_active = True
+        else:
+            print(f"Dialogue '{name}' not found.")
 
-    def yap(self, text):
-        self.text = text
-        self.text = TextBox(200, 75, 900, 600, text)
-        self.text.print
-    
+    def update(self, dt):
+        # Update the current dialogue.
+        if self.is_active and self.current_dialogue:
+            self.current_dialogue.update(dt)
 
+    def draw(self, surface):
+        # Draw the current dialogue.
+        if self.is_active and self.current_dialogue:
+            self.current_dialogue.draw(surface)
 
-class PlayerDialogue(Dialogue):
-    def __init__(self, player, enemy):
-        super().__init__(player, enemy)
+    def handleEvent(self, event):
+        # Handle events like mouse clicks to skip typing or progress dialogue.
+        if self.is_active and self.current_dialogue:
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:  # Left mouse button
+                    if self.current_dialogue.isTyping():
+                        self.current_dialogue.skipTyping()
+                    else:
+                        self.is_active = False  # End the current dialogue
 
-    def yap(self, text):
-        self.text = text
-        self.text = TextBox(200, 75, 900, 600, text)
-        self.text.print
+    # Returns whether a dialogue is currently active.
+    def isActive(self):
+        return self.is_active
 
-class EnemyDialogue(Dialogue):
-    def __init__(self, player, enemy):
-        super().__init__(player, enemy)
-
-    def yap(self, text):
-        if self.enemy.currentHp > 0:
-            self.text = text
-            self.text = TextBox(200, 75, 900, 600, text)
-            self.text.print
