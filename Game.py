@@ -17,7 +17,6 @@ class Game:
         # Creating a screen variable with the window dimension variables set above
         # when setting window dimensions have to do .set_mode( (_,_) )
         # Treat the (_,_) as order pairs inside of ( (_,_) ).
-        
         self.screen = pygame.display.set_mode((1280 , 720 ))
 
         self.titleColor = (200, 50, 50)
@@ -55,7 +54,7 @@ class Game:
         
         # Stores the Button objects for the shop menu.
         self.shopOptions = {
-            'Box': Button(200, 75, 900, 600, ''),
+            'Box': TextBox(200, 75, 900, 600, '', (93, 29, 117, 160)),
             'Title': Text(500, 100, 280, 50, 'Upgrades', self.fonts['shopTitle'], self.titleColor),
             'Attack':Button(275, 500, 140,50, 'Attack'),
             'Infection': Button(575, 500, 140, 50, 'Infect'),
@@ -70,7 +69,7 @@ class Game:
         }
 
         self.itemReward = {
-            'Intro': TextBox(200, 400, 900, 200, text="Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah")
+            'Reward': TextBox(200, 600, 900, 200, text="Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah")
 
         }
 
@@ -133,7 +132,7 @@ class Game:
                 self.titleMusicPlaying = False
 
             # Plays the title song when in the main menu and the exposition state.
-            elif (self.gameStates['main'] or self.gameStates['Start']) and not self.titleMusicPlaying:
+            elif (self.gameStates['main'] or self.gameStates['startGame'] or self.gameStates['shop']) and not self.titleMusicPlaying:
                 self.assets['intermissionSong'].stop()
                 self.assets['titleSong'].play(-1)
                 self.titleMusicPlaying = True
@@ -197,6 +196,11 @@ class Game:
 
                         # Switches back to the main menu when the back button is clicked.
                         if self.gameStates['shop']:
+
+                            # Changes color of shop buttons if hovering over them.
+                            for button in self.shopOptions.values():
+                                button.isHovered = button.rect.collidepoint(mousePos)
+
                             if self.shopOptions['Back'].rect.collidepoint(mousePos):
                                 self.gameStates['shop'] = False
                                 self.gameStates['main'] = True
@@ -217,14 +221,12 @@ class Game:
             if self.gameStates['itemReward']:
                 # Changes the background when the item reward screen starts.
                 print('Got reward')
-                self.screen.fill((0,0,0))
+                self.drawMenu(self.intermission)
                 self.drawMenu(self.itemReward)
 
                 dt = clock.tick(60) / 1
             
 
-            # Fill the screen with black
-            self.screen.fill((0, 0, 0))
 
             if self.gameStates['main']:
 
