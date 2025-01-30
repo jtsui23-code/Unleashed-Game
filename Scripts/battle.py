@@ -26,7 +26,7 @@ class Battle:
             # Player and Enemy take their turns and store choices in variables   
             pmov = self.player.TakeTurn
             emov = self.enemy.TakeTurn
-            
+
             # If guarded TakeTurn will return 0
             if emov == 0: 
                 self.gaurd(self.enemy) # Prints 'name' gaurded and restarts
@@ -45,6 +45,7 @@ class Battle:
             else:
                 if self.player.TakeDmg(emov) == 0: # If player dies call game over
                     self.GameOver
+                    break
             
             for x in self.player.skills:
                 self.player.skills[x].reduceCD

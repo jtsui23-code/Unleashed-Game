@@ -4,6 +4,9 @@ import random
 from Scripts.ui import Button, Text, TextBox
 from Scripts.util import loadImage
 from Scripts.dialogue import DialogueManager
+from Scripts.battle import Battle
+from Scripts.character import Player
+from Scripts.enemies import RSoldier, Orc, Rat, FFaith, Ghoul, Carrion, wiz
 
 class Game:
     
@@ -58,6 +61,18 @@ class Game:
             'Guard': Button(500, 575, 280, 50, 'Guard'),
             'Inventory': Button(500, 650, 280, 50, 'Inventory')
         }
+
+        self.player = Player()
+
+        self.enemies = {
+            'soldier' : RSoldier,
+            'orc' : Orc,
+            'rat' : Rat,
+            'priest' : FFaith,
+            'ghoul' : Ghoul,
+            'carrion' : Carrion,
+            'boss' : wiz
+        }
         
         # Stores the Button objects for the shop menu.
         self.shopOptions = {
@@ -83,7 +98,8 @@ class Game:
             'main': True, 
             'shop': False, 
             'startGame':False,
-            'battle': False, 'intermission': False, 
+            'battle': False,
+            'intermission': False, 
             'gameOver': False,
             'itemReward': False,
             'nextStage': False
@@ -140,6 +156,8 @@ class Game:
                 self.assets['intermissionSong'].play(-1)
                 self.intermissionMusicPlaying = True
                 self.titleMusicPlaying = False
+
+        
 
             # Plays the title song when in the main menu and the exposition state.
             elif (self.gameStates['main'] or self.gameStates['startGame'] or self.gameStates['shop']) and not self.titleMusicPlaying:
@@ -338,6 +356,12 @@ class Game:
                 # intermission screen.
                 self.screen.blit(self.assets['intermission'], (0, 0))
                 self.drawMenu(self.intermission)
+
+
+            if self.gameStates['battle']:
+
+                floor1 = Battle(self.player, self.enemies['soldier'])
+                floor1.fight            
 
 
             # Display the screen

@@ -50,6 +50,7 @@ class Player(Character):
         self.maxSp = 100
         self.attackstat = 0.8
         self.name = 'You'
+        self.gold = 0
 
         # Skill points will be the unit expensed when using a skill.
         self.currentSp = self.maxSp
@@ -168,3 +169,6 @@ class Player(Character):
         self.Skills[2] = enemy.Skills[1]
         self.attackDmg = enemy.attackDmg
         self.attackstat = enemy.attackstat
+
+    def GetGold(self, enemy):
+        self.gold += enemy.gold
