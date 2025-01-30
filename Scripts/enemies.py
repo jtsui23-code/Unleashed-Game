@@ -9,6 +9,7 @@ class Enemy(Character):
 
         self.name = ' '
         self.InfectRate = 0.0
+        self.gold = 10
 
         self.attackstat = 0.8
         self.sp = 100
