@@ -129,7 +129,7 @@ class Player(Character):
                 if event.type == pygame.MOUSEBUTTONDOWN:
 
                     # Changes color of shop buttons if hovering over them.
-                    for button in self.shopOptions.values():
+                    for button in self.game.battle.values():
                         button.isHovered = button.rect.collidepoint(mousePos)
 
                     # Checks if the left mouse button is pressed.

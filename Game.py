@@ -101,8 +101,8 @@ class Game:
             'intermissionSong': pygame.mixer.Sound('Media/Music/intermission.wav'),
             'titleSong': pygame.mixer.Sound('Media/Music/title.wav'),
             'shopBackground': pygame.transform.scale(loadImage('/background/shop.png'), (1280, 720)),
-            'enemy1': pygame.transform.scale(loadImage('/enemies/1.jpg').convert_alpha(), (100, 100)),
-            'enemy2': pygame.transform.scale(loadImage('/enemies/2.jpg').convert_alpha(), (100, 100)),
+            'enemy1': pygame.transform.scale(loadImage('/enemies/1.png').convert_alpha(), (200, 200)),
+            'enemy2': pygame.transform.scale(loadImage('/enemies/2.png').convert_alpha(), (200, 200)),
 
         }
 
@@ -259,8 +259,8 @@ class Game:
                 self.drawMenu(self.preBattle)
 
                 # Draws the enemies on the screen.
-                self.screen.blit(self.assets['enemy1'], (200, 200))
-                self.screen.blit(self.assets['enemy2'], (500, 200))
+                self.screen.blit(self.assets['enemy1']), (200, 200))
+                self.screen.blit(self.assets['enemy2']), (900, 200))
 
                 # Handles hover effect on the buttons.
                 mousePos = pygame.mouse.get_pos()
