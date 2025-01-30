@@ -1,6 +1,7 @@
 import pygame
 from character import Player
 from enemies import Enemy
+from ui import TextBox
 
 
 
@@ -12,7 +13,7 @@ class Battle:
         self.won = False
 
     def gaurd(self, entity):
-        pass
+        text = TextBox(200, 600, 900, 200, text= entity.name + ' gaurded!')
 
     def GameOver(self):
         pass
@@ -26,13 +27,14 @@ class Battle:
             pmov = self.player.TakeTurn
             emov = self.enemy.TakeTurn
             
-            if emov == 0: # If guarded TakeTurn will return 0
-                self.gaurd(self.enemy)
-                # print "enemy gaurded"
+            # If guarded TakeTurn will return 0
+            if emov == 0: 
+                self.gaurd(self.enemy) # Prints 'name' gaurded and restarts
+                continue               # loop before damage is done
 
             if pmov == 0: 
                 self.gaurd(self.player)
-                # print "you gaurded"
+                continue
 
             # If defender dies TakeDmg will return 0
             # TakeDmg will change defender's HP based on amount passed in and return 0 if defender dies
@@ -43,4 +45,11 @@ class Battle:
             else:
                 if self.player.TakeDmg(emov) == 0: # If player dies call game over
                     self.GameOver
-                        
+            
+            for x in self.player.skills:
+                self.player.skills[x].reduceCD
+                                                    # Reduce Cooldowns for all skills
+            for x in self.enemy.skills:
+                self.enemy.skills[x].reduceCD
+
+        return 0
