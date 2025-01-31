@@ -3,7 +3,6 @@ import random
 from Scripts.character import Character, skill
 
 class Enemy(Character):
-
     def __init__(self, game, pos, size):
         super().__init__(game, 'Enemy', pos, size)
 
@@ -18,51 +17,57 @@ class Enemy(Character):
         self.attackDmg = 10
         self.maxHp = 100
         self.currentHp = self.maxHp
-        #self.skillCooldown = []
-        self.skills = [skill, skill]
+        self.skills = [skill, skill]  # Initialize with placeholder skills
 
         self.attackFlip = False
 
-    def TakeDmg(self, amount):
+    def TakeDmg(self, amount=0):
+        try:
+            # Ensure amount is a valid number
+            amount = float(amount)
+            if amount < 0:
+                raise ValueError("Damage amount cannot be negative.")
+            
+            # Reduce current HP by the damage amount
+            self.currentHp = max(0, self.currentHp - amount)
+            
+            # Check if the enemy has been defeated
+            if self.currentHp <= 0:
+                print(self.name + " has been defeated.")
+        except (ValueError, TypeError) as e:
+            print(f"Error in TakeDmg: {e}")
 
-        # Reduces the current hp of enemy by amount of inflicted attack.
-        # Have to use max(0, ...) or the enemy's health 
-        # will eventually become negative.
-        self.currentHp = max(0, self.currentHp - amount)
-
-        if self.currentHp <= 0:
-            print(self.name + " has been defeated.")
-       
     def heal(self, amount):
-
         # Increases the current hp of enemy by amount of healing.
-        # Have to use min(eslf.maxHp, ...) or the enemy's health 
-        # will eventually overcap.
         self.currentHp = min(self.maxHp, self.currentHp + amount)
 
     def basicAttack(self):
         self.attackDmg = 10 * self.attackstat
         return self.attackDmg
-    
+
     def TakeTurn(self):
-        #if skill 1 of cooldown and has enough sp use it
-        if self.skills[0].cooldown == 0 and self.sp > self.skills[0].sp:
-            self.sp -= self.skills[0].sp # lose sp based on skill
-            return self.skills[0].use
+        # If skill 1 is off cooldown and has enough SP, use it
+        if self.skills[0].cooldown == 0 and self.sp >= self.skills[0].sp_cost:
+            self.sp -= self.skills[0].sp_cost  # Lose SP based on skill
+            return self.skills[0].use  # Ensure this returns a valid damage value
 
-        #if skill 2 on cooldown and skill 2 of cooldown use it
-        elif self.skills[1].cooldown == 0 and self.sp > self.skills[1].sp:
-            self.sp -= self.skills[1].sp # lose sp based on skill
-            return self.skills[1].use
+        # If skill 2 is off cooldown and has enough SP, use it
+        elif self.skills[1].cooldown == 0 and self.sp >= self.skills[1].sp_cost:
+            self.sp -= self.skills[1].sp_cost  # Lose SP based on skill
+            return self.skills[1].use  # Ensure this returns a valid damage value
 
-        #if either skill is about to be off cooldown then gaurd
+        # If either skill is about to be off cooldown, then guard
         elif self.skills[0].cooldown == 1 or self.skills[1].cooldown == 1:
-            self.gaurd()
-            return 0
-    
+            self.guard()
+            return 0  # Guarding returns 0 damage
+
+        # Otherwise, use a basic attack
         else:
-            return self.basicAttack()
-        
+            return self.basicAttack()  # Ensure this returns a valid damage value
+
+    def guard(self):
+        print(f"{self.name} is guarding!")
+
     def infected(self, defaultInfectionRate):
         pass
 
@@ -83,14 +88,13 @@ class RSoldier(Enemy):
     def __init__(self, game, pos, size):
         super().__init__(game, pos, size)
 
+        self.character = "Soldier"
         self.name = 'Revived Soldier'
         self.InfectRate = 0.5
-
 
         self.attackstat = 0.8
         self.sp = 100
 
-        # How much the attack 
         self.attackDmg = 10
         self.maxHp = 150
         self.currentHp = self.maxHp
