@@ -70,7 +70,7 @@ class Game:
             'Inventory': Button(500, 650, 280, 50, 'Inventory')
         }
 
-        self.player = Player()
+        self.player = Player
 
         self.enemies = {
             'soldier' : RSoldier,
@@ -278,20 +278,15 @@ class Game:
                     self.gameStates['nextStage'] = True  
 
             if self.gameStates['nextStage']:
-                self.screen.fill((0,0,0))
-                
-                # Draws the menu to prompt the user to 
-                # fight or infect the enemies on the floor.
-                self.drawMenu(self.preBattle)
-
-                # Draws the enemies on the screen.
-                self.screen.blit(self.assets['enemy1'], (200, 200))
-                self.screen.blit(self.assets['enemy2'], (500, 200))
-
-                # Handles hover effect on the buttons.
+                # Get mouse position and check for button clicks
                 mousePos = pygame.mouse.get_pos()
-                for button in self.preBattle.values():
-                    button.isHovered = button.rect.collidepoint(mousePos)
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if event.button == 1:
+                        if self.preBattle['fight'].rect.collidepoint(mousePos):
+                            self.gameStates['nextStage'] = False
+                            self.gameStates['battle'] = True
+                            # Create battle instance
+                            self.currentBattle = Battle(self.player, self.enemies['soldier']())
 
                 
 
@@ -367,10 +362,19 @@ class Game:
 
 
             if self.gameStates['battle']:
-
-                floor1 = Battle(self.player, self.enemies['soldier'])
-                floor1.fight            
-
+                # Background for battle
+                self.screen.fill((0, 0, 0))
+                
+                # Draw battle UI elements (add your battle UI drawing code here)
+                self.drawMenu(self.battle)
+                
+                # Handle the battle
+                result = self.currentBattle.fight()
+                
+                # Check battle result
+                if result == 0:  # Battle is finished
+                    self.gameStates['battle'] = False
+                    self.gameStates['intermission'] = True  # Or whatever state should come next
 
             # Display the screen
             pygame.display.flip()

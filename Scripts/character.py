@@ -1,6 +1,7 @@
 import pygame
 import math
-from ui import TextBox, Text, Button
+from Scripts.ui import TextBox, Text, Button
+from Scripts.util import loadImage
 
 class skill:
     def __init__(self, name, dmg, cooldown, cost):
@@ -51,6 +52,8 @@ class Player(Character):
         self.attackstat = 0.8
         self.name = 'You'
         self.gold = 0
+
+        self.sprite = pygame.transform.scale(loadImage('/enemies/2.jpg').convert_alpha(), (100, 100))
 
         # Skill points will be the unit expensed when using a skill.
         self.currentSp = self.maxSp
