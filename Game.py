@@ -88,7 +88,7 @@ class Game:
         }
 
         # Create an instance of the Player class
-        self.player = Player(self, (0, 0), (100, 100))
+        self.player = Player(self, (0, 0), (100, 100), self.screen)
 
         # Store instances of enemies, not class references
         self.enemies = {
@@ -133,7 +133,7 @@ class Game:
             
         }
 
-       
+        self.currentBattle = Battle(self.player, self.enemies['soldier'])
 
         # Stores the selected button by the player.
         self.selectedOption = None
@@ -311,11 +311,12 @@ class Game:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 1:
                         if self.preBattle['fight'].rect.collidepoint(mousePos):
+
                             self.gameStates['prebattle'] = False
                             self.gameStates['battle'] = True
+                            self.currentBattle.fight()
 
                             # Create a Battle instance with instances of Player and Enemy
-                            self.currentBattle = Battle(self.player, self.enemies['soldier'])
                         #elif self.preBattle['infect'].rect.collidepoint(mousePos) & self.enemies['soldier'].currentHp > 0:
                         #    self.gameStates['prebattle'] = False
                         #    self.gameStates['battle'] = True

@@ -32,6 +32,13 @@ class Battle:
             if emov is None:
                 emov = 0  # Default to 0 if emov is None
 
+                        # If pmov is a method, call it to get the damage value
+            if callable(pmov):
+                pmov = pmov()
+
+            if callable(emov):
+                emov = emov()
+
             # If guarded, TakeTurn will return 0
             if emov == 0:
                 self.guard(self.enemy)  # Prints 'name' guarded and restarts loop
