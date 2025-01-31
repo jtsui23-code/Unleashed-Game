@@ -10,12 +10,12 @@ class skill:
         self.cooldown = cooldown
         self.currentCD = 0
         self.sp = cost
-#        self.text = Text(200, 75, 900, 600, name + '!')
+        self.text = Text(200, 75, 900, 600, name + '!', pygame.font.Font('Media/Assets/Fonts/fantasy.ttf', 100), (255, 255, 255))
     def __str__(self):
         return f"{self.name} does {self.damage} damage and has a cooldown of {self.cooldown} turns. It costs {self.sp} SP to use."
 
     def use(self):
-        self.text.print # Prints message declaring skill
+        self.text.draw # Prints message declaring skill
         self.currentCD = self.cooldown
         return self.damage
     
@@ -46,7 +46,7 @@ class Character:
         return pygame.Rect(self.pos[0], self.pos[1], self.size[0], self.size[1])
     
 class Player(Character):
-    def __init__(self, game, pos, size):
+    def __init__(self, game, pos, size, surface):
         super().__init__(game, "player", pos, size)
 
         self.attacking = False
@@ -55,6 +55,7 @@ class Player(Character):
         self.attackstat = 0.8
         self.name = 'You'
         self.gold = 0
+        self.surface = surface
 
         self.sprite = pygame.transform.scale(loadImage('enemies/2.png').convert_alpha(), (100, 100))
 
@@ -77,11 +78,14 @@ class Player(Character):
 
 
 
-        self.Buttons = {
-            'Box' : TextBox (200, 600, 900, 200, ''),
-            'Attack' : Button(250, 550, 200, 50, 'Attack'),
-            'Skills' : Button(250, 450, 200, 50, 'Skills'),
-            'Gaurd' : Button(250, 350, 200, 50, 'Gaurd')
+        self.bottons = {
+            # The text box is at the beginning of the map because it will be the first thing to be drawn.
+            'Text': TextBox(200, 75, 900, 600, text=''),
+            'Attack': Button(500, 500, 280, 50, 'Attack'),
+            'Skill1': Button(500, 575, 280, 50, 'Skill 1'),
+            'Skill2': Button(500, 575, 280, 50, 'Skill 2'),
+            'Guard': Button(500, 575, 280, 50, 'Guard'),
+            'Inventory': Button(500, 650, 280, 50, 'Inventory')
         }
 
         self.SkillList = {
@@ -95,7 +99,7 @@ class Player(Character):
         # Reduces the current hp of player by amount of inflicted attack.
         # Have to use max(0, ...) or the player's health 
         # will eventually become negative.
-        self.currentHp = max(0, self.currentHp - amount)
+        self.currentHp = max(0, self.currentHp - int(amount))
 
         if self.currentHp <= 0:
             print("Player has been defeated.")
@@ -125,26 +129,66 @@ class Player(Character):
         if state == 'Infection':
             self.infectRate += 0.5
 
+    def drawMenu(self, menu):
+        self.surface.fill((0, 0, 0))
+        for option in menu.values():
+            option.draw(self.surface)
+
+
     def TakeTurn(self):
-        for skill in self.Skills:
-            print(skill)
+        
+        print(skill)    
+
+        action_selected = False
+        
+        # Draw the menu
+        self.drawMenu(self.bottons)
+
+        while not action_selected:
+            for event in pygame.event.get():
+                mousePos = pygame.mouse.get_pos()
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if event.button == 1:
+                        if self.bottons['Attack'].rect.collidepoint(mousePos):
+                            action_selected = True
+                            return self.basicAttack
+                        
+                        if self.bottons['Skill1'].rect.collidepoint(mousePos):
+                            action_selected = True
+                            return self.Skills[0].use
+                        
+                        if self.bottons['Skill2'].rect.collidepoint(mousePos):
+                            action_selected = True
+                            return self.Skills[1].use
+                        
+                        if self.bottons['Guard'].rect.collidepoint(mousePos):
+                            action_selected = True
+                            self.guard()
+                            return 0
+
+        # Keep the game running while waiting for input
+        pygame.display.flip()
+        pygame.time.Clock().tick(60)
+        
+        
+        
         # If skill 1 is off cooldown and has enough SP, use it
-        if self.Skills[0].cooldown == 0 and self.sp >= self.Skills[0].sp:
-            self.sp -= self.Skills[0].sp  # Lose SP based on skill
-            return self.Skills[0].use  # Ensure this returns a valid damage value
+        #if self.Skills[0].cooldown == 0 and self.sp >= self.Skills[0].sp:
+        #    self.sp -= self.Skills[0].sp  # Lose SP based on skill
+        #    return self.Skills[0].use  # Ensure this returns a valid damage value
 
         # If skill 2 is off cooldown and has enough SP, use it
-        elif self.Skills[1].cooldown == 0 and self.sp >= self.Skills[1].sp:
-            self.sp -= self.Skills[1].sp  # Lose SP based on skill
-            return self.Skills[1].use  # Ensure this returns a valid damage value
+        #elif self.Skills[1].cooldown == 0 and self.sp >= self.Skills[1].sp:
+        #    self.sp -= self.Skills[1].sp  # Lose SP based on skill
+        #    return self.Skills[1].use  # Ensure this returns a valid damage value
 
         # If either skill is about to be off cooldown, then guard
-        elif self.Skills[0].cooldown == 1 or self.Skills[1].cooldown == 1:
-            return 0  # Guarding returns 0 damage
+        #elif self.Skills[0].cooldown == 1 or self.Skills[1].cooldown == 1:
+        #    return 0  # Guarding returns 0 damage
 
         # Otherwise, use a basic attack
-        else:
-            return self.basicAttack()  # Ensure this returns a valid damage value
+        #else:
+        #    return self.basicAttack()  # Ensure this returns a valid damage value
 
        
     def infect(self, enemy):

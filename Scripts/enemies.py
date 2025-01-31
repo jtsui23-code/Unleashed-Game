@@ -21,21 +21,15 @@ class Enemy(Character):
 
         self.attackFlip = False
 
-    def TakeDmg(self, amount=0):
-        try:
-            # Ensure amount is a valid number
-            amount = float(amount)
-            if amount < 0:
-                raise ValueError("Damage amount cannot be negative.")
-            
-            # Reduce current HP by the damage amount
-            self.currentHp = max(0, self.currentHp - amount)
-            
-            # Check if the enemy has been defeated
-            if self.currentHp <= 0:
-                print(self.name + " has been defeated.")
-        except (ValueError, TypeError) as e:
-            print(f"Error in TakeDmg: {e}")
+    def TakeDmg(self, amount):
+        # Reduces the current hp of enemy by amount of inflicted attack.
+        # Have to use max(0, ...) or the enemy's health 
+        # will eventually become negative.
+        self.currentHp = max(0, self.currentHp - int(amount))
+
+        if self.currentHp <= 0:
+            print(f"{self.name} has been defeated.")
+            return 0
 
     def heal(self, amount):
         # Increases the current hp of enemy by amount of healing.
