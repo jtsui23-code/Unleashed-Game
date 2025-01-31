@@ -259,8 +259,8 @@ class Game:
                 self.drawMenu(self.preBattle)
 
                 # Draws the enemies on the screen.
-                self.screen.blit(self.assets['enemy1']), (200, 200))
-                self.screen.blit(self.assets['enemy2']), (900, 200))
+                self.screen.blit(self.assets['enemy1'], (200, 200))
+                self.screen.blit(self.assets['enemy2'], (900, 200))
 
                 # Handles hover effect on the buttons.
                 mousePos = pygame.mouse.get_pos()
