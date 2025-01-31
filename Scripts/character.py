@@ -10,7 +10,9 @@ class skill:
         self.cooldown = cooldown
         self.currentCD = 0
         self.sp = cost
-        self.text = Text(200, 75, 900, 600, name + '!')
+#        self.text = Text(200, 75, 900, 600, name + '!')
+    def __str__(self):
+        return f"{self.name} does {self.damage} damage and has a cooldown of {self.cooldown} turns. It costs {self.sp} SP to use."
 
     def use(self):
         self.text.print # Prints message declaring skill
@@ -24,7 +26,7 @@ class skill:
         # If Cooldown is more than 0 it is reduced,
         #  if it is 0 the function does nothing
         if self.currentCD > 0:
-            self.currentCD - 1
+            self.currentCD =- 1
 
 
 class Character:
@@ -49,11 +51,12 @@ class Player(Character):
 
         self.attacking = False
         self.maxSp = 100
+        self.sp = self.maxSp
         self.attackstat = 0.8
         self.name = 'You'
         self.gold = 0
 
-        self.sprite = pygame.transform.scale(loadImage('/enemies/2.jpg').convert_alpha(), (100, 100))
+        self.sprite = pygame.transform.scale(loadImage('enemies/2.png').convert_alpha(), (100, 100))
 
         # Skill points will be the unit expensed when using a skill.
         self.currentSp = self.maxSp
@@ -87,7 +90,7 @@ class Player(Character):
             'Skill3' : Button(250, 350, 200, 50, self.Skills[2].name)
         }
 
-    def takeDmg(self, amount):
+    def TakeDmg(self, amount):
 
         # Reduces the current hp of player by amount of inflicted attack.
         # Have to use max(0, ...) or the player's health 
@@ -123,47 +126,25 @@ class Player(Character):
             self.infectRate += 0.5
 
     def TakeTurn(self):
+        for skill in self.Skills:
+            print(skill)
+        # If skill 1 is off cooldown and has enough SP, use it
+        if self.Skills[0].cooldown == 0 and self.sp >= self.Skills[0].sp:
+            self.sp -= self.Skills[0].sp  # Lose SP based on skill
+            return self.Skills[0].use  # Ensure this returns a valid damage value
 
-        inSkills = False
+        # If skill 2 is off cooldown and has enough SP, use it
+        elif self.Skills[1].cooldown == 0 and self.sp >= self.Skills[1].sp:
+            self.sp -= self.Skills[1].sp  # Lose SP based on skill
+            return self.Skills[1].use  # Ensure this returns a valid damage value
 
-        if inSkills == True:
-            for event in pygame.event.get():
+        # If either skill is about to be off cooldown, then guard
+        elif self.Skills[0].cooldown == 1 or self.Skills[1].cooldown == 1:
+            return 0  # Guarding returns 0 damage
 
-                # Check if the mouse button is pressed.
-                if event.type == pygame.MOUSEBUTTONDOWN:
-
-                    # Changes color of shop buttons if hovering over them.
-                    for button in self.shopOptions.values():
-                        button.isHovered = button.rect.collidepoint(mousePos)
-
-                    # Checks if the left mouse button is pressed.
-                    if event.button == 1:
-                        mousePos = pygame.mouse.get_pos()
-
-
-                        if self.Buttons['Attack'].rect.collidepoint(mousePos):
-                            return self.basicAttack
-
-                        elif self.Buttons['Skills'].rect.collidepoint(mousePos):
-                            inSkills = True
-
-                            if self.Skills[1].name == '': # If player only has 1 skill only show that button
-                                if self.SkillList['Skill1'].rect.collidepoint(mousePos):
-                                    return self.Skills[0].use
-                                
-                            else:
-                                if self.SkillList['Skill1'].rect.collidepoint(mousePos):
-                                    return self.Skills[0].use
-                                
-                                if self.SkillList['Skill2'].rect.collidepoint(mousePos):
-                                    return self.Skills[1].use
-                                
-                                if self.SkillList['Skill3'].rect.collidepoint(mousePos):
-                                    return self.Skills[2].use
-                                
-
-                        elif self.Buttons['Gaurd'].rect.collidepoint(mousePos):
-                            return 0
+        # Otherwise, use a basic attack
+        else:
+            return self.basicAttack()  # Ensure this returns a valid damage value
 
        
     def infect(self, enemy):

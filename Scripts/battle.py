@@ -1,56 +1,59 @@
 import pygame
-from Scripts.character import Character, Player
-from Scripts.enemies import Enemy
-from Scripts.ui import TextBox
+# from enemies import Enemy
+# from character import Player, Character
+# from Scripts.ui import TextBox
 
 
 
 class Battle:
     def __init__(self, player, enemy):
-        
-        self.player = player
-        self.enemy = enemy
+        self.player = player  # Instance of Player
+        self.enemy = enemy    # Instance of Enemy
         self.won = False
 
     def guard(self, entity):
-        text = TextBox(200, 600, 900, 200, text= entity.name + ' gaurded!')
+        # Print a message indicating the entity is guarding
+        print(f"{entity.name} guarded!")
 
     def GameOver(self):
-        pass
+        # Handle game over logic
+        print("Game Over!")
 
     def fight(self):
-
         # Main combat loop
-        while self.won == False:
-                
-            # Player and Enemy take their turns and store choices in variables   
+        while not self.won:
+            # Player and Enemy take their turns and store choices in variables
             pmov = self.player.TakeTurn()
             emov = self.enemy.TakeTurn()
 
-            # If guarded TakeTurn will return 0
-            if emov == 0: 
-                self.guard(self.enemy) # Prints 'name' gaurded and restarts
-                continue               # loop before damage is done
+            # Ensure pmov and emov are valid numbers
+            if pmov is None:
+                pmov = 0  # Default to 0 if pmov is None
+            if emov is None:
+                emov = 0  # Default to 0 if emov is None
 
-            if pmov == 0: 
+            # If guarded, TakeTurn will return 0
+            if emov == 0:
+                self.guard(self.enemy)  # Prints 'name' guarded and restarts loop
+                continue
+
+            if pmov == 0:
                 self.guard(self.player)
                 continue
 
-            # If defender dies TakeDmg will return 0
-            # TakeDmg will change defender's HP based on amount passed in and return 0 if defender dies
-
-            if self.enemy.TakeDmg(pmov) == 0: # If enemy dies break loop
-                self.won = True  
+            # If defender dies, TakeDmg will return 0
+            if self.enemy.TakeDmg(pmov) == 0:  # If enemy dies, break loop
+                self.won = True
                 break
             else:
-                if self.player.TakeDmg(emov) == 0: # If player dies call game over
+                if self.player.TakeDmg(emov) == 0:  # If player dies, call game over
                     self.GameOver()
                     break
-            
-            for x in self.player.skills:
-                self.player.skills[x].reduceCD()
-                                                    # Reduce Cooldowns for all skills
-            for x in self.enemy.skills:
-                self.enemy.skills[x].reduceCD()
+
+            # Reduce cooldowns for all Skills
+            for skill in self.player.Skills:
+                skill.reduceCD()
+            for skill in self.enemy.Skills:
+                skill.reduceCD()
 
         return 0

@@ -29,11 +29,6 @@ class Game:
             'title': pygame.font.Font('Media/Assets/Fonts/fantasy.ttf', 100),
             'shopTitle': pygame.font.Font('Media/Assets/Fonts/fantasy.ttf', 100)
         }
-
-        self.preBattle = {
-            'fight': Button(500, 375, 280, 50, 'Fight'),
-            'infect': Button(500, 460, 280, 50, 'Infect')
-        }
         
         self.dialogue = DialogueManager()
 
@@ -60,6 +55,11 @@ class Game:
             'Exit': Button(500, 525, 280, 50, 'Exit')
         }
 
+        self.preBattle = {
+            'fight': Button(500, 375, 280, 50, 'Fight'),
+            'infect': Button(500, 460, 280, 50, 'Infect')
+        }
+
         # Stores the Button objects for the battle menu.
         self.battle = {
             # The text box is at the beginning of the map because it will be the first thing to be drawn.
@@ -70,16 +70,18 @@ class Game:
             'Inventory': Button(500, 650, 280, 50, 'Inventory')
         }
 
-        self.player = Player
+        # Create an instance of the Player class
+        self.player = Player(self, (0, 0), (100, 100))
 
+        # Store instances of enemies, not class references
         self.enemies = {
-            'soldier' : RSoldier,
-            'orc' : Orc,
-            'rat' : Rat,
-            'priest' : FFaith,
-            'ghoul' : Ghoul,
-            'carrion' : Carrion,
-            'boss' : wiz
+            'soldier': RSoldier(self, (0, 0), (100, 100)),  # Create an instance of RSoldier
+            'orc': Orc(self, (0, 0), (100, 100)),           # Create an instance of Orc
+            'rat': Rat(self, (0, 0), (100, 100)),           # Create an instance of Rat
+            'priest': FFaith(self, (0, 0), (100, 100)),     # Create an instance of FFaith
+            'ghoul': Ghoul(self, (0, 0), (100, 100)),       # Create an instance of Ghoul
+            'carrion': Carrion(self, (0, 0), (100, 100)),   # Create an instance of Carrion
+            'boss': wiz(self, (0, 0), (100, 100))           # Create an instance of wiz
         }
         
         # Stores the Button objects for the shop menu.
@@ -107,10 +109,10 @@ class Game:
             'shop': False, 
             'startGame':False,
             'battle': False,
+            'prebattle': False,
             'intermission': False, 
             'gameOver': False,
-            'itemReward': False,
-            'nextStage': False
+            'itemReward': False
             
         }
 
@@ -125,8 +127,8 @@ class Game:
             'intermissionSong': pygame.mixer.Sound('Media/Music/intermission.wav'),
             'titleSong': pygame.mixer.Sound('Media/Music/title.wav'),
             'shopBackground': pygame.transform.scale(loadImage('/background/shop.png'), (1280, 720)),
-            'enemy1': pygame.transform.scale(loadImage('/enemies/1.jpg').convert_alpha(), (100, 100)),
-            'enemy2': pygame.transform.scale(loadImage('/enemies/2.jpg').convert_alpha(), (100, 100)),
+            'enemy1': pygame.transform.scale(loadImage('/enemies/1.png').convert_alpha(), (200, 200)),
+            'enemy2': pygame.transform.scale(loadImage('/enemies/2.png').convert_alpha(), (200, 200)),
 
         }
 
@@ -197,7 +199,7 @@ class Game:
                                 
                                 if random.random() < .5:
                                     self.gameStates['intermission'] = False
-                                    self.gameStates['nextStage'] = True
+                                    self.gameStates['prebattle'] = True
                                 else:
                                     self.gameStates['intermission'] = False
                                     self.gameStates['itemReward'] = True
@@ -206,7 +208,7 @@ class Game:
 
                                 if random.random() < .5:
                                     self.gameStates['intermission'] = False
-                                    self.gameStates['nextStage'] = True
+                                    self.gameStates['prebattle'] = True
                                 else:
                                     self.gameStates['intermission'] = False
                                     self.gameStates['itemReward'] = True
@@ -275,18 +277,35 @@ class Game:
                                 self.dialogue.handleEvent(event)
                 else:
                     self.gameStates['itemReward'] = False
-                    self.gameStates['nextStage'] = True  
+                    self.gameStates['prebattle'] = True  
 
-            if self.gameStates['nextStage']:
-                # Get mouse position and check for button clicks
+            if self.gameStates['prebattle']:
+                self.screen.fill((0, 0, 0))
+
+                # Draw the menu to prompt the user to fight or infect the enemies
+                self.drawMenu(self.preBattle)
+
+                # Draw the enemies on the screen
+                self.screen.blit(self.assets['enemy1'], (200, 200))
+                self.screen.blit(self.assets['enemy2'], (500, 200))
+
+                # Handle hover effect on the buttons
                 mousePos = pygame.mouse.get_pos()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 1:
                         if self.preBattle['fight'].rect.collidepoint(mousePos):
-                            self.gameStates['nextStage'] = False
+                            self.gameStates['prebattle'] = False
                             self.gameStates['battle'] = True
-                            # Create battle instance
-                            self.currentBattle = Battle(self.player, self.enemies['soldier']())
+
+                            # Create a Battle instance with instances of Player and Enemy
+                            self.currentBattle = Battle(self.player, self.enemies['soldier'])
+                        #elif self.preBattle['infect'].rect.collidepoint(mousePos) & self.enemies['soldier'].currentHp > 0:
+                        #    self.gameStates['prebattle'] = False
+                        #    self.gameStates['battle'] = True
+
+                        #    # Create a Battle instance with instances of Player and Enemy
+                        #    self.currentBattle = Battle(self.player, self.enemies['soldier'])
+
 
                 
 
