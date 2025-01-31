@@ -4,6 +4,9 @@ import random
 from Scripts.ui import Button, Text, TextBox
 from Scripts.util import loadImage
 from Scripts.dialogue import DialogueManager
+from Scripts.battle import Battle
+from Scripts.character import Player
+from Scripts.enemies import RSoldier, Orc, Rat, FFaith, Ghoul, Carrion, wiz
 
 class Game:
     
@@ -32,10 +35,18 @@ class Game:
             'infect': Button(500, 460, 280, 50, 'Infect')
         }
         
-        self.dialouge = DialogueManager()
+        self.dialogue = DialogueManager()
 
-        self.dialouge.addDialogue('intro', TextBox(200, 75, 900, 600, text="Welcome to the game!Welcome to the game!Welcome to the game!Welcome to the game!Welcome to the game!"))
-        self.dialouge.addDialogue('reward', TextBox(200, 600, 900, 200, text="You found a potion!"))
+        self.dialogue.addDialogue('intro', TextBox(200, 75, 900, 600, text="The year is 712. The land of Terrestrea has reached its brink. Both man and child cry as they mourn their late prince Mestallan. The very prince that was the remaining hope for the common folk amidst a king near as heavy as the gold he hoards. The cause of the prince’s death? Why, you, small and fickle as you may seem. Why else would you be here, in a forgotten cellar at the bottom floor of this Great Dungeon? A month has passed since His Grace the prince was slain by your hands and all of the king’s guards are to be in attendance for the royal funeral. You want to be free once more, do you not? The time is ripe, my friend, make your move and infect what is before you."))
+        self.dialogue.addDialogue('ending', TextBox(200, 600, 900, 200, text="The year is 863. The land of Terrestrea has reached its brink. Both man and… forget about it. It makes no matter. All you need to know is that the time is ripe, my friend. Make your move and infect what is before you."))
+        self.dialogue.addDialogue('reward', TextBox(200, 600, 900, 200, text="You found a potion!"))
+        self.dialogue.addDialogue('RevivedSoldierEncounter', TextBox(200, 600, 900, 200, text="You! You.. monster! I do not know what I have become nor do I know who you are, but you must be part of this. You shall taste vengeance."))
+        self.dialogue.addDialogue('RatEncounter', TextBox(200, 600, 900, 200, text="squeak, squeak."))
+        self.dialogue.addDialogue('GhoulEncounter', TextBox(200, 600, 900, 200, text="... hAAhhhhhhh…."))
+        self.dialogue.addDialogue('OrcEncounter', TextBox(200, 600, 900, 200, text="YOU. MEAT. I. KILL."))
+        self.dialogue.addDialogue('ForgottenFaithfulEncounter', TextBox(200, 600, 900, 200, text="Hesitation Is Not An Option When His Prowess Is Watching."))
+        self.dialogue.addDialogue('CarrionEncounter', TextBox(200, 600, 900, 200, text="ArE YoU HerE TO BinD US OncE MorE? NO… NeveR AneW… WhaT WE ArE, WhaT WE HavE BecomE, CaN NeveR BE BounD AgaiN."))
+        self.dialogue.addDialogue('HarbingerOfTheUnwantedEncounter', TextBox(200, 600, 900, 200, text="Fear molds the mind of man. You, however, can take on the mold of a man. Does that make you fear itself or the one who should fear the most? I suppose we shall see, my friend."))
         
 
         # Stores the Buttons objects for the main menu
@@ -57,6 +68,18 @@ class Game:
             'Skill': Button(500, 575, 280, 50, 'Skill'),
             'Guard': Button(500, 575, 280, 50, 'Guard'),
             'Inventory': Button(500, 650, 280, 50, 'Inventory')
+        }
+
+        self.player = Player
+
+        self.enemies = {
+            'soldier' : RSoldier,
+            'orc' : Orc,
+            'rat' : Rat,
+            'priest' : FFaith,
+            'ghoul' : Ghoul,
+            'carrion' : Carrion,
+            'boss' : wiz
         }
         
         # Stores the Button objects for the shop menu.
@@ -83,7 +106,8 @@ class Game:
             'main': True, 
             'shop': False, 
             'startGame':False,
-            'battle': False, 'intermission': False, 
+            'battle': False,
+            'intermission': False, 
             'gameOver': False,
             'itemReward': False,
             'nextStage': False
@@ -140,6 +164,8 @@ class Game:
                 self.assets['intermissionSong'].play(-1)
                 self.intermissionMusicPlaying = True
                 self.titleMusicPlaying = False
+
+        
 
             # Plays the title song when in the main menu and the exposition state.
             elif (self.gameStates['main'] or self.gameStates['startGame'] or self.gameStates['shop']) and not self.titleMusicPlaying:
@@ -235,18 +261,18 @@ class Game:
                 dt = clock.tick(60) / 1  
 
                 # Picks the reward dialogue and starts the typing animation.
-                self.dialouge.startDialogue('reward')
+                self.dialogue.startDialogue('reward')
 
                  # Adds next character from text.
-                self.dialouge.update(dt)
+                self.dialogue.update(dt)
                 self.drawMenu(self.intermission)
 
                 # Draw the text box.
-                self.dialouge.draw(self.screen)
+                self.dialogue.draw(self.screen)
 
                 # Checks for mouse clicks to skip the typing animation or progress the dialogue.
-                if self.dialouge.is_active and self.dialouge.current_dialogue.isTyping():
-                                self.dialouge.handleEvent(event)
+                if self.dialogue.is_active and self.dialogue.current_dialogue.isTyping():
+                                self.dialogue.handleEvent(event)
                 else:
                     self.gameStates['itemReward'] = False
                     self.gameStates['nextStage'] = True  
@@ -260,12 +286,17 @@ class Game:
 
                 # Draws the enemies on the screen.
                 self.screen.blit(self.assets['enemy1'], (200, 200))
-                self.screen.blit(self.assets['enemy2'], (900, 200))
+                self.screen.blit(self.assets['enemy2'], (500, 200))
 
                 # Handles hover effect on the buttons.
                 mousePos = pygame.mouse.get_pos()
-                for button in self.preBattle.values():
-                    button.isHovered = button.rect.collidepoint(mousePos)
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if event.button == 1:
+                        if self.preBattle['fight'].rect.collidepoint(mousePos):
+                            self.gameStates['nextStage'] = False
+                            self.gameStates['battle'] = True
+                            # Create battle instance
+                            self.currentBattle = Battle(self.player, self.enemies['soldier']())
 
                 
 
@@ -295,13 +326,13 @@ class Game:
                 dt = clock.tick(60) / 1  # Time in seconds since last frame.
 
                 # Picks the intro dialogue and starts the typing animation.
-                self.dialouge.startDialogue('intro')
+                self.dialogue.startDialogue('intro')
 
                 # Adds next character from text
-                self.dialouge.update(dt) 
+                self.dialogue.update(dt) 
 
                 # Draw the text box
-                self.dialouge.draw(self.screen)  
+                self.dialogue.draw(self.screen)  
 
                 for event in pygame.event.get():
 
@@ -309,8 +340,8 @@ class Game:
                         if event.button == 1:
                             # If the text is not finsihed typing, 
                             # and the user clicks the screen, skip the typing animation.
-                            if self.dialouge.is_active and self.dialouge.current_dialogue.isTyping():
-                                self.dialouge.handleEvent(event)
+                            if self.dialogue.is_active and self.dialogue.current_dialogue.isTyping():
+                                self.dialogue.handleEvent(event)
 
                             # If the text is finished typing, performs an
                             # additional click which will exist the 
@@ -339,6 +370,21 @@ class Game:
                 self.screen.blit(self.assets['intermission'], (0, 0))
                 self.drawMenu(self.intermission)
 
+
+            if self.gameStates['battle']:
+                # Background for battle
+                self.screen.fill((0, 0, 0))
+                
+                # Draw battle UI elements (add your battle UI drawing code here)
+                self.drawMenu(self.battle)
+                
+                # Handle the battle
+                result = self.currentBattle.fight()
+                
+                # Check battle result
+                if result == 0:  # Battle is finished
+                    self.gameStates['battle'] = False
+                    self.gameStates['intermission'] = True  # Or whatever state should come next
 
             # Display the screen
             pygame.display.flip()

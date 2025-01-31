@@ -1,7 +1,7 @@
 import pygame
-from character import Player
-from enemies import Enemy
-from ui import TextBox
+from Scripts.character import Character, Player
+from Scripts.enemies import Enemy
+from Scripts.ui import TextBox
 
 
 
@@ -12,7 +12,7 @@ class Battle:
         self.enemy = enemy
         self.won = False
 
-    def gaurd(self, entity):
+    def guard(self, entity):
         text = TextBox(200, 600, 900, 200, text= entity.name + ' gaurded!')
 
     def GameOver(self):
@@ -24,16 +24,16 @@ class Battle:
         while self.won == False:
                 
             # Player and Enemy take their turns and store choices in variables   
-            pmov = self.player.TakeTurn
-            emov = self.enemy.TakeTurn
-            
+            pmov = self.player.TakeTurn()
+            emov = self.enemy.TakeTurn()
+
             # If guarded TakeTurn will return 0
             if emov == 0: 
-                self.gaurd(self.enemy) # Prints 'name' gaurded and restarts
+                self.guard(self.enemy) # Prints 'name' gaurded and restarts
                 continue               # loop before damage is done
 
             if pmov == 0: 
-                self.gaurd(self.player)
+                self.guard(self.player)
                 continue
 
             # If defender dies TakeDmg will return 0
@@ -44,12 +44,13 @@ class Battle:
                 break
             else:
                 if self.player.TakeDmg(emov) == 0: # If player dies call game over
-                    self.GameOver
+                    self.GameOver()
+                    break
             
             for x in self.player.skills:
-                self.player.skills[x].reduceCD
+                self.player.skills[x].reduceCD()
                                                     # Reduce Cooldowns for all skills
             for x in self.enemy.skills:
-                self.enemy.skills[x].reduceCD
+                self.enemy.skills[x].reduceCD()
 
         return 0

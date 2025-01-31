@@ -1,6 +1,6 @@
 import pygame
 import random
-from character import Character, skill
+from Scripts.character import Character, skill
 
 class Enemy(Character):
 
@@ -9,6 +9,7 @@ class Enemy(Character):
 
         self.name = ' '
         self.InfectRate = 0.0
+        self.gold = 10
 
         self.attackstat = 0.8
         self.sp = 100
