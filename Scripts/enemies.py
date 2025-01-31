@@ -1,6 +1,6 @@
 import pygame
 import random
-from character import Character, skill
+from Scripts.character import Character, skill
 
 class Enemy(Character):
 
