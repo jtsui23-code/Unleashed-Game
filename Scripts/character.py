@@ -11,6 +11,8 @@ class skill:
         self.currentCD = 0
         self.sp = cost
 #        self.text = Text(200, 75, 900, 600, name + '!')
+    def __str__(self):
+        return f"{self.name} does {self.damage} damage and has a cooldown of {self.cooldown} turns. It costs {self.sp} SP to use."
 
     def use(self):
         self.text.print # Prints message declaring skill
@@ -124,14 +126,16 @@ class Player(Character):
             self.infectRate += 0.5
 
     def TakeTurn(self):
+        for skill in self.Skills:
+            print(skill)
         # If skill 1 is off cooldown and has enough SP, use it
-        if self.Skills[0].cooldown == 0 and self.sp >= self.Skills[0].sp_cost:
-            self.sp -= self.skills[0].sp_cost  # Lose SP based on skill
-            return self.skills[0].use  # Ensure this returns a valid damage value
+        if self.Skills[0].cooldown == 0 and self.sp >= self.Skills[0].sp:
+            self.sp -= self.Skills[0].sp  # Lose SP based on skill
+            return self.Skills[0].use  # Ensure this returns a valid damage value
 
         # If skill 2 is off cooldown and has enough SP, use it
-        elif self.Skills[1].cooldown == 0 and self.sp >= self.Skills[1].sp_cost:
-            self.sp -= self.Skills[1].sp_cost  # Lose SP based on skill
+        elif self.Skills[1].cooldown == 0 and self.sp >= self.Skills[1].sp:
+            self.sp -= self.Skills[1].sp  # Lose SP based on skill
             return self.Skills[1].use  # Ensure this returns a valid damage value
 
         # If either skill is about to be off cooldown, then guard

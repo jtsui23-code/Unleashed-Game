@@ -1,7 +1,7 @@
 import pygame
-from enemies import Enemy
-from character import Player, Character, TakeDown
-from Scripts.ui import TextBox
+# from enemies import Enemy
+# from character import Player, Character
+# from Scripts.ui import TextBox
 
 
 
@@ -50,10 +50,10 @@ class Battle:
                     self.GameOver()
                     break
 
-            # Reduce cooldowns for all skills
-            for skill in self.player.skills:
+            # Reduce cooldowns for all Skills
+            for skill in self.player.Skills:
                 skill.reduceCD()
-            for skill in self.enemy.skills:
+            for skill in self.enemy.Skills:
                 skill.reduceCD()
 
         return 0
