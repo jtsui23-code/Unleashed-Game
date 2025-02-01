@@ -81,10 +81,10 @@ class Game:
         self.battle = {
             # The text box is at the beginning of the map because it will be the first thing to be drawn.
             'Text': TextBox(200, 75, 900, 600, text=''),
-            'Attack': Button(500, 500, 280, 50, 'Attack'),
-            'Skill': Button(500, 575, 280, 50, 'Skill'),
-            'Guard': Button(500, 575, 280, 50, 'Guard'),
-            'Inventory': Button(500, 650, 280, 50, 'Inventory')
+            'Attack': Button(500, 400, 280, 50, 'Attack'),
+            'Skill': Button(500, 475, 280, 50, 'Skill'),
+            'Guard': Button(500, 550, 280, 50, 'Guard'),
+            'Inventory': Button(500, 725, 280, 50, 'Inventory')
         }
 
         # Create an instance of the Player class
@@ -207,8 +207,16 @@ class Game:
                     if event.button == 1:
                         mousePos = pygame.mouse.get_pos()
 
+                        # Handles the player's choice to fight or infect the enemies.
+                        if self.gameStates['prebattle']:
+                            if self.preBattle['fight'].rect.collidepoint(mousePos):
+                                print("Fight button clicked")  # Debug print
+                                self.gameStates['prebattle'] = False
+                                self.gameStates['battle'] = True
+                                self.currentBattle = Battle(self.player, self.enemies['soldier'])
+
                         # After pressing left or right button, create a 50% chance for a battle and a 50% chance for a bonus intermission
-                        if self.gameStates['intermission']:
+                        elif self.gameStates['intermission']:
                             if self.intermission['right'].rect.collidepoint(mousePos):
                                 
                                 if random.random() < .5:
@@ -228,7 +236,7 @@ class Game:
                                     self.gameStates['itemReward'] = True
                                                                                    
                         # Switches to the shop menu when the shop button is clicked.
-                        if self.gameStates['main']:
+                        elif self.gameStates['main']:
 
                             if self.mainMenuOptions['Shop'].rect.collidepoint(mousePos):
                                 self.gameStates['main'] = False
@@ -247,7 +255,7 @@ class Game:
                                 self.gameStates['shop'] = False
 
                         # Switches back to the main menu when the back button is clicked.
-                        if self.gameStates['shop']:
+                        elif self.gameStates['shop']:
 
                             # Changes color of shop buttons if hovering over them.
                             for button in self.shopOptions.values():
@@ -373,41 +381,22 @@ class Game:
                 # Draw the menu to prompt the user to fight or infect the enemies
                 self.drawMenu(self.preBattle)
 
-                
-
                 # Handle hover effect on the buttons
                 mousePos = pygame.mouse.get_pos()
 
                 for button in self.preBattle.values():
                     button.isHovered = button.rect.collidepoint(mousePos)
 
-                for event in pygame.event.get():
-
-                    if event.type == pygame.MOUSEBUTTONDOWN:
-                        if event.button == 1:
-                            if self.preBattle['fight'].rect.collidepoint(mousePos):
-                                print("Fight button clicked")
-                                self.gameStates['prebattle'] = False
-                                self.gameStates['battle'] = True
-                                self.currentBattle = Battle(self.player, self.enemies['soldier'])    
+                
 
 
-
-                                # Create a Battle instance with instances of Player and Enemy
-                            #elif self.preBattle['infect'].rect.collidepoint(mousePos) & self.enemies['soldier'].currentHp > 0:
-                            #    self.gameStates['prebattle'] = False
-                            #    self.gameStates['battle'] = True
-
-                            #    # Create a Battle instance with instances of Player and Enemy
-                            #    self.currentBattle = Battle(self.player, self.enemies['soldier'])
-
+                                
 
 
 
             if self.gameStates['battle']:
                 # Background for battle
 
-                print('Entered battle state')
                 self.screen.fill((0, 0, 0))
                 
                 # Draw battle UI elements (add your battle UI drawing code here)

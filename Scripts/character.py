@@ -7,26 +7,46 @@ class skill:
     def __init__(self, name, dmg, cooldown, cost):
         self.name = name
         self.damage = dmg
-        self.cooldown = cooldown
-        self.currentCD = 0
+        self.max_cooldown = cooldown  # Store the max cooldown
+        self.currentCD = 0  # Current cooldown starts at 0
         self.sp = cost
-        self.text = Text(200, 75, 900, 600, name + '!', pygame.font.Font('Media/Assets/Fonts/fantasy.ttf', 100), (255, 255, 255))
-    def __str__(self):
-        return f"{self.name} does {self.damage} damage and has a cooldown of {self.cooldown} turns. It costs {self.sp} SP to use."
+        self.text = Text(200, 75, 900, 600, name + '!', 
+                        pygame.font.Font('Media/Assets/Fonts/fantasy.ttf', 100), 
+                        (255, 255, 255))
 
-    def use(self):
-        self.text.draw # Prints message declaring skill
-        self.currentCD = self.cooldown
+    def __str__(self):
+        return f"{self.name} does {self.damage} damage and has a cooldown of {self.max_cooldown} turns. It costs {self.sp} SP to use."
+
+    def use(self, screen=None):
+        """
+        Use the skill and return its damage.
+        If screen is provided, draw the skill name.
+        """
+        if not self.is_available():
+            return 0
+            
+        if screen:
+            self.text.draw(screen)
+            
+        self.currentCD = self.max_cooldown  # Start the cooldown
         return self.damage
     
-    def cooldown(self):
+    def is_available(self):
+        """Check if the skill is available to use"""
+        return self.currentCD == 0
+    
+    def get_cooldown(self):
+        """Get current cooldown value"""
         return self.currentCD
 
     def reduceCD(self):
-        # If Cooldown is more than 0 it is reduced,
-        #  if it is 0 the function does nothing
+        """Reduce cooldown by 1 if it's greater than 0"""
         if self.currentCD > 0:
-            self.currentCD =- 1
+            self.currentCD -= 1  # Fixed the syntax error here
+    
+    def get_sp_cost(self):
+        """Get the SP cost of the skill"""
+        return self.sp
 
 
 class Character:
