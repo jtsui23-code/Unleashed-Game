@@ -1,66 +1,77 @@
-import pygame
-# from enemies import Enemy
-# from character import Player, Character
-# from Scripts.ui import TextBox
-
-
-
 class Battle:
     def __init__(self, player, enemy):
-        self.player = player  # Instance of Player
-        self.enemy = enemy    # Instance of Enemy
+        self.player = player
+        self.enemy = enemy
         self.won = False
+        self.battle_state = "player_turn"  # Track whose turn it is
+        self.player_move = None
+        self.enemy_move = None
+        self.turn_complete = False
 
     def guard(self, entity):
-        # Print a message indicating the entity is guarding
         print(f"{entity.name} guarded!")
+        return True
 
     def GameOver(self):
-        # Handle game over logic
         print("Game Over!")
+        return True
 
-    def fight(self):
-        # Main combat loop
-        while not self.won:
-            # Player and Enemy take their turns and store choices in variables
-            pmov = self.player.TakeTurn()
-            emov = self.enemy.TakeTurn()
-
-            # Ensure pmov and emov are valid numbers
-            if pmov is None:
-                pmov = 0  # Default to 0 if pmov is None
-            if emov is None:
-                emov = 0  # Default to 0 if emov is None
-
-                        # If pmov is a method, call it to get the damage value
+    def process_turn(self):
+        # Handle player turn
+        if self.battle_state == "player_turn":
+            if self.player_move is None:
+                return 1  # Still waiting for player input
+            
+            # Process player move
+            pmov = self.player_move
             if callable(pmov):
                 pmov = pmov()
+            
+            if pmov == 0:
+                self.guard(self.player)
+            else:
+                # Process player attack
+                if self.enemy.TakeDmg(pmov) == 0:
+                    self.won = True
+                    return 0  # Battle is over
+            
+            # Switch to enemy turn
+            self.battle_state = "enemy_turn"
+            self.player_move = None
+            return 1
 
+        # Handle enemy turn
+        elif self.battle_state == "enemy_turn":
+            # Get enemy move
+            emov = self.enemy.TakeTurn()
+            
+            if emov is None:
+                emov = 0
+            
             if callable(emov):
                 emov = emov()
 
-            # If guarded, TakeTurn will return 0
             if emov == 0:
-                self.guard(self.enemy)  # Prints 'name' guarded and restarts loop
-                continue
-
-            if pmov == 0:
-                self.guard(self.player)
-                continue
-
-            # If defender dies, TakeDmg will return 0
-            if self.enemy.TakeDmg(pmov) == 0:  # If enemy dies, break loop
-                self.won = True
-                break
+                self.guard(self.enemy)
             else:
-                if self.player.TakeDmg(emov) == 0:  # If player dies, call game over
+                # Process enemy attack
+                if self.player.TakeDmg(emov) == 0:
                     self.GameOver()
-                    break
+                    return 0  # Battle is over
 
-            # Reduce cooldowns for all Skills
+            # Reduce cooldowns
             for skill in self.player.Skills:
                 skill.reduceCD()
             for skill in self.enemy.Skills:
                 skill.reduceCD()
 
-        return 0
+            # Switch back to player turn
+            self.battle_state = "player_turn"
+            return 1
+
+    def fight(self):
+        return self.process_turn()
+
+    def set_player_move(self, move):
+        """Set the player's chosen move"""
+        self.player_move = move
