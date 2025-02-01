@@ -133,8 +133,6 @@ class Game:
             
         }
 
-        self.currentBattle = Battle(self.player, self.enemies['soldier'])
-
         # Stores the selected button by the player.
         self.selectedOption = None
 
@@ -213,7 +211,6 @@ class Game:
                         if self.gameStates['intermission']:
                             if self.intermission['right'].rect.collidepoint(mousePos):
                                 
-                                
                                 if random.random() < .5:
                                     self.gameStates['intermission'] = False
                                     self.gameStates['prebattle'] = True
@@ -229,7 +226,7 @@ class Game:
                                 else:
                                     self.gameStates['intermission'] = False
                                     self.gameStates['itemReward'] = True
-
+                                                                                   
                         # Switches to the shop menu when the shop button is clicked.
                         if self.gameStates['main']:
 
@@ -273,61 +270,6 @@ class Game:
                                     self.upgrades['SP']+= 1
                         
                         
-            if self.gameStates['itemReward']:
-                # Changes the background when the item reward screen starts.
-
-                # Need for creating the typing animation for the text box.
-                dt = clock.tick(60) / 1  
-
-                # Picks the reward dialogue and starts the typing animation.
-                self.dialogue.startDialogue('reward')
-
-                 # Adds next character from text.
-                self.dialogue.update(dt)
-                self.drawMenu(self.intermission)
-
-                # Draw the text box.
-                self.dialogue.draw(self.screen)
-
-                # Checks for mouse clicks to skip the typing animation or progress the dialogue.
-                if self.dialogue.is_active and self.dialogue.current_dialogue.isTyping():
-                                self.dialogue.handleEvent(event)
-                else:
-                    self.gameStates['itemReward'] = False
-                    self.gameStates['prebattle'] = True  
-
-            if self.gameStates['prebattle']:
-                self.screen.fill((0, 0, 0))
-
-                # Draw the menu to prompt the user to fight or infect the enemies
-                self.drawMenu(self.preBattle)
-
-                # Draw the enemies on the screen
-                self.screen.blit(self.assets['enemy1'], (200, 200))
-                self.screen.blit(self.assets['enemy2'], (500, 200))
-
-                # Handle hover effect on the buttons
-                mousePos = pygame.mouse.get_pos()
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    if event.button == 1:
-                        if self.preBattle['fight'].rect.collidepoint(mousePos):
-
-                            self.gameStates['prebattle'] = False
-                            self.gameStates['battle'] = True
-                            self.currentBattle.fight()
-
-                            # Create a Battle instance with instances of Player and Enemy
-                        #elif self.preBattle['infect'].rect.collidepoint(mousePos) & self.enemies['soldier'].currentHp > 0:
-                        #    self.gameStates['prebattle'] = False
-                        #    self.gameStates['battle'] = True
-
-                        #    # Create a Battle instance with instances of Player and Enemy
-                        #    self.currentBattle = Battle(self.player, self.enemies['soldier'])
-
-
-                
-
-
             if self.gameStates['main']:
 
                 # Get mouse position for hover effect on buttons.
@@ -397,9 +339,75 @@ class Game:
                 self.screen.blit(self.assets['intermission'], (0, 0))
                 self.drawMenu(self.intermission)
 
+            if self.gameStates['itemReward']:
+                # Changes the background when the item reward screen starts.
+
+                # Need for creating the typing animation for the text box.
+                dt = clock.tick(60) / 1  
+
+                # Picks the reward dialogue and starts the typing animation.
+                self.dialogue.startDialogue('reward')
+
+                 # Adds next character from text.
+                self.dialogue.update(dt)
+                self.drawMenu(self.intermission)
+
+                # Draw the text box.
+                self.dialogue.draw(self.screen)
+
+                # Checks for mouse clicks to skip the typing animation or progress the dialogue.
+                if self.dialogue.is_active and self.dialogue.current_dialogue.isTyping():
+                                self.dialogue.handleEvent(event)
+                else:
+                    self.gameStates['itemReward'] = False
+                    self.gameStates['prebattle'] = True  
+
+
+            if self.gameStates['prebattle']:
+                self.screen.fill((0, 0, 0))
+
+                # Draw the enemies on the screen
+                self.screen.blit(self.assets['enemy1'], (200, 200))
+                self.screen.blit(self.assets['enemy2'], (500, 200))
+
+                # Draw the menu to prompt the user to fight or infect the enemies
+                self.drawMenu(self.preBattle)
+
+                
+
+                # Handle hover effect on the buttons
+                mousePos = pygame.mouse.get_pos()
+
+                for button in self.preBattle.values():
+                    button.isHovered = button.rect.collidepoint(mousePos)
+
+                for event in pygame.event.get():
+
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                        if event.button == 1:
+                            if self.preBattle['fight'].rect.collidepoint(mousePos):
+                                print("Fight button clicked")
+                                self.gameStates['prebattle'] = False
+                                self.gameStates['battle'] = True
+                                self.currentBattle = Battle(self.player, self.enemies['soldier'])    
+
+
+
+                                # Create a Battle instance with instances of Player and Enemy
+                            #elif self.preBattle['infect'].rect.collidepoint(mousePos) & self.enemies['soldier'].currentHp > 0:
+                            #    self.gameStates['prebattle'] = False
+                            #    self.gameStates['battle'] = True
+
+                            #    # Create a Battle instance with instances of Player and Enemy
+                            #    self.currentBattle = Battle(self.player, self.enemies['soldier'])
+
+
+
 
             if self.gameStates['battle']:
                 # Background for battle
+
+                print('Entered battle state')
                 self.screen.fill((0, 0, 0))
                 
                 # Draw battle UI elements (add your battle UI drawing code here)
@@ -412,6 +420,7 @@ class Game:
                 if result == 0:  # Battle is finished
                     self.gameStates['battle'] = False
                     self.gameStates['intermission'] = True  # Or whatever state should come next
+
 
             # Display the screen
             pygame.display.flip()
