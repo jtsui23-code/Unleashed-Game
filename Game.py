@@ -87,14 +87,15 @@ class Game:
             'Attack': Button(500, 400, 280, 50, 'Attack'),
             'Skill': Button(500, 475, 280, 50, 'Skills'),
             'Guard': Button(500, 550, 280, 50, 'Guard'),
-            'Inventory': Button(500, 725, 280, 50, 'Inventory')
+            'Inventory': Button(500, 725, 280, 50, 'Inventory'),
         }
 
         self.moves = {
             'Text': TextBox(200, 75, 900, 600, text=''),
             'Skill0' : Button(500, 400, 280, 50, self.player.Skills[0].name),
             'Skill1' : Button(500, 475, 280, 50, self.player.Skills[1].name),
-            'Skill2' : Button(500, 550, 280, 50, self.player.Skills[2].name)
+            'Skill2' : Button(500, 550, 280, 50, self.player.Skills[2].name),
+            'Back': Button(20, 620, 140, 50, 'Back')      
         }
 
         # Store instances of enemies, not class references
@@ -436,9 +437,18 @@ class Game:
 
                                 elif self.moves['Skill2'].rect.collidepoint(mousePos):
                                     skillUsed = 2
+
+                                elif self.moves['Back'].rect.collidepoint(mousePos):
+                                    self.screen.fill((0, 0, 0))
+                                    self.drawMenu(self.battle)
+                                    skillUsed = 5
                                 
-                                action_selected = True
-                                move = self.player.Skills[skillUsed]
+                                if skillUsed == 5:
+                                    continue
+
+                                else:
+                                    action_selected = True
+                                    move = self.player.Skills[skillUsed]
                             
                             if self.battle['Inventory'].rect.collidepoint(mousePos):
                                 #action_selected = True
@@ -471,7 +481,3 @@ class Game:
 if __name__ == "__main__":
     game = Game()
     game.run()
-
-
-
-
