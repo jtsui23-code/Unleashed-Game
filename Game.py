@@ -77,18 +77,25 @@ class Game:
             'infect': Button(500, 460, 280, 50, 'Infect')
         }
 
+        # Create an instance of the Player class
+        self.player = Player(self, (0, 0), (100, 100), self.screen)
+
         # Stores the Button objects for the battle menu.
         self.battle = {
             # The text box is at the beginning of the map because it will be the first thing to be drawn.
             'Text': TextBox(200, 75, 900, 600, text=''),
             'Attack': Button(500, 400, 280, 50, 'Attack'),
-            'Skill': Button(500, 475, 280, 50, 'Skill'),
+            'Skill': Button(500, 475, 280, 50, 'Skills'),
             'Guard': Button(500, 550, 280, 50, 'Guard'),
             'Inventory': Button(500, 725, 280, 50, 'Inventory')
         }
 
-        # Create an instance of the Player class
-        self.player = Player(self, (0, 0), (100, 100), self.screen)
+        self.moves = {
+            'Text': TextBox(200, 75, 900, 600, text=''),
+            'Skill0' : Button(500, 400, 280, 50, self.player.Skills[0].name),
+            'Skill1' : Button(500, 475, 280, 50, self.player.Skills[1].name),
+            'Skill2' : Button(500, 550, 280, 50, self.player.Skills[2].name)
+        }
 
         # Store instances of enemies, not class references
         self.enemies = {
@@ -397,13 +404,57 @@ class Game:
             if self.gameStates['battle']:
                 # Background for battle
 
+                action_selected = False
+                move = 0
+
                 self.screen.fill((0, 0, 0))
                 
                 # Draw battle UI elements (add your battle UI drawing code here)
                 self.drawMenu(self.battle)
-                
+
+                while not action_selected:
+                    for event in pygame.event.get():
+                        mousePos = pygame.mouse.get_pos()
+                        if event.type == pygame.MOUSEBUTTONDOWN:
+                            
+                            if self.battle['Attack'].rect.collidepoint(mousePos):
+                                action_selected = True
+                                #return self.basicAttack
+                                move = self.player.basicAttack()
+                            
+                            if self.battle['Skill'].rect.collidepoint(mousePos):
+
+                                self.drawMenu(self.moves)
+
+                                skillUsed = 0
+
+                                if self.moves['Skill0'].rect.collidepoint(mousePos):
+                                    skillUsed = 0
+
+                                elif self.moves['Skill1'].rect.collidepoint(mousePos):
+                                    skillUsed = 1
+
+                                elif self.moves['Skill2'].rect.collidepoint(mousePos):
+                                    skillUsed = 2
+                                
+                                action_selected = True
+                                move = self.player.Skills[skillUsed]
+                            
+                            if self.battle['Inventory'].rect.collidepoint(mousePos):
+                                #action_selected = True
+                                #return self.Skills[1].use
+                                continue
+                            
+                            if self.battle['Guard'].rect.collidepoint(mousePos):
+                                action_selected = True
+                                move = 0
+
+
+                # Keep the game running while waiting for input
+                pygame.display.flip()
+                pygame.time.Clock().tick(60)
                 # Handle the battle
-                result = self.currentBattle.fight()
+                result = self.currentBattle.fight(move)
                 
                 # Check battle result
                 if result == 0:  # Battle is finished
