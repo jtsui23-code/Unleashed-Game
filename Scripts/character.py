@@ -89,7 +89,9 @@ class Player(Character):
 
         self.maxHp = 80
         self.currentHp = self.maxHp
-        Pari = skill('Parasidic Rage', 30, 3, 20)
+        Pari = skill('Parasitic Rage', 30, 3, 20)
+
+        # Blank skills to be replaced after infection
         BlankSkill1 = skill('', 0, 0, 0)
         BlankSkill2 = skill('', 0, 0, 0)
 

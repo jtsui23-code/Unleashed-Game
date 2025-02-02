@@ -16,14 +16,14 @@ class Battle:
         print("Game Over!")
         return True
 
-    def process_turn(self):
+    def process_turn(self, pmov):
         # Handle player turn
         if self.battle_state == "player_turn":
             if self.player_move is None:
                 return 1  # Still waiting for player input
             
             # Process player move
-            pmov = self.player_move
+            # pmov = self.player_move
             if callable(pmov):
                 pmov = pmov()
             
@@ -69,8 +69,8 @@ class Battle:
             self.battle_state = "player_turn"
             return 1
 
-    def fight(self):
-        return self.process_turn()
+    def fight(self, pmov):
+        return self.process_turn(pmov)
 
     def set_player_move(self, move):
         """Set the player's chosen move"""
