@@ -192,7 +192,7 @@ class FFaith(Enemy):
         self.skillCooldown = []
 
         # Skills
-        DivR = skill('Divin Retribution', 50, 8, 0)
+        DivR = skill('Divine Retribution', 50, 8, 0)
         Smite = skill('Smite', 20, 1, 0)
 
         self.Skills = [DivR, Smite]
