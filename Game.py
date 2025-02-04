@@ -26,8 +26,7 @@ class Game:
         self.titleColor = (200, 50, 50)
 
         self.fonts = {
-            'title': pygame.font.Font('Media/Assets/Fonts/fantasy.ttf', 100),
-            'shopTitle': pygame.font.Font('Media/Assets/Fonts/fantasy.ttf', 100)
+            'fanta': pygame.font.Font('Media/Assets/Fonts/fantasy.ttf', 100),
         }
         
         self.dialogue = DialogueManager()
@@ -66,7 +65,7 @@ class Game:
 
         # Stores the Button objects for the main menu.
         self.mainMenuOptions = {
-            'Title': Text(500, 200, 280, 50, 'Unleeched', self.fonts['title'], self.titleColor),
+            'Title': Text(500, 200, 280, 50, 'Unleeched', self.fonts['fanta'], self.titleColor),
             'Start': Button(500, 375, 280, 50, 'Start'),
             'Shop': Button(500, 450, 280, 50, 'Shop'),
             'Exit': Button(500, 525, 280, 50, 'Exit')
@@ -112,7 +111,7 @@ class Game:
         # Stores the Button objects for the shop menu.
         self.shopOptions = {
             'Box': TextBox(200, 75, 900, 600, '', (43, 44, 58, 160)),
-            'Title': Text(500, 120, 280, 50, 'Upgrades', self.fonts['shopTitle'], self.titleColor),
+            'Title': Text(500, 120, 280, 50, 'Upgrades', self.fonts['fanta'], self.titleColor),
             'Attack':Button(275, 500, 140,50, 'Attack'),
             'Infection': Button(575, 500, 140, 50, 'Infect'),
             'SP': Button(875, 500, 140, 50, 'SP'),

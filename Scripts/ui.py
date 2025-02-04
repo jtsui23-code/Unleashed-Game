@@ -6,11 +6,9 @@ import textwrap
 pygame.init()
 #Fonts
 
-fonts = {
-            'basic': 'Media/Assets/Fonts/Ariall.ttf'
-        }
-TEXT_FONT = pygame.font.Font(fonts['basic'],36)
-BUTTON_FONT = pygame.font.Font(fonts['basic'], 48)
+
+TEXT_FONT = pygame.font.Font(None,36)
+BUTTON_FONT = pygame.font.Font(None, 48)
 
 # Colors
 WHITE = (255, 255, 255)
