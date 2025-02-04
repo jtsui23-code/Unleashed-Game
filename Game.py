@@ -149,6 +149,8 @@ class Game:
             'intermissionSong': pygame.mixer.Sound('Media/Music/intermission.wav'),
             'titleSong': pygame.mixer.Sound('Media/Music/title.wav'),
             'battleSong': pygame.mixer.Sound('Media/Music/battle.wav'),
+            'midBossSong': pygame.mixer.Sound('Media/Music/carrion.wav'),
+            'finalBossSong': pygame.mixer.Sound('Media/Music/harbinger.wav'),
             'shopBackground': pygame.transform.scale(loadImage('/background/shop.png'), (1280, 720)),
             'enemy1': pygame.transform.scale(loadImage('/enemies/Knight.png').convert_alpha(), (400, 500)),
             'enemy2': pygame.transform.scale(loadImage('/enemies/Ghost.png').convert_alpha(), (400, 300)),
