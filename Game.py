@@ -16,7 +16,7 @@ class Game:
         pygame.init()
 
         # Sets the name of the window icon to "Rogue-like"
-        pygame.display.set_caption("Unleached")
+        pygame.display.set_caption("Unleeched")
 
         # Creating a screen variable with the window dimension variables set above
         # when setting window dimensions have to do .set_mode( (_,_) )
@@ -148,6 +148,7 @@ class Game:
             'intermission': pygame.transform.scale(loadImage('/background/intermission.png').convert_alpha(), (1280, 720)),
             'intermissionSong': pygame.mixer.Sound('Media/Music/intermission.wav'),
             'titleSong': pygame.mixer.Sound('Media/Music/title.wav'),
+            'battleSong': pygame.mixer.Sound('Media/Music/battle.wav'),
             'shopBackground': pygame.transform.scale(loadImage('/background/shop.png'), (1280, 720)),
             'enemy1': pygame.transform.scale(loadImage('/enemies/Knight.png').convert_alpha(), (400, 500)),
             'enemy2': pygame.transform.scale(loadImage('/enemies/Ghost.png').convert_alpha(), (400, 300)),
@@ -170,6 +171,7 @@ class Game:
          # Flags to track if certain music are playing.
         self.intermissionMusicPlaying = False
         self.titleMusicPlaying = False
+        self.battleMusicPlaying = False
 
     def drawMenu(self, menu):
         # Draw the menu options for the main menu.
@@ -188,6 +190,7 @@ class Game:
                 self.assets['intermissionSong'].play(-1)
                 self.intermissionMusicPlaying = True
                 self.titleMusicPlaying = False
+                self.battleMusicPlaying = False
 
         
 
@@ -197,6 +200,16 @@ class Game:
                 self.assets['titleSong'].play(-1)
                 self.titleMusicPlaying = True
                 self.intermissionMusicPlaying = False
+                self.battleMusicPlaying = False
+
+            elif (self.gameStates['battle'] or self.gameStates['prebattle']) and not self.battleMusicPlaying:
+                self.assets['intermissionSong'].stop()
+                self.assets['titleSong'].stop()
+                self.assets['battleSong'].play(-1)
+                self.battleMusicPlaying = True
+                self.titleMusicPlaying = False
+                self.intermissionMusicPlaying = False
+
 
             
             # Event loop
