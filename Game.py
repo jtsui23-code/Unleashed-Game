@@ -174,6 +174,7 @@ class Game:
         self.intermissionMusicPlaying = False
         self.titleMusicPlaying = False
         self.battleMusicPlaying = False
+        self.midBossMusicPlaying = False
 
     def drawMenu(self, menu):
         # Draw the menu options for the main menu.
@@ -217,10 +218,11 @@ class Game:
             #    self.assets['titleSong'].stop()
             #    self.assets['battleSong'].stop()
             #    self.assets['midBossSong'].play(-1)
+            #    self.midBossMusicPlaying = True
             #    self.battleMusicPlaying = False
             #    self.titleMusicPlaying = False
             #    self.intermissionMusicPlaying = False
-            #    self.midBossMusicPlaying = True
+
 
 
             
