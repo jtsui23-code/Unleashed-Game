@@ -228,6 +228,7 @@ class Game:
             #    self.battleMusicPlaying = False
             #    self.titleMusicPlaying = False
             #    self.intermissionMusicPlaying = False
+            #    self.finalBossMusicPlaying = False
 
             #elif (self.gameStates['finalBoss']) and not self.titleMusicPlaying and not self.battleMusicPlaying:
             #    self.assets['intermissionSong'].stop()
@@ -238,6 +239,7 @@ class Game:
             #    self.battleMusicPlaying = False
             #    self.titleMusicPlaying = False
             #    self.intermissionMusicPlaying = False
+            #    self.midBossMusicPlaying = False
 
 
 
