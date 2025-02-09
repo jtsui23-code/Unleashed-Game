@@ -143,6 +143,7 @@ class Game:
         # Stores the selected button by the player.
         self.selectedOption = None
 
+        # Stores battle music
         self.assets = {
             'titleBackground':pygame.transform.scale(loadImage('/background/otherTitle.png').convert_alpha(), (1280, 720)),
             'intermission': pygame.transform.scale(loadImage('/background/intermission.png').convert_alpha(), (1280, 720)),
