@@ -158,6 +158,7 @@ class Game:
 
         }
 
+        # Stores the buttons for the intermission screen.
         self.intermission = {
             'left': Button(100, 300, 200, 100, 'Left'),
             'right': Button(1000, 300, 200, 100, 'Right')
