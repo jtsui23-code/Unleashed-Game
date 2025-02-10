@@ -71,6 +71,7 @@ class Game:
             'Exit': Button(500, 525, 280, 50, 'Exit')
         }
 
+        # Provides preBattle options
         self.preBattle = {
             'fight': Button(500, 375, 280, 50, 'Fight'),
             'infect': Button(500, 460, 280, 50, 'Infect')
