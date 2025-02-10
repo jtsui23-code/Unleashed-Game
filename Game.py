@@ -212,6 +212,7 @@ class Game:
                 self.midBossMusicPlaying = False
                 self.finalBossMusicPlaying = False
 
+            # Plays the battle song when in the battle state.
             elif (self.gameStates['battle'] or self.gameStates['prebattle']) and not self.battleMusicPlaying:
                 self.assets['intermissionSong'].stop()
                 self.assets['titleSong'].stop()
