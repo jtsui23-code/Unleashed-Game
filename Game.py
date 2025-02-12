@@ -333,7 +333,7 @@ class Game:
                                   if self.upgrades['SP'] < 4:
                                     self.upgrades['SP']+= 1
                         
-                        
+            # main state    
             if self.gameStates['main']:
 
                 # Get mouse position for hover effect on buttons.
