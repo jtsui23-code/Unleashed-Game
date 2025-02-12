@@ -390,6 +390,7 @@ class Game:
                 for button in self.shopOptions.values():
                     button.isHovered = button.rect.collidepoint(mousePos)
 
+            # intermission state
             if self.gameStates['intermission']:
                 
                 # Get mouse position for hover effect on buttons.
