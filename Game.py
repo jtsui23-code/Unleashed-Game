@@ -31,7 +31,7 @@ class Game:
         
         self.dialogue = DialogueManager()
 
-        self.dialogue.addDialogue('intro', TextBox(200, 75, 900, 600, text="The year is 712. The land of Terrestrea has reached its brink. Both man and child cry as they mourn their late prince Mestallan. The very prince that was the remaining hope for the common folk amidst a king near as heavy as the gold he hoards. The cause of the prince’s death? Why, you, small and fickle as you may seem. Why else would you be here, in a forgotten cellar at the bottom floor of this Great Dungeon? A month has passed since His Grace the prince was slain by your hands and all of the king’s guards are to be in attendance for the royal funeral. You want to be free once more, do you not? The time is ripe, my friend, make your move and infect what is before you."))
+        self.dialogue.addDialogue('intro', TextBox(200, 75, 900, 600, text="The year is 712. The land of Terrestrea has reached its brink. Both man and child cry as they mourn their late prince Mestallan. The very prince whom defended the common folk amidst a king near as heavy as the gold he hoards. The cause of this prince’s death? Why, you, small and fickle as you may seem. Why else would you lie here, forgotten by all at the nethermost floor of this dank dungeon? A month has drawn since His Royal Highness the prince was slain by your accord and all of the king’s guards are to be in attendance for the royal funeral. You wish to be free once more, do you not? The time is ripe, my friend, make your move and infect what is before you."))
         self.dialogue.addDialogue('ending', TextBox(200, 600, 900, 200, text="The year is 863. The land of Terrestrea has reached its brink. Both man and… forget about it. It makes no matter. All you need to know is that the time is ripe, my friend. Make your move and infect what is before you."))
         self.dialogue.addDialogue('reward', TextBox(200, 600, 900, 200, text="You found a potion!"))
         self.dialogue.addDialogue('RevivedSoldierEncounter', TextBox(200, 600, 900, 200, text="You! You.. monster! I do not know what I have become nor do I know who you are, but you must be part of this. You shall taste vengeance."))
@@ -71,6 +71,7 @@ class Game:
             'Exit': Button(500, 525, 280, 50, 'Exit')
         }
 
+        # Provides preBattle options
         self.preBattle = {
             'fight': Button(500, 375, 280, 50, 'Fight'),
             'infect': Button(500, 460, 280, 50, 'Infect')
@@ -143,6 +144,7 @@ class Game:
         # Stores the selected button by the player.
         self.selectedOption = None
 
+        # Stores battle music
         self.assets = {
             'titleBackground':pygame.transform.scale(loadImage('/background/otherTitle.png').convert_alpha(), (1280, 720)),
             'intermission': pygame.transform.scale(loadImage('/background/intermission.png').convert_alpha(), (1280, 720)),
@@ -157,6 +159,7 @@ class Game:
 
         }
 
+        # Stores the buttons for the intermission screen.
         self.intermission = {
             'left': Button(100, 300, 200, 100, 'Left'),
             'right': Button(1000, 300, 200, 100, 'Right')
@@ -174,6 +177,7 @@ class Game:
         self.intermissionMusicPlaying = False
         self.titleMusicPlaying = False
         self.battleMusicPlaying = False
+        self.midBossMusicPlaying = False
 
     def drawMenu(self, menu):
         # Draw the menu options for the main menu.
@@ -193,6 +197,8 @@ class Game:
                 self.intermissionMusicPlaying = True
                 self.titleMusicPlaying = False
                 self.battleMusicPlaying = False
+                self.midBossMusicPlaying = False
+                self.finalBossMusicPlaying = False
 
         
 
@@ -203,7 +209,10 @@ class Game:
                 self.titleMusicPlaying = True
                 self.intermissionMusicPlaying = False
                 self.battleMusicPlaying = False
+                self.midBossMusicPlaying = False
+                self.finalBossMusicPlaying = False
 
+            # Plays the battle song when in the battle state.
             elif (self.gameStates['battle'] or self.gameStates['prebattle']) and not self.battleMusicPlaying:
                 self.assets['intermissionSong'].stop()
                 self.assets['titleSong'].stop()
@@ -211,6 +220,31 @@ class Game:
                 self.battleMusicPlaying = True
                 self.titleMusicPlaying = False
                 self.intermissionMusicPlaying = False
+                self.midBossMusicPlaying = False
+                self.finalBossMusicPlaying = False
+
+            #elif (self.gameStates['midBoss']) and not self.titleMusicPlaying and not self.battleMusicPlaying:
+            #    self.assets['intermissionSong'].stop()
+            #    self.assets['titleSong'].stop()
+            #    self.assets['battleSong'].stop()
+            #    self.assets['midBossSong'].play(-1)
+            #    self.midBossMusicPlaying = True
+            #    self.battleMusicPlaying = False
+            #    self.titleMusicPlaying = False
+            #    self.intermissionMusicPlaying = False
+            #    self.finalBossMusicPlaying = False
+
+            #elif (self.gameStates['finalBoss']) and not self.titleMusicPlaying and not self.battleMusicPlaying:
+            #    self.assets['intermissionSong'].stop()
+            #    self.assets['titleSong'].stop()
+            #    self.assets['battleSong'].stop()
+            #    self.assets['midBossSong'].play(-1)
+            #    self.finalBossMusicPlaying = True
+            #    self.battleMusicPlaying = False
+            #    self.titleMusicPlaying = False
+            #    self.intermissionMusicPlaying = False
+            #    self.midBossMusicPlaying = False
+
 
 
             
@@ -299,7 +333,7 @@ class Game:
                                   if self.upgrades['SP'] < 4:
                                     self.upgrades['SP']+= 1
                         
-                        
+            # main state    
             if self.gameStates['main']:
 
                 # Get mouse position for hover effect on buttons.
@@ -356,6 +390,7 @@ class Game:
                 for button in self.shopOptions.values():
                     button.isHovered = button.rect.collidepoint(mousePos)
 
+            # intermission state
             if self.gameStates['intermission']:
                 
                 # Get mouse position for hover effect on buttons.
