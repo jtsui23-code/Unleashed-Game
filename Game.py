@@ -90,6 +90,7 @@ class Game:
             'Inventory': Button(500, 725, 280, 50, 'Inventory'),
         }
 
+        # Stores the Button objects for the battle menu.
         self.moves = {
             'Text': TextBox(200, 75, 900, 600, text=''),
             'Skill0' : Button(500, 400, 280, 50, self.player.Skills[0].name),
@@ -179,6 +180,7 @@ class Game:
         self.battleMusicPlaying = False
         self.midBossMusicPlaying = False
 
+        # Stores the current battle instance
     def drawMenu(self, menu):
         # Draw the menu options for the main menu.
         for option in menu.values():
