@@ -180,6 +180,7 @@ class Game:
         self.battleMusicPlaying = False
         self.midBossMusicPlaying = False
 
+        # Stores the current battle instance
     def drawMenu(self, menu):
         # Draw the menu options for the main menu.
         for option in menu.values():
