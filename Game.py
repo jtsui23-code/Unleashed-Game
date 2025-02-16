@@ -187,6 +187,7 @@ class Game:
             option.draw(self.screen)
 
 
+        # The running loop
     def run(self):
         while True:
 
