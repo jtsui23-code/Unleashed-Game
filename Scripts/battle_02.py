@@ -1,6 +1,3 @@
-from Scripts.character import Player
-
-
 class Battle:
     def __init__(self, player, enemy):
         self.player = player
