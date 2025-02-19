@@ -6,8 +6,7 @@ import textwrap
 pygame.init()
 #Fonts
 
-
-TEXT_FONT = pygame.font.Font(None,36)
+TEXT_FONT = pygame.font.Font(None, 36)
 BUTTON_FONT = pygame.font.Font(None, 48)
 
 # Colors
@@ -124,25 +123,33 @@ class Button:
         self.color = TBLACK
         self.hoverColor = WHITE
         self.isHovered = False
-    def draw(self, surface):
         
-        # Changes the color of the button and text if the mouse is hovering over it.
+    def draw(self, surface):
+        # Draw button background
         color = self.hoverColor if self.isHovered else self.color  
-        textColor = BLACK if self.isHovered else LIGHT_GRAY
-
         pygame.draw.rect(surface, color, self.rect)
-        pygame.draw.rect(surface, WHITE, self.rect, 2)
-
-        text_surf = BUTTON_FONT.render(self.text, True, textColor)
+        pygame.draw.rect(surface, WHITE, self.rect, 2)  # White border
+        
+        # Choose text color based on background
+        text_color = BLACK if self.isHovered else WHITE
+        
+        # Create text surface
+        text_surf = BUTTON_FONT.render(self.text, True, text_color)
         text_rect = text_surf.get_rect(center=self.rect.center)
+        
+        # If not hovering and background is transparent, add a small background
+        # that matches the button color to improve text visibility
+        if not self.isHovered and self.color[3] < 255:
+            padding = 4
+            bg_rect = text_rect.inflate(padding, padding)
+            pygame.draw.rect(surface, BLACK, bg_rect)
+        
+        # Draw the text
         surface.blit(text_surf, text_rect)
 
     def handle_event(self, event):
         if event.type == pygame.MOUSEMOTION:
-            if self.rect.collidepoint(event.pos):
-                self.color = self.hoverColor
-            else:
-                self.color = GRAY
+            self.isHovered = self.rect.collidepoint(event.pos)
         
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1 and self.rect.collidepoint(event.pos):
@@ -150,7 +157,7 @@ class Button:
                     self.action()
 
 class Text:
-    def __init__(self, x, y, width, height, text, font,  color):
+    def __init__(self, x, y, width, height, text, font, color):
         self.rect = pygame.Rect(x, y, width, height)
         self.text = text
         self.font = font
