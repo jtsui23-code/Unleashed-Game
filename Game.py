@@ -31,35 +31,6 @@ class Game:
         
         self.dialogue = DialogueManager()
 
-        self.dialogue.addDialogue('intro', TextBox(200, 75, 900, 600, text="The year is 712. The land of Terrestrea has reached its brink. Both man and child cry as they mourn their late prince Mestallan. The very prince whom defended the common folk amidst a king near as heavy as the gold he hoards. The cause of this prince’s death? Why, you, small and fickle as you may seem. Why else would you lie here, forgotten by all at the nethermost floor of this dank dungeon? A month has drawn since His Royal Highness the prince was slain by your accord and all of the king’s guards are to be in attendance for the royal funeral. You wish to be free once more, do you not? The time is ripe, my friend, make your move and infect what is before you."))
-        self.dialogue.addDialogue('ending', TextBox(200, 600, 900, 200, text="The year is 863. The land of Terrestrea has reached its brink. Both man and… forget about it. It makes no matter. All you need to know is that the time is ripe, my friend. Make your move and infect what is before you."))
-        self.dialogue.addDialogue('reward', TextBox(200, 600, 900, 200, text="You found a potion!"))
-        self.dialogue.addDialogue('RevivedSoldierEncounter', TextBox(200, 600, 900, 200, text="You! You.. monster! I do not know what I have become nor do I know who you are, but you must be part of this. You shall taste vengeance."))
-        self.dialogue.addDialogue('RatEncounter', TextBox(200, 600, 900, 200, text="squeak, squeak."))
-        self.dialogue.addDialogue('GhoulEncounter', TextBox(200, 600, 900, 200, text="... hAAhhhhhhh…."))
-        self.dialogue.addDialogue('OrcEncounter', TextBox(200, 600, 900, 200, text="YOU. MEAT. I. KILL."))
-        self.dialogue.addDialogue('ForgottenFaithfulEncounter', TextBox(200, 600, 900, 200, text="Hesitation Is Not An Option When His Prowess Is Watching."))
-        self.dialogue.addDialogue('CarrionEncounter', TextBox(200, 600, 900, 200, text="ArE YoU HerE TO BinD US OncE MorE? NO… NeveR AneW… WhaT WE ArE, WhaT WE HavE BecomE, CaN NeveR BE BounD AgaiN."))
-        self.dialogue.addDialogue('HarbingerOfTheUnwantedEncounter', TextBox(200, 600, 900, 200, text="Fear molds the mind of man. You, however, can take on the mold of a man. Does that make you fear itself or the one who should fear the most? I suppose we shall see, my friend."))
-        self.dialogue.addDialogue('RevivedSoldierPossession', TextBox(200, 600, 900, 200, text="“No, please!”"))
-        self.dialogue.addDialogue('RatPossession', TextBox(200, 600, 900, 200, text="squeak. SQUEAK."))
-        self.dialogue.addDialogue('GhoulPossession', TextBox(200, 600, 900, 200, text="........yEsss.."))
-        self.dialogue.addDialogue('OrcPossession', TextBox(200, 600, 900, 200, text="WHAT. HAPPENING."))
-        self.dialogue.addDialogue('ForgottenFaithfulPossession', TextBox(200, 600, 900, 200, text="Ah, I Was Expecting You…"))
-        self.dialogue.addDialogue('RevivedSoldierDeath', TextBox(200, 600, 900, 200, text="squeak, squeak."))
-        self.dialogue.addDialogue('RatDeath', TextBox(200, 600, 900, 200, text="squeak, squeak."))
-        self.dialogue.addDialogue('GhoulDeath', TextBox(200, 600, 900, 200, text="squeak, squeak."))
-        self.dialogue.addDialogue('OrcDeath', TextBox(200, 600, 900, 200, text="squeak, squeak."))
-        self.dialogue.addDialogue('ForgottenFaithfulDeath', TextBox(200, 600, 900, 200, text="squeak, squeak."))
-        self.dialogue.addDialogue('CarrionDeath', TextBox(200, 600, 900, 200, text="squeak, squeak."))
-        self.dialogue.addDialogue('HarbingerOfTheUnwantedDeath', TextBox(200, 600, 900, 200, text="squeak, squeak."))
-        self.dialogue.addDialogue('RevivedSoldierIntermission', TextBox(200, 600, 900, 200, text="I should’ve listened to my wife. Another job would have suited me better than this garb."))
-        self.dialogue.addDialogue('RatIntermission', TextBox(200, 600, 900, 200, text="squeak, squeak. Squeak!"))
-        self.dialogue.addDialogue('GhoulIntermission', TextBox(200, 600, 900, 200, text="...AAAhhhhh…. hAAhhhh…hA."))
-        self.dialogue.addDialogue('OrcIntermission', TextBox(200, 600, 900, 200, text="WE. FRIEND. NOT. SURE. MAYBE. NOT."))
-        self.dialogue.addDialogue('ForgottenFaithfulIntermission', TextBox(200, 600, 900, 200, text="All Will Happen As His Providence Has Decided. Enjoy Your Time Here."))
-        
-
         # Stores the Buttons objects for the main menu
         self.menuState = "main"
 
