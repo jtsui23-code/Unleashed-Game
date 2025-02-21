@@ -4,6 +4,7 @@ import random
 from Scripts.ui import Button, Text, TextBox
 from Scripts.util import loadImage
 from Scripts.dialogue import DialogueManager
+from Scripts.allDialogues import dialogues
 from Scripts.battle import Battle
 from Scripts.character import Player
 from Scripts.enemies import RSoldier, Orc, Rat, FFaith, Ghoul, Carrion, wiz
@@ -29,8 +30,12 @@ class Game:
             'fanta': pygame.font.Font('Media/Assets/Fonts/fantasy.ttf', 100),
         }
         
-        self.dialogue = DialogueManager()        
-
+        self.dialogue = DialogueManager()
+        
+        for key, params in dialogues.items():
+            x, y, width, height, text = params
+            self.dialogue.addDialogue(key, TextBox(x, y, width, height, text=text))
+               
         # Stores the Buttons objects for the main menu
         self.menuState = "main"
 
