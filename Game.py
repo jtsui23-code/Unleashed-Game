@@ -172,6 +172,7 @@ class Game:
             # Plays the intermission song after the intro exposition.
             if self.gameStates['intermission'] and not self.intermissionMusicPlaying:
                 self.assets['titleSong'].stop()
+                self.assets['battleSong'].stop()
                 self.assets['intermissionSong'].play(-1)
                 self.intermissionMusicPlaying = True
                 self.titleMusicPlaying = False
@@ -179,11 +180,22 @@ class Game:
                 self.midBossMusicPlaying = False
                 self.finalBossMusicPlaying = False
 
+
+            elif self.gameStates['shop'] and not self.intermissionMusicPlaying:
+                self.assets['titleSong'].stop()
+                self.assets['battleSong'].stop()
+                self.assets['intermissionSong'].play(-1)
+                self.intermissionMusicPlaying = True
+                self.titleMusicPlaying = False
+                self.battleMusicPlaying = False
+                self.midBossMusicPlaying = False
+                self.finalBossMusicPlaying = False
         
 
             # Plays the title song when in the main menu and the exposition state.
-            elif (self.gameStates['main'] or self.gameStates['startGame'] or self.gameStates['shop']) and not self.titleMusicPlaying:
+            elif (self.gameStates['main'] or self.gameStates['startGame']) and not self.titleMusicPlaying:
                 self.assets['intermissionSong'].stop()
+                self.assets['battleSong'].stop()
                 self.assets['titleSong'].play(-1)
                 self.titleMusicPlaying = True
                 self.intermissionMusicPlaying = False
@@ -276,6 +288,7 @@ class Game:
                             if self.mainMenuOptions['Shop'].rect.collidepoint(mousePos):
                                 self.gameStates['main'] = False
                                 self.gameStates['shop'] = True
+                                self.titleMusicPlaying = False
 
 
                             # Exits the game when the exit button is clicked.
@@ -299,6 +312,8 @@ class Game:
                             if self.shopOptions['Back'].rect.collidepoint(mousePos):
                                 self.gameStates['shop'] = False
                                 self.gameStates['main'] = True
+                                self.intermissionMusicPlaying = False
+                                self.assets['intermissionSong'].stop()
 
                             elif self.shopOptions['Attack'].rect.collidepoint(mousePos):
                                 if self.upgrades['Attack'] < 4:
