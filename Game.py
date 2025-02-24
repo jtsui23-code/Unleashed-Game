@@ -4,7 +4,7 @@ import random
 from Scripts.ui import Button, Text, TextBox
 from Scripts.util import loadImage
 from Scripts.dialogue import DialogueManager
-from Scripts.allDialogues import dialogues
+from Scripts.AllDialogues import dialogues
 from Scripts.battle import Battle
 from Scripts.character import Player
 from Scripts.enemies import RSoldier, Orc, Rat, FFaith, Ghoul, Carrion, wiz
@@ -59,11 +59,11 @@ class Game:
         # Stores the Button objects for the battle menu.
         self.battle = {
             # The text box is at the beginning of the map because it will be the first thing to be drawn.
-            'Text': TextBox(200, 75, 900, 600, text=''),
-            'Attack': Button(500, 400, 280, 50, 'Attack'),
-            'Skill': Button(500, 475, 280, 50, 'Skills'),
-            'Guard': Button(500, 550, 280, 50, 'Guard'),
-            'Inventory': Button(500, 725, 280, 50, 'Inventory'),
+            'Text': TextBox(200, 100, 900, 600, text=''),
+            'Attack': Button(500, 375, 280, 50, 'Attack'),
+            'Skill': Button(500, 450, 280, 50, 'Skills'),
+            'Guard': Button(500, 525, 280, 50, 'Guard'),
+            'Inventory': Button(500, 600, 280, 50, 'Inventory'),
         }
 
         # Stores the Button objects for the battle menu.
@@ -236,9 +236,6 @@ class Game:
             #    self.intermissionMusicPlaying = False
             #    self.midBossMusicPlaying = False
 
-
-
-            
             # Event loop
             for event in pygame.event.get():
 
@@ -326,6 +323,9 @@ class Game:
                             elif self.shopOptions['SP'].rect.collidepoint(mousePos):
                                   if self.upgrades['SP'] < 4:
                                     self.upgrades['SP']+= 1
+
+                        
+                        
                         
             # main state    
             if self.gameStates['main']:
@@ -438,33 +438,43 @@ class Game:
                 for button in self.preBattle.values():
                     button.isHovered = button.rect.collidepoint(mousePos)
 
-                
-
-
-                                
-
-
 
             if self.gameStates['battle']:
+
                 # Background for battle
                 action_selected = False
                 move = 0
                 current_menu = 'battle'  # Track which menu we're showing
 
-                self.screen.fill((0, 0, 0))
-                
-                # Initially draw battle UI elements
-                self.drawMenu(self.battle)
-
                 while not action_selected:
+                    # Clear screen EVERY FRAME
+                    self.screen.fill((0, 0, 0))
+
+                    # Update mouse position and hover states FIRST
+                    mousePos = pygame.mouse.get_pos()
+
+                    # Update hover states for current menu
+                    if current_menu == 'battle':
+                        for item in self.battle.values():
+                            if isinstance(item, Button):
+                                item.isHovered = item.rect.collidepoint(mousePos)
+
+                        self.drawMenu(self.battle)  # Redraw battle menu
+
+                    elif current_menu == 'skills':
+                        for item in self.moves.values():
+                            if isinstance(item, Button):
+                                item.isHovered = item.rect.collidepoint(mousePos)
+                                
+                        self.drawMenu(self.moves)  # Redraw skills menu
+
+                    # Handle events
                     for event in pygame.event.get():
                         if event.type == pygame.QUIT:
                             pygame.quit()
                             sys.exit()
                             
-                        mousePos = pygame.mouse.get_pos()
                         if event.type == pygame.MOUSEBUTTONDOWN:
-                            
                             if current_menu == 'battle':
                                 if self.battle['Attack'].rect.collidepoint(mousePos):
                                     action_selected = True
@@ -472,11 +482,9 @@ class Game:
                                 
                                 elif self.battle['Skill'].rect.collidepoint(mousePos):
                                     current_menu = 'skills'
-                                    self.screen.fill((0, 0, 0))
-                                    self.drawMenu(self.moves)
                                 
                                 elif self.battle['Inventory'].rect.collidepoint(mousePos):
-                                    continue
+                                    pass  # Add inventory logic here
                                 
                                 elif self.battle['Guard'].rect.collidepoint(mousePos):
                                     action_selected = True
@@ -485,8 +493,6 @@ class Game:
                             elif current_menu == 'skills':
                                 if self.moves['Back'].rect.collidepoint(mousePos):
                                     current_menu = 'battle'
-                                    self.screen.fill((0, 0, 0))
-                                    self.drawMenu(self.battle)
                                 
                                 elif self.moves['Skill0'].rect.collidepoint(mousePos):
                                     action_selected = True
@@ -500,15 +506,13 @@ class Game:
                                     action_selected = True
                                     move = self.player.Skills[2]
 
-                    # Update display
+                    # Update display EVERY FRAME
                     pygame.display.flip()
                     pygame.time.Clock().tick(60)
 
-                # Handle the battle once an action is selected
+                # Handle post-battle logic
                 result = self.currentBattle.fight(move)
-                
-                # Check battle result
-                if result == 0:  # Battle is finished
+                if result == 0:
                     self.gameStates['battle'] = False
                     self.gameStates['intermission'] = True
 
