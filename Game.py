@@ -4,7 +4,7 @@ import random
 from Scripts.ui import Button, Text, TextBox
 from Scripts.util import loadImage
 from Scripts.dialogue import DialogueManager
-from Scripts.allDialogues import dialogues
+from Scripts.AllDialogues import dialogues
 from Scripts.battle import Battle
 from Scripts.character import Player
 from Scripts.enemies import RSoldier, Orc, Rat, FFaith, Ghoul, Carrion, wiz
@@ -172,6 +172,7 @@ class Game:
             # Plays the intermission song after the intro exposition.
             if self.gameStates['intermission'] and not self.intermissionMusicPlaying:
                 self.assets['titleSong'].stop()
+                self.assets['battleSong'].stop()
                 self.assets['intermissionSong'].play(-1)
                 self.intermissionMusicPlaying = True
                 self.titleMusicPlaying = False
@@ -179,11 +180,22 @@ class Game:
                 self.midBossMusicPlaying = False
                 self.finalBossMusicPlaying = False
 
+
+            elif self.gameStates['shop'] and not self.intermissionMusicPlaying:
+                self.assets['titleSong'].stop()
+                self.assets['battleSong'].stop()
+                self.assets['intermissionSong'].play(-1)
+                self.intermissionMusicPlaying = True
+                self.titleMusicPlaying = False
+                self.battleMusicPlaying = False
+                self.midBossMusicPlaying = False
+                self.finalBossMusicPlaying = False
         
 
             # Plays the title song when in the main menu and the exposition state.
-            elif (self.gameStates['main'] or self.gameStates['startGame'] or self.gameStates['shop']) and not self.titleMusicPlaying:
+            elif (self.gameStates['main'] or self.gameStates['startGame']) and not self.titleMusicPlaying:
                 self.assets['intermissionSong'].stop()
+                self.assets['battleSong'].stop()
                 self.assets['titleSong'].play(-1)
                 self.titleMusicPlaying = True
                 self.intermissionMusicPlaying = False
@@ -276,6 +288,7 @@ class Game:
                             if self.mainMenuOptions['Shop'].rect.collidepoint(mousePos):
                                 self.gameStates['main'] = False
                                 self.gameStates['shop'] = True
+                                self.titleMusicPlaying = False
 
 
                             # Exits the game when the exit button is clicked.
@@ -299,6 +312,8 @@ class Game:
                             if self.shopOptions['Back'].rect.collidepoint(mousePos):
                                 self.gameStates['shop'] = False
                                 self.gameStates['main'] = True
+                                self.intermissionMusicPlaying = False
+                                self.assets['intermissionSong'].stop()
 
                             elif self.shopOptions['Attack'].rect.collidepoint(mousePos):
                                 if self.upgrades['Attack'] < 4:
@@ -432,72 +447,70 @@ class Game:
 
             if self.gameStates['battle']:
                 # Background for battle
-
                 action_selected = False
                 move = 0
+                current_menu = 'battle'  # Track which menu we're showing
 
                 self.screen.fill((0, 0, 0))
                 
-                # Draw battle UI elements (add your battle UI drawing code here)
+                # Initially draw battle UI elements
                 self.drawMenu(self.battle)
 
                 while not action_selected:
                     for event in pygame.event.get():
+                        if event.type == pygame.QUIT:
+                            pygame.quit()
+                            sys.exit()
+                            
                         mousePos = pygame.mouse.get_pos()
                         if event.type == pygame.MOUSEBUTTONDOWN:
                             
-                            if self.battle['Attack'].rect.collidepoint(mousePos):
-                                action_selected = True
-                                #return self.basicAttack
-                                move = self.player.basicAttack()
-                            
-                            if self.battle['Skill'].rect.collidepoint(mousePos):
+                            if current_menu == 'battle':
+                                if self.battle['Attack'].rect.collidepoint(mousePos):
+                                    action_selected = True
+                                    move = self.player.basicAttack()
+                                
+                                elif self.battle['Skill'].rect.collidepoint(mousePos):
+                                    current_menu = 'skills'
+                                    self.screen.fill((0, 0, 0))
+                                    self.drawMenu(self.moves)
+                                
+                                elif self.battle['Inventory'].rect.collidepoint(mousePos):
+                                    continue
+                                
+                                elif self.battle['Guard'].rect.collidepoint(mousePos):
+                                    action_selected = True
+                                    move = 0
 
-                                self.drawMenu(self.moves)
-
-                                skillUsed = 0
-
-                                if self.moves['Skill0'].rect.collidepoint(mousePos):
-                                    skillUsed = 0
-
-                                elif self.moves['Skill1'].rect.collidepoint(mousePos):
-                                    skillUsed = 1
-
-                                elif self.moves['Skill2'].rect.collidepoint(mousePos):
-                                    skillUsed = 2
-
-                                elif self.moves['Back'].rect.collidepoint(mousePos):
+                            elif current_menu == 'skills':
+                                if self.moves['Back'].rect.collidepoint(mousePos):
+                                    current_menu = 'battle'
                                     self.screen.fill((0, 0, 0))
                                     self.drawMenu(self.battle)
-                                    skillUsed = 5
                                 
-                                if skillUsed == 5:
-                                    continue
-
-                                else:
+                                elif self.moves['Skill0'].rect.collidepoint(mousePos):
                                     action_selected = True
-                                    move = self.player.Skills[skillUsed]
-                            
-                            if self.battle['Inventory'].rect.collidepoint(mousePos):
-                                #action_selected = True
-                                #return self.Skills[1].use
-                                continue
-                            
-                            if self.battle['Guard'].rect.collidepoint(mousePos):
-                                action_selected = True
-                                move = 0
+                                    move = self.player.Skills[0]
+                                
+                                elif self.moves['Skill1'].rect.collidepoint(mousePos):
+                                    action_selected = True
+                                    move = self.player.Skills[1]
+                                
+                                elif self.moves['Skill2'].rect.collidepoint(mousePos):
+                                    action_selected = True
+                                    move = self.player.Skills[2]
 
+                    # Update display
+                    pygame.display.flip()
+                    pygame.time.Clock().tick(60)
 
-                # Keep the game running while waiting for input
-                pygame.display.flip()
-                pygame.time.Clock().tick(60)
-                # Handle the battle
+                # Handle the battle once an action is selected
                 result = self.currentBattle.fight(move)
                 
                 # Check battle result
                 if result == 0:  # Battle is finished
                     self.gameStates['battle'] = False
-                    self.gameStates['intermission'] = True  # Or whatever state should come next
+                    self.gameStates['intermission'] = True
 
 
             # Display the screen
