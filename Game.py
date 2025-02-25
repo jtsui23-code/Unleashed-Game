@@ -4,7 +4,7 @@ import random
 from Scripts.ui import Button, Text, TextBox
 from Scripts.util import loadImage
 from Scripts.dialogue import DialogueManager
-from Scripts.AllDialogues import dialogues
+from Scripts.allDialogues import dialogues
 from Scripts.battle import Battle
 from Scripts.character import Player
 from Scripts.enemies import RSoldier, Orc, Rat, FFaith, Ghoul, Carrion, wiz
