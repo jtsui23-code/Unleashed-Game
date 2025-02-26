@@ -466,14 +466,47 @@ class Game:
                                 elif self.moves['Skill0'].rect.collidepoint(mousePos):
                                     action_selected = True
                                     move = self.player.Skills[0]
+
+                                    if move.is_available() and self.player.sp > move.get_sp_cost():
+                                        self.player.sp -= move.get_sp_cost()
+                                        action_selected = True
+
+                                        damage = move.use()
+                                        self.enemies['ghoul'].currentHp -= damage
+                                        print(f"Skills DMG {damage}")
+                                        print(f"Player sp {self.player.sp}")
+                                        print(f"Enenmys '{self.enemies['ghoul'].currentHp}'.")
+
                                 
                                 elif self.moves['Skill1'].rect.collidepoint(mousePos):
                                     action_selected = True
                                     move = self.player.Skills[1]
+
+                                    if move.is_available() and self.player.sp > move.get_sp_cost():
+                                        self.player.sp -= move.get_sp_cost()
+                                        action_selected = True
+                                        
+                                        damage = move.use()
+                                        self.enemies['ghoul'].currentHp -= damage
+                                        print(f"Skills DMG {damage}")
+                                        print(f"Player sp {self.player.sp}")
+                                        print(f"Enenmys '{self.enemies['ghoul'].currentHp}'.")
+
                                 
                                 elif self.moves['Skill2'].rect.collidepoint(mousePos):
                                     action_selected = True
                                     move = self.player.Skills[2]
+
+                                    if move.is_available() and self.player.sp > move.get_sp_cost():
+                                        self.player.sp -= move.get_sp_cost()
+                                        action_selected = True
+                                        
+                                        damage = move.use()
+                                        self.enemies['ghoul'].currentHp -= damage
+                                        print(f"Skills DMG {damage}")
+                                        print(f"Player sp {self.player.sp}")
+                                        print(f"Enenmys '{self.enemies['ghoul'].currentHp}'.")
+
 
                     # Update display EVERY FRAME
                     pygame.display.flip()
