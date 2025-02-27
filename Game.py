@@ -409,6 +409,13 @@ class Game:
             if self.gameStates['prebattle']:
                 self.screen.fill((0, 0, 0))
 
+                if self.currentFloor == 1:
+                    self.setEnemyPair('soldier', 'ghoul')
+                elif self.currentFloor == 2:
+                    self.setEnemyPair('orc', 'rat')
+                elif self.currentFloor == 3:
+                    self.setEnemyPair('priest', 'carrion')
+
                 # Draw the enemies on the screen
                 self.screen.blit(self.assets['enemy1'], (200, 200))
                 self.screen.blit(self.assets['enemy2'], (500, 200))
@@ -416,20 +423,22 @@ class Game:
                 # Draw the menu to prompt the user to fight or infect the enemies
                 self.drawMenu(self.preBattle)
 
+                
+
                 # Handle hover effect on the buttons
                 mousePos = pygame.mouse.get_pos()
+
+                if self.preBattle['infect'].rect.collidepoint(mousePos):
+                    self.player.infect(self.currentEnemy[1])
 
                 for button in self.preBattle.values():
                     button.isHovered = button.rect.collidepoint(mousePos)
 
+                
+
             if self.gameStates['battle']:
                 # Background for battle
-                if self.currentFloor == 1:
-                    self.setEnemyPair('soldier', 'ghoul')
-                elif self.currentFloor == 2:
-                    self.setEnemyPair('orc', 'rat')
-                elif self.currentFloor == 3:
-                    self.setEnemyPair('priest', 'carrion')
+                
                 action_selected = False
                 move = 0
                 current_menu = 'battle'  # Track which menu we're showing
