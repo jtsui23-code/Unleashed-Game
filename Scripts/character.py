@@ -100,21 +100,21 @@ class Player(Character):
 
 
 
-        self.bottons = {
-            # The text box is at the beginning of the map because it will be the first thing to be drawn.
-            'Text': TextBox(200, 75, 900, 600, text=''),
-            'Attack': Button(500, 500, 280, 50, 'Attack'),
-            'Skill1': Button(500, 575, 280, 50, 'Skill 1'),
-            'Skill2': Button(500, 575, 280, 50, 'Skill 2'),
-            'Guard': Button(500, 575, 280, 50, 'Guard'),
-            'Inventory': Button(500, 650, 280, 50, 'Inventory')
-        }
+        # self.bottons = {
+        #     # The text box is at the beginning of the map because it will be the first thing to be drawn.
+        #     'Text': TextBox(200, 75, 900, 600, text=''),
+        #     'Attack': Button(500, 500, 280, 50, 'Attack'),
+        #     'Skill1': Button(500, 575, 280, 50, 'Skill 1'),
+        #     'Skill2': Button(500, 575, 280, 50, 'Skill 2'),
+        #     'Guard': Button(500, 575, 280, 50, 'Guard'),
+        #     'Inventory': Button(500, 650, 280, 50, 'Inventory')
+        # }
 
-        self.SkillList = {
-            'Skill1' : Button(250, 550, 200, 50, self.Skills[0].name),
-            'Skill2' : Button(250, 450, 200, 50, self.Skills[1].name),
-            'Skill3' : Button(250, 350, 200, 50, self.Skills[2].name)
-        }
+        # self.SkillList = {
+        #     'Skill1' : Button(250, 550, 200, 50, self.Skills[0].name),
+        #     'Skill2' : Button(250, 450, 200, 50, self.Skills[1].name),
+        #     'Skill3' : Button(250, 350, 200, 50, self.Skills[2].name)
+        # }
 
     def TakeDmg(self, amount):
 
@@ -215,6 +215,8 @@ class Player(Character):
        
     def infect(self, enemy):
         # Parasite copies enemy stats and skills
+
+        
         self.Skills[1] = enemy.Skills[0]
         self.Skills[2] = enemy.Skills[1]
         self.attackDmg = enemy.attackDmg
