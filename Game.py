@@ -80,13 +80,16 @@ class Game:
         # Store instances of enemies, not class references
         self.enemies = {
             'soldier': RSoldier(self, (0, 0), (100, 100)),  # Create an instance of RSoldier
+            'ghoul': Ghoul(self, (0, 0), (100, 100)),       # Create an instance of Ghoul
             'orc': Orc(self, (0, 0), (100, 100)),           # Create an instance of Orc
             'rat': Rat(self, (0, 0), (100, 100)),           # Create an instance of Rat
             'priest': FFaith(self, (0, 0), (100, 100)),     # Create an instance of FFaith
-            'ghoul': Ghoul(self, (0, 0), (100, 100)),       # Create an instance of Ghoul
             'carrion': Carrion(self, (0, 0), (100, 100)),   # Create an instance of Carrion
             'boss': wiz(self, (0, 0), (100, 100))           # Create an instance of wiz
         }
+        
+        self.currentEnemy = []
+        self.currentFloor = 1
         
         # Stores the Button objects for the shop menu.
         self.shopOptions = {
@@ -161,6 +164,16 @@ class Game:
         # Draw the menu options for the main menu.
         for option in menu.values():
             option.draw(self.screen)
+
+    def setEnemyPair(self, firstEnemyKey, secondEnemyKey):
+        """
+        Set the current enemy pair based on specific enemy keys
+        """
+        # Clear current enemy list and add the specified pair
+        self.currentEnemy = [
+            self.enemies[firstEnemyKey],
+            self.enemies[secondEnemyKey]
+        ]
 
         # The running loop
     def run(self):
@@ -411,6 +424,12 @@ class Game:
 
             if self.gameStates['battle']:
                 # Background for battle
+                if self.currentFloor == 1:
+                    self.setEnemyPair('soldier', 'ghoul')
+                elif self.currentFloor == 2:
+                    self.setEnemyPair('orc', 'rat')
+                elif self.currentFloor == 3:
+                    self.setEnemyPair('priest', 'carrion')
                 action_selected = False
                 move = 0
                 current_menu = 'battle'  # Track which menu we're showing
@@ -472,10 +491,10 @@ class Game:
                                         action_selected = True
 
                                         damage = move.use()
-                                        self.enemies['ghoul'].currentHp -= damage
+                                        self.currentEnemy[1].currentHp -= damage
                                         print(f"Skills DMG {damage}")
                                         print(f"Player sp {self.player.sp}")
-                                        print(f"Enenmys '{self.enemies['ghoul'].currentHp}'.")
+                                        print(f"Enenmys '{self.currentEnemy[1].currentHp}'.")
 
                                 
                                 elif self.moves['Skill1'].rect.collidepoint(mousePos):
@@ -487,11 +506,10 @@ class Game:
                                         action_selected = True
                                         
                                         damage = move.use()
-                                        self.enemies['ghoul'].currentHp -= damage
+                                        self.currentEnemy[1].currentHp -= damage
                                         print(f"Skills DMG {damage}")
                                         print(f"Player sp {self.player.sp}")
-                                        print(f"Enenmys '{self.enemies['ghoul'].currentHp}'.")
-
+                                        print(f"Enenmys '{self.currentEnemy[1].currentHp}'.")
                                 
                                 elif self.moves['Skill2'].rect.collidepoint(mousePos):
                                     action_selected = True
@@ -502,10 +520,10 @@ class Game:
                                         action_selected = True
                                         
                                         damage = move.use()
-                                        self.enemies['ghoul'].currentHp -= damage
+                                        self.currentEnemy[1].currentHp -= damage
                                         print(f"Skills DMG {damage}")
                                         print(f"Player sp {self.player.sp}")
-                                        print(f"Enenmys '{self.enemies['ghoul'].currentHp}'.")
+                                        print(f"Enenmys '{self.currentEnemy[1].currentHp}'.")
 
 
                     # Update display EVERY FRAME
