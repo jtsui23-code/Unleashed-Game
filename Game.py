@@ -251,22 +251,32 @@ class Game:
                         if self.gameStates['itemReward']:
                             if self.itemRewardOptions['Continue'].rect.collidepoint(mousePos):
                                 self.item += 1
-                                print(self.item)
+                                print(F" Have {self.item} number of items.")
                                 self.gameStates['itemReward'] = False
                                 self.gameStates['prebattle'] = True
 
                         # Handles the player's choice to fight or infect the enemies.
                         elif self.gameStates['prebattle']:
+
+                            # Checks if the fight button was clicked on the prebattle screen.
                             if self.preBattle['fight'].rect.collidepoint(mousePos):
                                 print("Fight button clicked")  # Debug print
                                 self.gameStates['prebattle'] = False
                                 self.gameStates['battle'] = True
-                                self.currentBattle = Battle(self.player, self.enemies['soldier'])
+                                self.currentBattle = Battle(self.player, self.currentEnemy[0])
+
+
+                            # Checks if the infect button was clicked ont the prebattle screen.
                             elif self.preBattle['infect'].rect.collidepoint(mousePos):
                                 print("Infect button clicked")  # Debug print
+
+                                # The player will inherit the skills and states of the enemy they infect.
+                                self.player.infect(self.currentEnemy[1])
+                                print(f"Player infects {self.currentEnemy[1].name}")
+                                print(f"New skills: {self.player.Skills[1].name}, {self.player.Skills[2].name}")
                                 self.gameStates['prebattle'] = False
                                 self.gameStates['battle'] = True
-                                self.currentBattle = Battle(self.player, self.enemies['soldier'])
+                                self.currentBattle = Battle(self.player, self.currentEnemy[0])
 
                         # After pressing left or right button, create a 50% chance for a battle and a 50% chance for a bonus intermission
                         elif self.gameStates['intermission']:
@@ -428,8 +438,9 @@ class Game:
                 # Handle hover effect on the buttons
                 mousePos = pygame.mouse.get_pos()
 
-                if self.preBattle['infect'].rect.collidepoint(mousePos):
-                    self.player.infect(self.currentEnemy[1])
+                # if self.preBattle['infect'].rect.collidepoint(mousePos):
+                #     self.player.infect(self.currentEnemy[1])
+                #     print(f"Player infects {self.currentEnemy[1].name}")
 
                 for button in self.preBattle.values():
                     button.isHovered = button.rect.collidepoint(mousePos)
@@ -477,12 +488,19 @@ class Game:
                                     action_selected = True
                                     move = self.player.basicAttack()
                                 
+                                # If the skill button is clicked, switch to the skills menu.
                                 elif self.battle['Skill'].rect.collidepoint(mousePos):
+                                    
+                                    # Updates the text for the skills menu.
+                                    self.moves['Skill1'].text = self.player.Skills[1].name
+                                    self.moves['Skill2'].text = self.player.Skills[2].name
                                     current_menu = 'skills'
                                 
+                                # If the guard button is clicked, set the action to guard.
                                 elif self.battle['Inventory'].rect.collidepoint(mousePos):
                                     pass  # Add inventory logic here
                                 
+                                # If the guard button is clicked, set the action to guard.
                                 elif self.battle['Guard'].rect.collidepoint(mousePos):
                                     action_selected = True
                                     move = 0
@@ -501,7 +519,7 @@ class Game:
 
                                         damage = move.use()
                                         self.currentEnemy[1].currentHp -= damage
-                                        print(f"Skills DMG {damage}")
+                                        print(f"Skill: {self.player.Skills[0].name} does  {damage} DMG")
                                         print(f"Player sp {self.player.sp}")
                                         print(f"Enenmys '{self.currentEnemy[1].currentHp}'.")
 
@@ -516,7 +534,7 @@ class Game:
                                         
                                         damage = move.use()
                                         self.currentEnemy[1].currentHp -= damage
-                                        print(f"Skills DMG {damage}")
+                                        print(f"Skill: {self.player.Skills[1].name} does  {damage} DMG")
                                         print(f"Player sp {self.player.sp}")
                                         print(f"Enenmys '{self.currentEnemy[1].currentHp}'.")
                                 
@@ -530,7 +548,7 @@ class Game:
                                         
                                         damage = move.use()
                                         self.currentEnemy[1].currentHp -= damage
-                                        print(f"Skills DMG {damage}")
+                                        print(f"Skill: {self.player.Skills[2].name} does  {damage} DMG")
                                         print(f"Player sp {self.player.sp}")
                                         print(f"Enenmys '{self.currentEnemy[1].currentHp}'.")
 

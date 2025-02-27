@@ -215,6 +215,8 @@ class Player(Character):
        
     def infect(self, enemy):
         # Parasite copies enemy stats and skills
+
+        
         self.Skills[1] = enemy.Skills[0]
         self.Skills[2] = enemy.Skills[1]
         self.attackDmg = enemy.attackDmg
