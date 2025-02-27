@@ -89,6 +89,8 @@ class Game:
         }
         
         self.currentEnemy = []
+        self.currentFloor = 1
+        
         # Stores the Button objects for the shop menu.
         self.shopOptions = {
             'Box': TextBox(200, 75, 900, 600, '', (43, 44, 58, 160)),
@@ -422,8 +424,12 @@ class Game:
 
             if self.gameStates['battle']:
                 # Background for battle
-
-                self.setEnemyPair('soldier', 'ghoul')
+                if self.currentFloor == 1:
+                    self.setEnemyPair('soldier', 'ghoul')
+                elif self.currentFloor == 2:
+                    self.setEnemyPair('orc', 'rat')
+                elif self.currentFloor == 3:
+                    self.setEnemyPair('priest', 'carrion')
                 action_selected = False
                 move = 0
                 current_menu = 'battle'  # Track which menu we're showing
