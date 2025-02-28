@@ -131,10 +131,10 @@ class Game:
         }
 
         self.skillUsed = "None"
+        self.skillDialogueSet = False
 
         self.displayBattleButtons = {
-        'attack': Text(500, 800, 140, 25, '', self.fonts['fanta'], self.titleColor),
-
+        'attack': TextBox(340, 600, 600, 100, text='')
         }
 
         # Item reward screen buttons - now has only a Continue button
@@ -193,8 +193,7 @@ class Game:
     def skillDialogue(self, skill):
 
         # Updates the textbox of the display battle screen to show the skill used.
-        self.displayBattleButtons['attack'] = Text(500, 500, 140, 25, skill, self.fonts['fanta'], self.titleColor)  
-
+        self.displayBattleButtons['attack'].setText(f"{self.skillUsed} was used!")
 
     # Returns a copy of the enemy sprite with different shade of color 
     # to create a blinking effect.
@@ -571,28 +570,21 @@ class Game:
                     self.setEnemyPair('priest', 'carrion')
 
                 
-                
-               
-
-                
                 # Handle hover effect on the buttons
                 mousePos = pygame.mouse.get_pos()
 
-               
-
-                
 
                # Draw the enemies on the screen without blinking effect.
                 self.screen.blit(self.assets['enemy1'], (200, 200))
                 self.screen.blit(self.assets['enemy2'], (500, 200))
 
                 
-
                 # Draw the menu to prompt the user to fight or infect the enemies
                 self.drawMenu(self.preBattle)
 
                 for button in self.preBattle.values():
                     button.isHovered = button.rect.collidepoint(mousePos)
+
 
             if self.gameStates['displayBattle']:
                 self.screen.fill((0,0,0))
@@ -601,14 +593,18 @@ class Game:
                 self.screen.blit(self.assets['enemy1'], (200, 100))
                 self.screen.blit(self.assets['enemy2'], (500, 100))
 
-
                 # Render textbox for the skill used in the display battle screen.
-                self.skillDialogue(self.skillUsed) 
-                self.drawMenu(self.displayBattleButtons)
+
+                dt = clock.tick(60) / 1  # Time in seconds since last frame.
+
+                if self.skillDialogueSet == False:
+                    self.skillDialogue(self.skillUsed)
+                    self.skillDialogueSet = True
+
+                self.displayBattleButtons['attack'].update(dt)
+                self.displayBattleButtons['attack'].draw(self.screen)
 
 
-                
-                
 
             if self.gameStates['battle']:
                 # Background for battle
