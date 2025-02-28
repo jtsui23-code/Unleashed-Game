@@ -181,11 +181,15 @@ class Game:
         for option in menu.values():
             option.draw(self.screen)
 
+    # Returns a copy of the enemy sprite with different shade of color 
+    # to create a blinking effect.
     def colorize(self, image, new_color):
 
         print("Colorize")
         colored = image.copy()
-        colored.fill(new_color, special_flags=pygame.BLEND_RGBA_MIN)
+
+        # Adds the color given to the rgb value of the enemy sprite.
+        colored.fill(new_color, special_flags=pygame.BLEND_ADD)
         return colored
 
 
@@ -197,10 +201,12 @@ class Game:
         # Gets the current time in Pygame.
         currentTime = pygame.time.get_ticks()
 
+        # Makes the blinking effect every 500 milliseconds.
         if currentTime - self.blinkTimer > self.blinkInterval:
             self.blinkTimer = currentTime
             self.blinkState = not self.blinkState
 
+        # Get the enemy images to apply the blinking effect.
         enemy1Image = self.assets['enemy1']
         enemy2Image = self.assets['enemy2']
     
@@ -210,11 +216,11 @@ class Game:
             # pygame.draw.rect(self.screen, (255, 0, 0), highlightRect, 5)
 
             if enemyIndex == 0:
-                newImage = self.colorize(enemy1Image, (255, 255, 255))
+                newImage = self.colorize(enemy1Image, (30, 30, 30))
                 self.screen.blit(newImage, (200, 200))
             
             elif enemyIndex == 1:
-                newImage = self.colorize(enemy2Image, (255, 255, 255))
+                newImage = self.colorize(enemy2Image, (30, 30, 30))
                 self.screen.blit(newImage, (500, 200))
 
     def setEnemyPair(self, firstEnemyKey, secondEnemyKey):
@@ -481,6 +487,7 @@ class Game:
 
                 # self.enemyRect = [enemyRect1, enemyRect2]
 
+                # Getting the enemy images to apply the blinking effect to enemy sprites.
                 enemy1_image = self.assets['enemy1']
                 enemy2_image = self.assets['enemy2']
 
