@@ -125,8 +125,16 @@ class Game:
             'intermission': False, 
             'gameOver': False,
             'itemReward': False,
-            'infectMode': False
+            'infectMode': False,
+            'displayBattle': False,
             
+        }
+
+        self.skillUsed = "None"
+
+        self.displayBattleButtons = {
+        'attack': Text(500, 800, 140, 25, '', self.fonts['fanta'], self.titleColor),
+
         }
 
         # Item reward screen buttons - now has only a Continue button
@@ -180,6 +188,13 @@ class Game:
         # Draw the menu options for the main menu.
         for option in menu.values():
             option.draw(self.screen)
+
+    # Displays the dialogue for the skills menu.
+    def skillDialogue(self, skill):
+
+        # Updates the textbox of the display battle screen to show the skill used.
+        self.displayBattleButtons['attack'] = Text(500, 500, 140, 25, skill, self.fonts['fanta'], self.titleColor)  
+
 
     # Returns a copy of the enemy sprite with different shade of color 
     # to create a blinking effect.
@@ -579,6 +594,20 @@ class Game:
                 for button in self.preBattle.values():
                     button.isHovered = button.rect.collidepoint(mousePos)
 
+            if self.gameStates['displayBattle']:
+                self.screen.fill((0,0,0))
+
+                # Display enemy sprites on the display battle screen.
+                self.screen.blit(self.assets['enemy1'], (200, 100))
+                self.screen.blit(self.assets['enemy2'], (500, 100))
+
+
+                # Render textbox for the skill used in the display battle screen.
+                self.skillDialogue(self.skillUsed) 
+                self.drawMenu(self.displayBattleButtons)
+
+
+                
                 
 
             if self.gameStates['battle']:
@@ -657,6 +686,11 @@ class Game:
                                         print(f"Player sp {self.player.sp}")
                                         print(f"Enenmys '{self.currentEnemy[1].currentHp}'.")
 
+                                        # Saves the skill used as a string to display in the display battle screen.
+                                        self.skillUsed = self.player.Skills[0].name
+                                        self.gameStates['battle'] = False
+                                        self.gameStates['displayBattle'] = True
+
                                 
                                 elif self.moves['Skill1'].rect.collidepoint(mousePos):
                                     action_selected = True
@@ -671,6 +705,12 @@ class Game:
                                         print(f"Skill: {self.player.Skills[1].name} does  {damage} DMG")
                                         print(f"Player sp {self.player.sp}")
                                         print(f"Enenmys '{self.currentEnemy[1].currentHp}'.")
+
+                                        # Saves the skill used as a string to display in the display battle screen.
+                                        self.skillUsed = self.player.Skills[1].name
+                                        self.gameStates['battle'] = False
+                                        self.gameStates['displayBattle'] = True
+
                                 
                                 elif self.moves['Skill2'].rect.collidepoint(mousePos):
                                     action_selected = True
@@ -685,6 +725,11 @@ class Game:
                                         print(f"Skill: {self.player.Skills[2].name} does  {damage} DMG")
                                         print(f"Player sp {self.player.sp}")
                                         print(f"Enenmys '{self.currentEnemy[1].currentHp}'.")
+
+                                        # Saves the skill used as a string to display in the display battle screen.
+                                        self.skillUsed = self.player.Skills[2].name
+                                        self.gameStates['battle'] = False
+                                        self.gameStates['displayBattle'] = True
 
 
                     # Update display EVERY FRAME
