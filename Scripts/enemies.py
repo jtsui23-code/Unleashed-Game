@@ -21,6 +21,8 @@ class Enemy(Character):
 
         self.attackFlip = False
 
+
+
     def TakeDmg(self, amount):
         # Reduces the current hp of enemy by amount of inflicted attack.
         # Have to use max(0, ...) or the enemy's health 

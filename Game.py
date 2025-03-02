@@ -26,6 +26,20 @@ class Game:
 
         self.titleColor = (200, 50, 50)
 
+        # Tracks which enemy is being hovered over
+        # 0 - firsts enemy 
+        # 1 - second enemy
+        self.hoveredEnemy = None
+        
+        # Stores the enemy rects to apply blinking effect onto them.
+        self.enemyRect = []
+
+        self.blinkTimer = 0
+        self.blinkInterval = 500
+
+        # Invisiblity is for the blinking effect.
+        self.blinkState = True # True for visible, False for invisible
+
         self.fonts = {
             'fanta': pygame.font.Font('Media/Assets/Fonts/fantasy.ttf', 100),
         }
@@ -110,8 +124,17 @@ class Game:
             'prebattle': False,
             'intermission': False, 
             'gameOver': False,
-            'itemReward': False
+            'itemReward': False,
+            'infectMode': False,
+            'displayBattle': False,
             
+        }
+
+        self.skillUsed = "None"
+        self.skillDialogueSet = False
+
+        self.displayBattleButtons = {
+        'attack': TextBox(340, 600, 600, 100, text='')
         }
 
         # Item reward screen buttons - now has only a Continue button
@@ -152,6 +175,7 @@ class Game:
             'Infection': 0
         }
 
+
         # Flags to track if certain music are playing.
         self.intermissionMusicPlaying = False
         self.titleMusicPlaying = False
@@ -164,6 +188,54 @@ class Game:
         # Draw the menu options for the main menu.
         for option in menu.values():
             option.draw(self.screen)
+
+    # Displays the dialogue for the skills menu.
+    def skillDialogue(self, skill):
+
+        # Updates the textbox of the display battle screen to show the skill used.
+        self.displayBattleButtons['attack'].setText(f"{self.skillUsed} was used!")
+
+    # Returns a copy of the enemy sprite with different shade of color 
+    # to create a blinking effect.
+    def colorize(self, image, new_color):
+
+        print("Colorize")
+        colored = image.copy()
+
+        # Adds the color given to the rgb value of the enemy sprite.
+        colored.fill(new_color, special_flags=pygame.BLEND_ADD)
+        return colored
+
+
+    def blinkEnemySprite(self, enemyIndex):
+
+        print("Blinking")
+        # Creates a blinking effect for the hovered enemy sprite.
+
+        # Gets the current time in Pygame.
+        currentTime = pygame.time.get_ticks()
+
+        # Makes the blinking effect every 500 milliseconds.
+        if currentTime - self.blinkTimer > self.blinkInterval:
+            self.blinkTimer = currentTime
+            self.blinkState = not self.blinkState
+
+        # Get the enemy images to apply the blinking effect.
+        enemy1Image = self.assets['enemy1']
+        enemy2Image = self.assets['enemy2']
+    
+
+        if self.blinkState:
+            # highlightRect = self.currentEnemy[enemyIndex].rect
+            # pygame.draw.rect(self.screen, (255, 0, 0), highlightRect, 5)
+
+            if enemyIndex == 0:
+                newImage = self.colorize(enemy1Image, (30, 30, 30))
+                self.screen.blit(newImage, (200, 200))
+            
+            elif enemyIndex == 1:
+                newImage = self.colorize(enemy2Image, (30, 30, 30))
+                self.screen.blit(newImage, (500, 200))
 
     def setEnemyPair(self, firstEnemyKey, secondEnemyKey):
         """
@@ -254,9 +326,28 @@ class Game:
                                 print(F" Have {self.item} number of items.")
                                 self.gameStates['itemReward'] = False
                                 self.gameStates['prebattle'] = True
+                        
+                        elif self.gameStates['infectMode']:
+                            # Contains which enemy the player clicks on to infect.
+                                enemyIndex = None
+                                for i, rect in enumerate(self.enemyRect):
+                                    if rect.collidepoint(mousePos):
+                                        enemyIndex = i
+                                        break
+
+                                if enemyIndex is not None:
+                                    print(f"Enemy {enemyIndex + 1} clicked")  # Debug print
+                                    self.player.infect(self.currentEnemy[enemyIndex])
+                                    print(f"Player infects {self.currentEnemy[enemyIndex].name}")
+
+                                    # Move to battle state
+                                    self.gameStates['infectionMode'] = False
+                                    self.gameStates['battle'] = True
+                                    self.currentBattle = Battle(self.player, self.currentEnemy[0])
 
                         # Handles the player's choice to fight or infect the enemies.
                         elif self.gameStates['prebattle']:
+                            
 
                             # Checks if the fight button was clicked on the prebattle screen.
                             if self.preBattle['fight'].rect.collidepoint(mousePos):
@@ -270,13 +361,23 @@ class Game:
                             elif self.preBattle['infect'].rect.collidepoint(mousePos):
                                 print("Infect button clicked")  # Debug print
 
+                                # if enemyIndex is not None:
+                                #     self.player.infect(self.currentEnemy[enemyIndex])
+                                #     print(f"Player infects {self.currentEnemy[enemyIndex].name}")
+                                # else:
+                                #     print("No enemy selected to infect")
+                                #     return
+                                
                                 # The player will inherit the skills and states of the enemy they infect.
-                                self.player.infect(self.currentEnemy[1])
-                                print(f"Player infects {self.currentEnemy[1].name}")
-                                print(f"New skills: {self.player.Skills[1].name}, {self.player.Skills[2].name}")
+                                # self.player.infect(self.currentEnemy[1])
+
+                                # print(f"Player infects {self.currentEnemy[enemyIndex].name}")
+                                # print(f"New skills: {self.player.Skills[1].name}, {self.player.Skills[2].name}")
+
                                 self.gameStates['prebattle'] = False
-                                self.gameStates['battle'] = True
+                                self.gameStates['infectMode'] = True
                                 self.currentBattle = Battle(self.player, self.currentEnemy[0])
+
 
                         # After pressing left or right button, create a 50% chance for a battle and a 50% chance for a bonus intermission
                         elif self.gameStates['intermission']:
@@ -390,6 +491,48 @@ class Game:
                 for button in self.shopOptions.values():
                     button.isHovered = button.rect.collidepoint(mousePos)
 
+            # Renders the infect 
+            if self.gameStates['infectMode']:
+                self.screen.fill((0, 0, 0))
+
+                # # Makes a rect object of the enemies on the screen so can apply blinking effect.
+                # enemyRect1 = self.currentEnemy[0].rect()
+                # enemyRect2 = self.currentEnemy[1].rect()
+
+                # self.enemyRect = [enemyRect1, enemyRect2]
+
+                # Getting the enemy images to apply the blinking effect to enemy sprites.
+                enemy1_image = self.assets['enemy1']
+                enemy2_image = self.assets['enemy2']
+
+                # Create rects based on where the images are drawn and their size
+                enemy_rect1 = pygame.Rect(200, 200, enemy1_image.get_width(), enemy1_image.get_height())
+                enemy_rect2 = pygame.Rect(500, 200, enemy2_image.get_width(), enemy2_image.get_height())
+                self.enemyRect = [enemy_rect1, enemy_rect2]
+                
+                # Handle hover effect on the buttons
+                mousePos = pygame.mouse.get_pos()
+
+                # Have to reset to prevent infinite blinking effect despite 
+                # the mouse not being on the enemy.
+                self.hoveredEnemy = None
+
+                # Checks if the mouse is hovering over an enemy to apply the blinking effect.
+                if enemy_rect1.collidepoint(mousePos):
+                    print("Hovering over enemy 1")
+                    self.hoveredEnemy = 0
+                elif enemy_rect2.collidepoint(mousePos):
+                    print("Hovering over enemy 2")
+                    self.hoveredEnemy = 1
+                
+
+                self.screen.blit(self.assets['enemy1'], (200, 200))
+                self.screen.blit(self.assets['enemy2'], (500, 200))
+
+                if self.hoveredEnemy is not None:
+                    self.blinkEnemySprite(self.hoveredEnemy)
+
+
             # intermission state
             if self.gameStates['intermission']:
                 # Get mouse position for hover effect on buttons.
@@ -426,26 +569,42 @@ class Game:
                 elif self.currentFloor == 3:
                     self.setEnemyPair('priest', 'carrion')
 
-                # Draw the enemies on the screen
-                self.screen.blit(self.assets['enemy1'], (200, 200))
-                self.screen.blit(self.assets['enemy2'], (500, 200))
-
-                # Draw the menu to prompt the user to fight or infect the enemies
-                self.drawMenu(self.preBattle)
-
                 
-
                 # Handle hover effect on the buttons
                 mousePos = pygame.mouse.get_pos()
 
-                # if self.preBattle['infect'].rect.collidepoint(mousePos):
-                #     self.player.infect(self.currentEnemy[1])
-                #     print(f"Player infects {self.currentEnemy[1].name}")
+
+               # Draw the enemies on the screen without blinking effect.
+                self.screen.blit(self.assets['enemy1'], (200, 200))
+                self.screen.blit(self.assets['enemy2'], (500, 200))
+
+                
+                # Draw the menu to prompt the user to fight or infect the enemies
+                self.drawMenu(self.preBattle)
 
                 for button in self.preBattle.values():
                     button.isHovered = button.rect.collidepoint(mousePos)
 
-                
+
+            if self.gameStates['displayBattle']:
+                self.screen.fill((0,0,0))
+
+                # Display enemy sprites on the display battle screen.
+                self.screen.blit(self.assets['enemy1'], (200, 100))
+                self.screen.blit(self.assets['enemy2'], (500, 100))
+
+                # Render textbox for the skill used in the display battle screen.
+
+                dt = clock.tick(60) / 1  # Time in seconds since last frame.
+
+                if self.skillDialogueSet == False:
+                    self.skillDialogue(self.skillUsed)
+                    self.skillDialogueSet = True
+
+                self.displayBattleButtons['attack'].update(dt)
+                self.displayBattleButtons['attack'].draw(self.screen)
+
+
 
             if self.gameStates['battle']:
                 # Background for battle
@@ -523,6 +682,11 @@ class Game:
                                         print(f"Player sp {self.player.sp}")
                                         print(f"Enenmys '{self.currentEnemy[1].currentHp}'.")
 
+                                        # Saves the skill used as a string to display in the display battle screen.
+                                        self.skillUsed = self.player.Skills[0].name
+                                        self.gameStates['battle'] = False
+                                        self.gameStates['displayBattle'] = True
+
                                 
                                 elif self.moves['Skill1'].rect.collidepoint(mousePos):
                                     action_selected = True
@@ -537,6 +701,12 @@ class Game:
                                         print(f"Skill: {self.player.Skills[1].name} does  {damage} DMG")
                                         print(f"Player sp {self.player.sp}")
                                         print(f"Enenmys '{self.currentEnemy[1].currentHp}'.")
+
+                                        # Saves the skill used as a string to display in the display battle screen.
+                                        self.skillUsed = self.player.Skills[1].name
+                                        self.gameStates['battle'] = False
+                                        self.gameStates['displayBattle'] = True
+
                                 
                                 elif self.moves['Skill2'].rect.collidepoint(mousePos):
                                     action_selected = True
@@ -551,6 +721,11 @@ class Game:
                                         print(f"Skill: {self.player.Skills[2].name} does  {damage} DMG")
                                         print(f"Player sp {self.player.sp}")
                                         print(f"Enenmys '{self.currentEnemy[1].currentHp}'.")
+
+                                        # Saves the skill used as a string to display in the display battle screen.
+                                        self.skillUsed = self.player.Skills[2].name
+                                        self.gameStates['battle'] = False
+                                        self.gameStates['displayBattle'] = True
 
 
                     # Update display EVERY FRAME

@@ -34,6 +34,14 @@ class TextBox:
 
         self.isFinished = False
 
+    def setText(self, newText):
+        self.text = newText
+        self.animated_text = ''
+        self.current_char = 0
+        
+        self.isFinished = False
+        self.lines = self.wrap_text()
+
     def wrap_text(self):
 
         # Split text into words to allow for repositioning them
