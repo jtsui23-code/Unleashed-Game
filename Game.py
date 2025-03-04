@@ -341,7 +341,7 @@ class Game:
                                     print(f"Player infects {self.currentEnemy[enemyIndex].name}")
 
                                     # Move to battle state
-                                    self.gameStates['infectionMode'] = False
+                                    self.gameStates['infectMode'] = False
                                     self.gameStates['battle'] = True
                                     self.currentBattle = Battle(self.player, self.currentEnemy[0])
 
@@ -478,7 +478,7 @@ class Game:
                             if self.dialogue.is_active and self.dialogue.current_dialogue.isTyping():
                                 self.dialogue.handleEvent(event)
                             # If the text is finished typing, performs an
-                            # additional click which will exist the 
+                            # additional click which will exit the 
                             # exposition.
                             else:
                                 self.gameStates['Start'] = False
@@ -603,6 +603,25 @@ class Game:
 
                 self.displayBattleButtons['attack'].update(dt)
                 self.displayBattleButtons['attack'].draw(self.screen)
+                
+                # Waits for the user to click the screen to exit the display battle screen.
+                # Also returns to the battle screen with all of the skills available.
+                for event in pygame.event.get():
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                        if event.button == 1:
+                            # If the text is not finsihed typing, 
+                            # and the user clicks the screen, skip the typing animation.
+                            if self.dialogue.is_active and self.dialogue.current_dialogue.isTyping():
+                                self.dialogue.handleEvent(event)
+
+                            # If the text is finished typing, performs an
+                            # additional click which will exit the 
+                            # display battle.
+                            else:
+                                self.gameStates['displayBattle'] = False
+                                self.gameStates['battle'] = True
+                                self.skillUsed = "None"
+                                self.skillDialogueSet = False
 
 
 
@@ -737,6 +756,7 @@ class Game:
                 if result == 0:
                     self.gameStates['battle'] = False
                     self.gameStates['intermission'] = True
+            print(self.gameStates['infectMode'])
 
             # Display the screen
             pygame.display.flip()
