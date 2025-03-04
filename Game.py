@@ -473,16 +473,18 @@ class Game:
                 for event in pygame.event.get():
                     if event.type == pygame.MOUSEBUTTONDOWN:
                         if event.button == 1:
-                            # If the text is not finsihed typing, 
-                            # and the user clicks the screen, skip the typing animation.
-                            if self.dialogue.is_active and self.dialogue.current_dialogue.isTyping():
-                                self.dialogue.handleEvent(event)
-                            # If the text is finished typing, performs an
-                            # additional click which will exit the 
-                            # exposition.
-                            else:
+                            # If the text has finished typing, 
+                            # and the user clicks the screen, the game will
+                            # move to the intermission state.
+                            if not self.dialogue.current_dialogue.isTyping():
                                 self.gameStates['Start'] = False
                                 self.gameStates['intermission'] = True
+                            # If the text is typing, the user can skip the typing animation 
+                            # by clicking on the screen.
+                            else:
+                                self.dialogue.current_dialogue.skipTyping()
+
+                                
             
             # Needed for creating hover effect on the buttons in the shop menu
             # and for adding functionality to the upgrade buttons.
@@ -609,19 +611,20 @@ class Game:
                 for event in pygame.event.get():
                     if event.type == pygame.MOUSEBUTTONDOWN:
                         if event.button == 1:
-                            # If the text is not finsihed typing, 
-                            # and the user clicks the screen, skip the typing animation.
-                            if self.dialogue.is_active and self.dialogue.current_dialogue.isTyping():
-                                self.dialogue.handleEvent(event)
-
-                            # If the text is finished typing, performs an
-                            # additional click which will exit the 
-                            # display battle.
-                            else:
+                            # If the text has finsihed typing, 
+                            # and the user clicks the screen, switch the battle screen
+                            # with all of the skills.
+                            if not self.dialogue.current_dialogue.isTyping():
                                 self.gameStates['displayBattle'] = False
                                 self.gameStates['battle'] = True
                                 self.skillUsed = "None"
                                 self.skillDialogueSet = False
+
+                            # If the text is still typing, the user can skip the typing animation
+                            # by clicking on the screen.
+                            else:
+                                self.dialogue.current_dialogue.skipTyping()
+                                
 
 
 
@@ -756,7 +759,7 @@ class Game:
                 if result == 0:
                     self.gameStates['battle'] = False
                     self.gameStates['intermission'] = True
-            print(self.gameStates['infectMode'])
+
 
             # Display the screen
             pygame.display.flip()
