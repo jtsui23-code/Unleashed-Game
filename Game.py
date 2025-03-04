@@ -30,6 +30,8 @@ class Game:
         # 0 - firsts enemy 
         # 1 - second enemy
         self.hoveredEnemy = None
+
+        self.reduceCoolDownNow = False
         
         # Stores the enemy rects to apply blinking effect onto them.
         self.enemyRect = []
@@ -591,6 +593,8 @@ class Game:
             if self.gameStates['displayBattle']:
                 self.screen.fill((0,0,0))
 
+                self.reduceCoolDownNow = not self.reduceCoolDownNow
+
                 # Display enemy sprites on the display battle screen.
                 self.screen.blit(self.assets['enemy1'], (200, 100))
                 self.screen.blit(self.assets['enemy2'], (500, 100))
@@ -635,6 +639,15 @@ class Game:
                 move = 0
                 current_menu = 'battle'  # Track which menu we're showing
                 
+                # Reduces the cooldown of skills only after the player has 
+                # selected a viable action. Otherwise the cooldown for 
+                # skills will be reduced every frame.
+                if not self.reduceCoolDownNow:
+                    # Reduce cooldowns for all skills.
+                    for skill in self.player.Skills:
+                        skill.reduceCD()
+                    self.reduceCoolDownNow = not self.reduceCoolDownNow
+
 
                 while not action_selected:
                     # Clear screen EVERY FRAME
@@ -760,9 +773,7 @@ class Game:
                                         self.gameStates['displayBattle'] = True
 
 
-                    # Reduce cooldowns for all skills.
-                    for skill in self.player.Skills:
-                        skill.reduceCD()
+                    
 
 
                     # Update display EVERY FRAME
