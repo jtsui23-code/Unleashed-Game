@@ -34,6 +34,8 @@ class Game:
         self.turnNum = 1
 
         
+
+        
         # Stores the enemy rects to apply blinking effect onto them.
         self.enemyRect = []
 
@@ -105,6 +107,7 @@ class Game:
             'boss': wiz(self, (0, 0), (100, 100))           # Create an instance of wiz
         }
         
+        self.currentEnemyIndex = 0
         self.currentEnemy = []
         self.currentFloor = 1
         
@@ -133,6 +136,7 @@ class Game:
             
         }
 
+        self.skillDamage = 0
         self.skillUsed = "None"
         self.skillDialogueSet = False
 
@@ -162,6 +166,7 @@ class Game:
             'shopBackground': pygame.transform.scale(loadImage('/background/shop.png'), (1280, 720)),
             'enemy1': pygame.transform.scale(loadImage('/enemies/Knight.png').convert_alpha(), (400, 500)),
             'enemy2': pygame.transform.scale(loadImage('/enemies/Ghost.png').convert_alpha(), (400, 300)),
+            'arena': pygame.transform.scale(loadImage('/background/Arena.png').convert_alpha(), (1280, 720))
         }
 
         # Stores the buttons for the intermission screen.
@@ -196,7 +201,7 @@ class Game:
     def skillDialogue(self, skill):
 
         # Updates the textbox of the display battle screen to show the skill used.
-        self.displayBattleButtons['attack'].setText(f"{self.skillUsed} was used!")
+        self.displayBattleButtons['attack'].setText(f"{self.skillUsed} infliced {self.skillDamage} damage!")
 
     # Returns a copy of the enemy sprite with different shade of color 
     # to create a blinking effect.
@@ -255,59 +260,59 @@ class Game:
         
         # Player HP bar calculation
         playerHpPercent = self.player.currentHp / self.player.maxHp
-        playerHpWidth = 200 * playerHpPercent
+        playerHpWidth = 300 * playerHpPercent
         
         # Player SP bar calculation
         playerSpPercent = self.player.sp / self.player.maxSp
-        playerSpWidth = 200 * playerSpPercent
+        playerSpWidth = 300 * playerSpPercent
         
         # Draw player's HP bar (top left)
         # HP bar background
-        pygame.draw.rect(self.screen, (100, 100, 100), (20, 20, 200, 20))
+        pygame.draw.rect(self.screen, (100, 100, 100), (20, 20, 300, 30))
         # HP bar fill
-        pygame.draw.rect(self.screen, (255, 0, 0), (20, 20, playerHpWidth, 20))
+        pygame.draw.rect(self.screen, (255, 0, 0), (20, 20, playerHpWidth, 30))
         # HP bar outline
-        pygame.draw.rect(self.screen, (0, 0, 0), (20, 20, 200, 20), 2)
+        pygame.draw.rect(self.screen, (0, 0, 0), (20, 20, 300, 30), 2)
         # HP text - explicitly labeled as "Player HP"
         hpText = pygame.font.Font(None, 24).render(f"Player HP: {self.player.currentHp}/{self.player.maxHp}", True, (255, 255, 255))
-        self.screen.blit(hpText, (25, 20))
+        self.screen.blit(hpText, (25, 30))
         
         # Draw player's SP bar (below player's HP)
         # SP bar background
-        pygame.draw.rect(self.screen, (100, 100, 100), (20, 50, 200, 20))
+        pygame.draw.rect(self.screen, (100, 100, 100), (20, 50, 300, 30))
         # SP bar fill
-        pygame.draw.rect(self.screen, (0, 0, 255), (20, 50, playerSpWidth, 20))
+        pygame.draw.rect(self.screen, (0, 0, 255), (20, 50, playerSpWidth, 30))
         # SP bar outline
-        pygame.draw.rect(self.screen, (0, 0, 0), (20, 50, 200, 20), 2)
+        pygame.draw.rect(self.screen, (0, 0, 0), (20, 50, 300, 30), 2)
         # SP text
         spText = pygame.font.Font(None, 24).render(f"Player SP: {self.player.sp}/{self.player.maxSp}", True, (255, 255, 255))
-        self.screen.blit(spText, (25, 50))
+        self.screen.blit(spText, (25, 60))
         
         # ENEMY HEALTH BAR (only for non-infected enemy at top right)
         # Only draw when in battle-related states
         if self.gameStates['battle'] or self.gameStates['displayBattle'] or self.gameStates['infectMode']:
             # In the infection scenario, we only want to show the health bar for the non-infected enemy
-            # Assuming currentEnemy[0] is the one the player didn't infect (based on your battle setup)
-            enemy = self.currentEnemy[1]  # The non-infected enemy
+            # Assuming currentEnemy[0] is the one the player didn't infect 
+            enemy = self.currentEnemy[self.currentEnemyIndex]  # The non-infected enemy
             
             if enemy.currentHp > 0:  # Only draw HP for living enemy
                 # Position the bar in the top right
-                hpX = 1060  # 1280 - 200 - 20 (screen width - bar width - margin)
+                hpX = 960  # 1280 - 300 - 20 (screen width - bar width - margin)
                 hpY = 20  # 20px from top
                 
                 # Calculate HP percentage
                 enemyHpPercent = enemy.currentHp / enemy.maxHp
-                enemyHpWidth = 200 * enemyHpPercent
+                enemyHpWidth = 300 * enemyHpPercent
                 
                 # HP bar background
-                pygame.draw.rect(self.screen, (100, 100, 100), (hpX, hpY, 200, 20))
+                pygame.draw.rect(self.screen, (100, 100, 100), (hpX, hpY, 300, 30))
                 # HP bar fill
-                pygame.draw.rect(self.screen, (255, 0, 0), (hpX, hpY, enemyHpWidth, 20))
+                pygame.draw.rect(self.screen, (255, 0, 0), (hpX, hpY, enemyHpWidth, 30))
                 # HP bar outline
-                pygame.draw.rect(self.screen, (0, 0, 0), (hpX, hpY, 200, 20), 2)
+                pygame.draw.rect(self.screen, (0, 0, 0), (hpX, hpY, 300, 30), 2)
                 # HP text
-                hpText = pygame.font.Font(None, 24).render(f"{enemy.name}: {enemy.currentHp}/{enemy.maxHp}", True, (255, 255, 255))
-                self.screen.blit(hpText, (hpX + 5, hpY))
+                hpText = pygame.font.Font(None, 24).render(f"{enemy.name}", True, (255, 255, 255))
+                self.screen.blit(hpText, (hpX + 5, hpY + 10))
 
         # The running loop
     def run(self):
@@ -401,6 +406,11 @@ class Game:
                                     print(f"Enemy {enemyIndex + 1} clicked")  # Debug print
                                     self.player.infect(self.currentEnemy[enemyIndex])
                                     print(f"Player infects {self.currentEnemy[enemyIndex].name}")
+
+                                    if enemyIndex == 0:
+                                        self.currentEnemyIndex = 1
+                                    else:
+                                        self.currentEnemyIndex = 0
 
                                     # Move to battle state
                                     self.gameStates['infectMode'] = False
@@ -653,7 +663,7 @@ class Game:
             if self.gameStates['displayBattle']:
                 self.screen.fill((0,0,0))
                 
-
+                self.screen.blit(self.assets['arena'], (0, 0))
                 self.isFirstTurn = False
 
                 # Display enemy sprites on the display battle screen.
@@ -745,8 +755,17 @@ class Game:
 
                                 if self.battle['Attack'].rect.collidepoint(mousePos):
                                     action_selected = True
-                                    move = self.player.basicAttack()
-                                
+
+                                    # Deals the default amount of damage to the enemy.
+                                    damage = int(self.player.basicAttack())
+                                    self.skillDamage = damage
+                                    self.currentEnemy[self.currentEnemyIndex].currentHp -= damage
+
+                                    self.skillUsed = "Strike"
+                                    self.gameStates['battle'] = False
+                                    self.gameStates['displayBattle'] = True
+
+
                                 # If the skill button is clicked, switch to the skills menu.
                                 elif self.battle['Skill'].rect.collidepoint(mousePos):
 
@@ -784,10 +803,12 @@ class Game:
                                         action_selected = True
 
                                         damage = move.use()
-                                        self.currentEnemy[1].currentHp -= damage
+                                        self.skillDamage = damage
+
+                                        self.currentEnemy[self.currentEnemyIndex].currentHp -= damage
                                         print(f"Skill: {self.player.Skills[0].name} does  {damage} DMG")
                                         print(f"Player sp {self.player.sp}")
-                                        print(f"Enenmys '{self.currentEnemy[1].currentHp}'.")
+                                        print(f"Enenmys '{self.currentEnemy[self.currentEnemyIndex].currentHp}'.")
                                         
 
                                         # Saves the skill used as a string to display in the display battle screen.
@@ -805,10 +826,12 @@ class Game:
                                         action_selected = True
                                         
                                         damage = move.use()
-                                        self.currentEnemy[1].currentHp -= damage
+                                        self.skillDamage = damage
+
+                                        self.currentEnemy[self.currentEnemyIndex].currentHp -= damage
                                         print(f"Skill: {self.player.Skills[1].name} does  {damage} DMG")
                                         print(f"Player sp {self.player.sp}")
-                                        print(f"Enenmys '{self.currentEnemy[1].currentHp}'.")
+                                        print(f"Enenmys '{self.currentEnemy[self.currentEnemyIndex].currentHp}'.")
                                        
 
                                         # Saves the skill used as a string to display in the display battle screen.
@@ -826,10 +849,12 @@ class Game:
                                         action_selected = True
                                         
                                         damage = move.use()
-                                        self.currentEnemy[1].currentHp -= damage
+                                        self.skillDamage = damage
+
+                                        self.currentEnemy[self.currentEnemyIndex].currentHp -= damage
                                         print(f"Skill: {self.player.Skills[2].name} does  {damage} DMG")
                                         print(f"Player sp {self.player.sp}")
-                                        print(f"Enenmys '{self.currentEnemy[1].currentHp}'.")
+                                        print(f"Enenmys '{self.currentEnemy[self.currentEnemyIndex].currentHp}'.")
                                         
 
                                         # Saves the skill used as a string to display in the display battle screen.
