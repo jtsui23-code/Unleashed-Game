@@ -13,6 +13,10 @@ class skill:
         self.text = Text(200, 75, 900, 600, name + '!', 
                         pygame.font.Font('Media/Assets/Fonts/fantasy.ttf', 100), 
                         (255, 255, 255))
+        
+        # Without this variable, skills that have been used will have their
+        # cooldowns reduced by 1 immediately after being used.
+        self.skillJustUsed = False
 
     def __str__(self):
         return f"{self.name} does {self.damage} damage and has a cooldown of {self.max_cooldown} turns. It costs {self.sp} SP to use."
@@ -29,6 +33,7 @@ class skill:
             self.text.draw(screen)
             
         self.currentCD = self.max_cooldown  # Start the cooldown
+        self.skillJustUsed = True
         return self.damage
     
     def is_available(self):
@@ -41,8 +46,14 @@ class skill:
 
     def reduceCD(self):
         """Reduce cooldown by 1 if it's greater than 0"""
-        if self.currentCD > 0:
+        """and checks if the skill was just used so"""
+        """the skill doesn't get reduced by 1 immediately after being used."""
+
+        if self.currentCD > 0 and not self.skillJustUsed:
             self.currentCD -= 1  # Fixed the syntax error here
+
+        elif self.skillJustUsed:
+            self.skillJustUsed = False
     
     def get_sp_cost(self):
         """Get the SP cost of the skill"""

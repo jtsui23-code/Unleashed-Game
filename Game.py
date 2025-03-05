@@ -31,7 +31,8 @@ class Game:
         # 1 - second enemy
         self.hoveredEnemy = None
 
-        self.reduceCoolDownNow = True
+        self.turnNum = 1
+
         
         # Stores the enemy rects to apply blinking effect onto them.
         self.enemyRect = []
@@ -593,7 +594,7 @@ class Game:
             if self.gameStates['displayBattle']:
                 self.screen.fill((0,0,0))
                 
-                self.reduceCoolDownNow = not self.reduceCoolDownNow
+                self.isFirstTurn = False
 
                 # Display enemy sprites on the display battle screen.
                 self.screen.blit(self.assets['enemy1'], (200, 100))
@@ -630,24 +631,21 @@ class Game:
                                 self.dialogue.current_dialogue.skipTyping()
                                 
 
-
-
             if self.gameStates['battle']:
                 # Background for battle
-                
+
+
                 action_selected = False
                 move = 0
                 current_menu = 'battle'  # Track which menu we're showing
-                
-                # Reduces the cooldown of skills only after the player has 
-                # selected a viable action. Otherwise the cooldown for 
-                # skills will be reduced every frame.
-                if not self.reduceCoolDownNow:
-                    # Reduce cooldowns for all skills.
-                    for i in range(3):
-                        self.player.Skills[i].reduceCD()
 
-                    self.reduceCoolDownNow = not self.reduceCoolDownNow
+                print(f"The current turn is {self.turnNum}")
+                self.turnNum += 1
+                print(f"Skill 1 was a cooldown of {self.player.Skills[0].currentCD} turns.")
+                print(f"Skill 2 was a cooldown of {self.player.Skills[1].currentCD} turns.")
+                print(f"Skill 3 was a cooldown of {self.player.Skills[2].currentCD} turns.")
+                
+                
 
 
                 while not action_selected:
@@ -692,7 +690,7 @@ class Game:
                                     for i in range(3):  # Assuming 3 skills
                                         if self.player.Skills[i].currentCD > 0:
                                             self.moves[f'Skill{i}'].text = str(self.player.Skills[i].currentCD)
-                                            print(f"Skill {i} has a cooldown of {self.player.Skills[i].currentCD} turns.")
+                                            print(f"Skill {i} has a new cooldown of {self.player.Skills[i].currentCD} turns.")
                                         else:
                                             self.moves[f'Skill{i}'].text = self.player.Skills[i].name
 
@@ -710,9 +708,6 @@ class Game:
 
                             elif current_menu == 'skills':
 
-                                
-
-
 
                                 if self.moves['Back'].rect.collidepoint(mousePos):
                                     current_menu = 'battle'
@@ -721,7 +716,7 @@ class Game:
                                     action_selected = True
                                     move = self.player.Skills[0]
 
-                                    if move.is_available() and self.player.sp > move.get_sp_cost():
+                                    if move.is_available() and self.player.sp >= move.get_sp_cost():
                                         self.player.sp -= move.get_sp_cost()
                                         action_selected = True
 
@@ -730,9 +725,7 @@ class Game:
                                         print(f"Skill: {self.player.Skills[0].name} does  {damage} DMG")
                                         print(f"Player sp {self.player.sp}")
                                         print(f"Enenmys '{self.currentEnemy[1].currentHp}'.")
-                                        print(f"Skill 1 has a cooldown of {self.player.Skills[0].currentCD} turns.")
-                                        print(f"Skill 2 has a cooldown of {self.player.Skills[1].currentCD} turns.")
-                                        print(f"Skill 3 has a cooldown of {self.player.Skills[2].currentCD} turns.")
+                                        
 
                                         # Saves the skill used as a string to display in the display battle screen.
                                         self.skillUsed = self.player.Skills[0].name
@@ -744,7 +737,7 @@ class Game:
                                     action_selected = True
                                     move = self.player.Skills[1]
 
-                                    if move.is_available() and self.player.sp > move.get_sp_cost():
+                                    if move.is_available() and self.player.sp >= move.get_sp_cost():
                                         self.player.sp -= move.get_sp_cost()
                                         action_selected = True
                                         
@@ -753,9 +746,7 @@ class Game:
                                         print(f"Skill: {self.player.Skills[1].name} does  {damage} DMG")
                                         print(f"Player sp {self.player.sp}")
                                         print(f"Enenmys '{self.currentEnemy[1].currentHp}'.")
-                                        print(f"Skill 1 has a cooldown of {self.player.Skills[0].currentCD} turns.")
-                                        print(f"Skill 2 has a cooldown of {self.player.Skills[1].currentCD} turns.")
-                                        print(f"Skill 3 has a cooldown of {self.player.Skills[2].currentCD} turns.")
+                                       
 
                                         # Saves the skill used as a string to display in the display battle screen.
                                         self.skillUsed = self.player.Skills[1].name
@@ -767,7 +758,7 @@ class Game:
                                     action_selected = True
                                     move = self.player.Skills[2]
 
-                                    if move.is_available() and self.player.sp > move.get_sp_cost():
+                                    if move.is_available() and self.player.sp >= move.get_sp_cost():
                                         self.player.sp -= move.get_sp_cost()
                                         action_selected = True
                                         
@@ -776,9 +767,7 @@ class Game:
                                         print(f"Skill: {self.player.Skills[2].name} does  {damage} DMG")
                                         print(f"Player sp {self.player.sp}")
                                         print(f"Enenmys '{self.currentEnemy[1].currentHp}'.")
-                                        print(f"Skill 1 has a cooldown of {self.player.Skills[0].currentCD} turns.")
-                                        print(f"Skill 2 has a cooldown of {self.player.Skills[1].currentCD} turns.")
-                                        print(f"Skill 3 has a cooldown of {self.player.Skills[2].currentCD} turns.")
+                                        
 
                                         # Saves the skill used as a string to display in the display battle screen.
                                         self.skillUsed = self.player.Skills[2].name
@@ -786,12 +775,19 @@ class Game:
                                         self.gameStates['displayBattle'] = True
 
 
-                    
+                        # Update display EVERY FRAME
+                        pygame.display.flip()
+                        pygame.time.Clock().tick(60)
 
+                # Reduces the cooldown of skills only after the player has 
+                # selected a viable action. Otherwise the cooldown for 
+                # skills will be reduced every frame.
+                # Reduce cooldowns for all skills.
+                for i in range(3):
+                    self.player.Skills[i].reduceCD()
 
-                    # Update display EVERY FRAME
-                    pygame.display.flip()
-                    pygame.time.Clock().tick(60)
+    
+    
 
                 # Handle post-battle logic
                 result = self.currentBattle.fight(move)
