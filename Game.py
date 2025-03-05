@@ -250,6 +250,65 @@ class Game:
             self.enemies[secondEnemyKey]
         ]
 
+    def drawBars(self):
+        # PLAYER'S HEALTH AND SP BARS (at top left)
+        
+        # Player HP bar calculation
+        playerHpPercent = self.player.currentHp / self.player.maxHp
+        playerHpWidth = 200 * playerHpPercent
+        
+        # Player SP bar calculation
+        playerSpPercent = self.player.sp / self.player.maxSp
+        playerSpWidth = 200 * playerSpPercent
+        
+        # Draw player's HP bar (top left)
+        # HP bar background
+        pygame.draw.rect(self.screen, (100, 100, 100), (20, 20, 200, 20))
+        # HP bar fill
+        pygame.draw.rect(self.screen, (255, 0, 0), (20, 20, playerHpWidth, 20))
+        # HP bar outline
+        pygame.draw.rect(self.screen, (0, 0, 0), (20, 20, 200, 20), 2)
+        # HP text - explicitly labeled as "Player HP"
+        hpText = pygame.font.Font(None, 24).render(f"Player HP: {self.player.currentHp}/{self.player.maxHp}", True, (255, 255, 255))
+        self.screen.blit(hpText, (25, 20))
+        
+        # Draw player's SP bar (below player's HP)
+        # SP bar background
+        pygame.draw.rect(self.screen, (100, 100, 100), (20, 50, 200, 20))
+        # SP bar fill
+        pygame.draw.rect(self.screen, (0, 0, 255), (20, 50, playerSpWidth, 20))
+        # SP bar outline
+        pygame.draw.rect(self.screen, (0, 0, 0), (20, 50, 200, 20), 2)
+        # SP text
+        spText = pygame.font.Font(None, 24).render(f"Player SP: {self.player.sp}/{self.player.maxSp}", True, (255, 255, 255))
+        self.screen.blit(spText, (25, 50))
+        
+        # ENEMY HEALTH BAR (only for non-infected enemy at top right)
+        # Only draw when in battle-related states
+        if self.gameStates['battle'] or self.gameStates['displayBattle'] or self.gameStates['infectMode']:
+            # In the infection scenario, we only want to show the health bar for the non-infected enemy
+            # Assuming currentEnemy[0] is the one the player didn't infect (based on your battle setup)
+            enemy = self.currentEnemy[1]  # The non-infected enemy
+            
+            if enemy.currentHp > 0:  # Only draw HP for living enemy
+                # Position the bar in the top right
+                hpX = 1060  # 1280 - 200 - 20 (screen width - bar width - margin)
+                hpY = 20  # 20px from top
+                
+                # Calculate HP percentage
+                enemyHpPercent = enemy.currentHp / enemy.maxHp
+                enemyHpWidth = 200 * enemyHpPercent
+                
+                # HP bar background
+                pygame.draw.rect(self.screen, (100, 100, 100), (hpX, hpY, 200, 20))
+                # HP bar fill
+                pygame.draw.rect(self.screen, (255, 0, 0), (hpX, hpY, enemyHpWidth, 20))
+                # HP bar outline
+                pygame.draw.rect(self.screen, (0, 0, 0), (hpX, hpY, 200, 20), 2)
+                # HP text
+                hpText = pygame.font.Font(None, 24).render(f"{enemy.name}: {enemy.currentHp}/{enemy.maxHp}", True, (255, 255, 255))
+                self.screen.blit(hpText, (hpX + 5, hpY))
+
         # The running loop
     def run(self):
         while True:
@@ -594,11 +653,15 @@ class Game:
             if self.gameStates['displayBattle']:
                 self.screen.fill((0,0,0))
                 
+
                 self.isFirstTurn = False
 
                 # Display enemy sprites on the display battle screen.
                 self.screen.blit(self.assets['enemy1'], (200, 100))
                 self.screen.blit(self.assets['enemy2'], (500, 100))
+
+                # Health Bar and SP bar for the player and enemies.
+                self.drawBars()
 
                 # Render textbox for the skill used in the display battle screen.
 
