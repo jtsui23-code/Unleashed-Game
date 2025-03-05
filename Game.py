@@ -31,7 +31,7 @@ class Game:
         # 1 - second enemy
         self.hoveredEnemy = None
 
-        self.reduceCoolDownNow = False
+        self.reduceCoolDownNow = True
         
         # Stores the enemy rects to apply blinking effect onto them.
         self.enemyRect = []
@@ -592,7 +592,7 @@ class Game:
 
             if self.gameStates['displayBattle']:
                 self.screen.fill((0,0,0))
-
+                
                 self.reduceCoolDownNow = not self.reduceCoolDownNow
 
                 # Display enemy sprites on the display battle screen.
@@ -644,8 +644,9 @@ class Game:
                 # skills will be reduced every frame.
                 if not self.reduceCoolDownNow:
                     # Reduce cooldowns for all skills.
-                    for skill in self.player.Skills:
-                        skill.reduceCD()
+                    for i in range(3):
+                        self.player.Skills[i].reduceCD()
+
                     self.reduceCoolDownNow = not self.reduceCoolDownNow
 
 
@@ -679,16 +680,23 @@ class Game:
                             
                         if event.type == pygame.MOUSEBUTTONDOWN:
                             if current_menu == 'battle':
+
+
                                 if self.battle['Attack'].rect.collidepoint(mousePos):
                                     action_selected = True
                                     move = self.player.basicAttack()
                                 
                                 # If the skill button is clicked, switch to the skills menu.
                                 elif self.battle['Skill'].rect.collidepoint(mousePos):
+
+                                    for i in range(3):  # Assuming 3 skills
+                                        if self.player.Skills[i].currentCD > 0:
+                                            self.moves[f'Skill{i}'].text = str(self.player.Skills[i].currentCD)
+                                            print(f"Skill {i} has a cooldown of {self.player.Skills[i].currentCD} turns.")
+                                        else:
+                                            self.moves[f'Skill{i}'].text = self.player.Skills[i].name
+
                                     
-                                    # Updates the text for the skills menu.
-                                    self.moves['Skill1'].text = self.player.Skills[1].name
-                                    self.moves['Skill2'].text = self.player.Skills[2].name
                                     current_menu = 'skills'
                                 
                                 # If the guard button is clicked, set the action to guard.
@@ -701,6 +709,11 @@ class Game:
                                     move = 0
 
                             elif current_menu == 'skills':
+
+                                
+
+
+
                                 if self.moves['Back'].rect.collidepoint(mousePos):
                                     current_menu = 'battle'
                                 
