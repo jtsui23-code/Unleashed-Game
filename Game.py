@@ -136,7 +136,7 @@ class Game:
             'enemyTurn': False
             
         }
-
+        self.hasUsedSkill = False
         self.skillDamage = 0
         self.skillUsed = "None"
         self.skillDialogueSet = False
@@ -202,7 +202,10 @@ class Game:
     def skillDialogue(self, skill):
 
         # Updates the textbox of the display battle screen to show the skill used.
-        self.displayBattleButtons['attack'].setText(f"{self.skillUsed} infliced {self.skillDamage} damage!")
+        if self.enemyGuarded:
+            self.displayBattleButtons['attack'].setText(f"{self.currentEnemy[self.currentEnemyIndex].name} guarded!")
+        else:
+            self.displayBattleButtons['attack'].setText(f"{self.skillUsed} infliced {self.skillDamage} damage!")
 
     # Returns a copy of the enemy sprite with different shade of color 
     # to create a blinking effect.
@@ -280,11 +283,13 @@ class Game:
         # Enemey guards if they are low and no skills are available.
         elif self.currentEnemy[self.currentEnemyIndex].currentHp < self.currentEnemy[self.currentEnemyIndex].maxHp//2:
             self.enemyGuarded = True
+            self.skillUsed = "Guard"
             print(f"{self.currentEnemy[self.currentEnemyIndex].name} is guarding.")
         else:
-            self.skillUsed = 'Strike'
+            self.skillUsed = "Strike"
             self.skillDamage = int(self.currentEnemy[self.currentEnemyIndex].basicAttack())
             self.player.currentHp -= self.skillDamage
+            print(f"{self.currentEnemy[self.currentEnemyIndex].name} uses {self.skillUsed} for {self.skillDamage} damage.")
 
     def drawBars(self):
         # PLAYER'S HEALTH AND SP BARS (at top left)
@@ -693,7 +698,10 @@ class Game:
 
             if self.gameStates['displayBattle']:
                 self.screen.fill((0,0,0))
+
+                self.hasUsedSkill = False
                 
+                # Display the battle screen background.
                 self.screen.blit(self.assets['arena'], (0, 0))
                 self.isFirstTurn = False
 
@@ -752,11 +760,8 @@ class Game:
                 move = 0
                 current_menu = 'battle'  # Track which menu we're showing
 
-                print(f"The current turn is {self.turnNum}")
                 self.turnNum += 1
-                print(f"Skill 1 was a cooldown of {self.player.Skills[0].currentCD} turns.")
-                print(f"Skill 2 was a cooldown of {self.player.Skills[1].currentCD} turns.")
-                print(f"Skill 3 was a cooldown of {self.player.Skills[2].currentCD} turns.")
+                
                 
                 # Allows the enemy to attack after the player's turn needed or the enemy will
                 # attack indefinitely.
@@ -819,7 +824,7 @@ class Game:
                                     for i in range(3):  # Assuming 3 skills
                                         if self.player.Skills[i].currentCD > 0:
                                             self.moves[f'Skill{i}'].text = str(self.player.Skills[i].currentCD)
-                                            print(f"Skill {i} has a new cooldown of {self.player.Skills[i].currentCD} turns.")
+
                                         else:
                                             self.moves[f'Skill{i}'].text = self.player.Skills[i].name
 
@@ -859,10 +864,9 @@ class Game:
                                         self.skillDamage = damage
 
                                         self.currentEnemy[self.currentEnemyIndex].currentHp -= damage
-                                        print(f"Skill: {self.player.Skills[0].name} does  {damage} DMG")
-                                        print(f"Player sp {self.player.sp}")
-                                        print(f"Enenmys '{self.currentEnemy[self.currentEnemyIndex].currentHp}'.")
                                         
+                                        
+                                        self.hasUsedSkill = True
 
                                         # Saves the skill used as a string to display in the display battle screen.
                                         self.skillUsed = self.player.Skills[0].name
@@ -887,11 +891,10 @@ class Game:
 
                                         self.skillDamage = damage
 
+                                        self.hasUsedSkill = True
+
                                         self.currentEnemy[self.currentEnemyIndex].currentHp -= damage
-                                        print(f"Skill: {self.player.Skills[1].name} does  {damage} DMG")
-                                        print(f"Player sp {self.player.sp}")
-                                        print(f"Enenmys '{self.currentEnemy[self.currentEnemyIndex].currentHp}'.")
-                                       
+                                        
 
                                         # Saves the skill used as a string to display in the display battle screen.
                                         self.skillUsed = self.player.Skills[1].name
@@ -915,10 +918,10 @@ class Game:
                                         damage = move.use()
                                         self.skillDamage = damage
 
+                                        self.hasUsedSkill = True
+
+
                                         self.currentEnemy[self.currentEnemyIndex].currentHp -= damage
-                                        print(f"Skill: {self.player.Skills[2].name} does  {damage} DMG")
-                                        print(f"Player sp {self.player.sp}")
-                                        print(f"Enenmys '{self.currentEnemy[self.currentEnemyIndex].currentHp}'.")
                                         
 
                                         # Saves the skill used as a string to display in the display battle screen.
@@ -929,14 +932,15 @@ class Game:
 
                         # Update display EVERY FRAME
                         pygame.display.flip()
-                        pygame.time.Clock().tick(60)
-
-                # Reduces the cooldown of skills only after the player has 
-                # selected a viable action. Otherwise the cooldown for 
-                # skills will be reduced every frame.
-                # Reduce cooldowns for all skills.
-                for i in range(3):
-                    self.player.Skills[i].reduceCD()
+                        pygame.time.Clock().tick(60)    
+                
+                if self.hasUsedSkill:
+                    # Reduces the cooldown of skills only after the player has 
+                    # selected a viable action. Otherwise the cooldown for 
+                    # skills will be reduced every frame.
+                    # Reduce cooldowns for all skills.
+                    for i in range(3):
+                        self.player.Skills[i].reduceCD()
 
     
     
@@ -948,7 +952,6 @@ class Game:
                 #     self.gameStates['intermission'] = True
 
             
-
             # Display the screen
             pygame.display.flip()
 
