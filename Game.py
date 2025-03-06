@@ -33,9 +33,7 @@ class Game:
 
         self.turnNum = 1
 
-        
 
-        
         # Stores the enemy rects to apply blinking effect onto them.
         self.enemyRect = []
 
@@ -109,6 +107,8 @@ class Game:
         
         self.currentEnemyIndex = 0
         self.currentEnemy = []
+        self.enemyGuarded = False
+        self.isEnemeyTurn = True
         self.currentFloor = 1
         
         # Stores the Button objects for the shop menu.
@@ -133,6 +133,7 @@ class Game:
             'itemReward': False,
             'infectMode': False,
             'displayBattle': False,
+            'enemyTurn': False
             
         }
 
@@ -254,6 +255,36 @@ class Game:
             self.enemies[firstEnemyKey],
             self.enemies[secondEnemyKey]
         ]
+    
+    def enemyTurn(self):
+        
+        move = self.currentEnemy[self.currentEnemyIndex].Skills
+        
+        if self.currentEnemy[self.currentEnemyIndex].currentHp <= 0:
+            print(f"{self.currentEnemy[self.currentEnemyIndex].name} has been defeated.")
+            return 0
+        # Prioties the use of the later skills becasue they are probably stronger.
+        elif move[1].is_available and self.currentEnemy[self.currentEnemyIndex].sp >= move[1].get_sp_cost():
+            self.skillUsed = move[1].name
+            self.skillDamage = move[1].use()
+            self.currentEnemy[self.currentEnemyIndex].sp -= move[1].get_sp_cost()
+            self.player.currentHp -= self.skillDamage
+
+        elif move[0].is_available and self.currentEnemy[self.currentEnemyIndex].sp >= move[0].get_sp_cost():
+            self.skillUsed = move[0].name
+            self.skillDamage = move[0].use()
+
+            self.currentEnemy[self.currentEnemyIndex].sp -= move[0].get_sp_cost()
+            self.player.currentHp -= self.skillDamage
+        
+        # Enemey guards if they are low and no skills are available.
+        elif self.currentEnemy[self.currentEnemyIndex].hp < self.currentEnemy[self.currentEnemyIndex].maxHp//2:
+            self.enemyGuarded = True
+            print(f"{self.currentEnemy[self.currentEnemyIndex].name} is guarding.")
+        else:
+            self.skillUsed = 'Strike'
+            self.skillDamage = self.currentEnemy[self.currentEnemyIndex].basicAttack()
+            self.player.currentHp -= self.skillDamage
 
     def drawBars(self):
         # PLAYER'S HEALTH AND SP BARS (at top left)
@@ -694,7 +725,10 @@ class Game:
                             # with all of the skills.
                             if not self.dialogue.current_dialogue.isTyping():
                                 self.gameStates['displayBattle'] = False
-                                self.gameStates['battle'] = True
+                                if self.isEnemeyTurn:
+                                    self.gameStates['enemyTurn'] = True
+                                else:
+                                    self.gameStates['battle'] = True
                                 self.skillUsed = "None"
                                 self.skillDialogueSet = False
 
@@ -703,6 +737,12 @@ class Game:
                             else:
                                 self.dialogue.current_dialogue.skipTyping()
                                 
+            if self.gameStates['enemyTurn']:
+                self.isEnemeyTurn = False   
+                self.enemyTurn()
+                self.gameStates['enemyTurn'] = False
+                self.gameStates['displayBattle'] = True
+
 
             if self.gameStates['battle']:
                 # Background for battle
@@ -718,8 +758,9 @@ class Game:
                 print(f"Skill 2 was a cooldown of {self.player.Skills[1].currentCD} turns.")
                 print(f"Skill 3 was a cooldown of {self.player.Skills[2].currentCD} turns.")
                 
-                
-
+                # Allows the enemy to attack after the player's turn needed or the enemy will
+                # attack indefinitely.
+                self.isEnemeyTurn = True
 
                 while not action_selected:
                     # Clear screen EVERY FRAME
@@ -759,6 +800,12 @@ class Game:
                                     # Deals the default amount of damage to the enemy.
                                     damage = int(self.player.basicAttack())
                                     self.skillDamage = damage
+
+                                    # If the enemy is guarding, the damage dealt is halved.
+                                    if self.enemyGuarded:
+                                        damage = damage // 2
+                                        self.enemyGuarded = False
+
                                     self.currentEnemy[self.currentEnemyIndex].currentHp -= damage
 
                                     self.skillUsed = "Strike"
@@ -803,6 +850,12 @@ class Game:
                                         action_selected = True
 
                                         damage = move.use()
+
+                                        # If the enemy is guarding, the damage dealt is halved.
+                                        if self.enemyGuarded:
+                                            damage = damage // 2
+                                            self.enemyGuarded = False
+
                                         self.skillDamage = damage
 
                                         self.currentEnemy[self.currentEnemyIndex].currentHp -= damage
@@ -826,6 +879,12 @@ class Game:
                                         action_selected = True
                                         
                                         damage = move.use()
+
+                                        # If the enemy is guarding, the damage dealt is halved.
+                                        if self.enemyGuarded:
+                                            damage = damage // 2
+                                            self.enemyGuarded = False
+
                                         self.skillDamage = damage
 
                                         self.currentEnemy[self.currentEnemyIndex].currentHp -= damage
@@ -848,6 +907,11 @@ class Game:
                                         self.player.sp -= move.get_sp_cost()
                                         action_selected = True
                                         
+                                        # If the enemy is guarding, the damage dealt is halved.
+                                        if self.enemyGuarded:
+                                            damage = damage // 2
+                                            self.enemyGuarded = False
+
                                         damage = move.use()
                                         self.skillDamage = damage
 
@@ -877,11 +941,11 @@ class Game:
     
     
 
-                # Handle post-battle logic
-                result = self.currentBattle.fight(move)
-                if result == 0:
-                    self.gameStates['battle'] = False
-                    self.gameStates['intermission'] = True
+                # # Handle post-battle logic
+                # result = self.currentBattle.fight(move)
+                # if result == 0:
+                #     self.gameStates['battle'] = False
+                #     self.gameStates['intermission'] = True
 
             
 
