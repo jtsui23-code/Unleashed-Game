@@ -264,13 +264,13 @@ class Game:
             print(f"{self.currentEnemy[self.currentEnemyIndex].name} has been defeated.")
             return 0
         # Prioties the use of the later skills becasue they are probably stronger.
-        elif move[1].is_available and self.currentEnemy[self.currentEnemyIndex].sp >= move[1].get_sp_cost():
+        elif move[1].is_available() and self.currentEnemy[self.currentEnemyIndex].sp >= move[1].get_sp_cost():
             self.skillUsed = move[1].name
             self.skillDamage = move[1].use()
             self.currentEnemy[self.currentEnemyIndex].sp -= move[1].get_sp_cost()
             self.player.currentHp -= self.skillDamage
 
-        elif move[0].is_available and self.currentEnemy[self.currentEnemyIndex].sp >= move[0].get_sp_cost():
+        elif move[0].is_available() and self.currentEnemy[self.currentEnemyIndex].sp >= move[0].get_sp_cost():
             self.skillUsed = move[0].name
             self.skillDamage = move[0].use()
 
@@ -278,12 +278,12 @@ class Game:
             self.player.currentHp -= self.skillDamage
         
         # Enemey guards if they are low and no skills are available.
-        elif self.currentEnemy[self.currentEnemyIndex].hp < self.currentEnemy[self.currentEnemyIndex].maxHp//2:
+        elif self.currentEnemy[self.currentEnemyIndex].currentHp < self.currentEnemy[self.currentEnemyIndex].maxHp//2:
             self.enemyGuarded = True
             print(f"{self.currentEnemy[self.currentEnemyIndex].name} is guarding.")
         else:
             self.skillUsed = 'Strike'
-            self.skillDamage = self.currentEnemy[self.currentEnemyIndex].basicAttack()
+            self.skillDamage = int(self.currentEnemy[self.currentEnemyIndex].basicAttack())
             self.player.currentHp -= self.skillDamage
 
     def drawBars(self):
