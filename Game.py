@@ -202,6 +202,7 @@ class Game:
     def skillDialogue(self, skill):
 
         # Updates the textbox of the display battle screen to show the skill used.
+        # Displays dialogue for when enemy guards as well.
         if self.enemyGuarded:
             self.displayBattleButtons['attack'].setText(f"{self.currentEnemy[self.currentEnemyIndex].name} guarded!")
         else:
@@ -261,12 +262,15 @@ class Game:
     
     def enemyTurn(self):
         
+        # Stores the all of the enemy skills to check for their cooldowns.
         move = self.currentEnemy[self.currentEnemyIndex].Skills
         
+        # Checks if the enemy has been defeated.
         if self.currentEnemy[self.currentEnemyIndex].currentHp <= 0:
             print(f"{self.currentEnemy[self.currentEnemyIndex].name} has been defeated.")
             return 0
-        # Prioties the use of the later skills becasue they are probably stronger.
+
+        # Prioties the use of the highr skills becasue they are probably stronger.
         elif move[1].is_available() and self.currentEnemy[self.currentEnemyIndex].sp >= move[1].get_sp_cost():
             self.skillUsed = move[1].name
             self.skillDamage = move[1].use()
@@ -280,8 +284,8 @@ class Game:
             self.currentEnemy[self.currentEnemyIndex].sp -= move[0].get_sp_cost()
             self.player.currentHp -= self.skillDamage
         
-        # Enemey guards if they are low and no skills are available.
-        elif self.currentEnemy[self.currentEnemyIndex].currentHp < self.currentEnemy[self.currentEnemyIndex].maxHp//2:
+        # Enemey guards if their health is below 50% half of the time to prevent spamming of guard.
+        elif self.currentEnemy[self.currentEnemyIndex].currentHp < self.currentEnemy[self.currentEnemyIndex].maxHp//2 and random.random() < .5:
             self.enemyGuarded = True
             self.skillUsed = "Guard"
             print(f"{self.currentEnemy[self.currentEnemyIndex].name} is guarding.")
