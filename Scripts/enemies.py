@@ -62,7 +62,7 @@ class Enemy(Character):
             return self.basicAttack()  # Ensure this returns a valid damage value
 
     def guard(self):
-        print(f"{self.name} is guarding!")
+        return True
 
     def infected(self, defaultInfectionRate):
         pass
