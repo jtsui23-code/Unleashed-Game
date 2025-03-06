@@ -107,6 +107,7 @@ class Game:
         
         self.currentEnemyIndex = 0
         self.currentEnemy = []
+        self.playerGuarded = False
         self.enemyGuarded = False
         self.isEnemeyTurn = True
         self.currentFloor = 1
@@ -205,6 +206,10 @@ class Game:
         # Displays dialogue for when enemy guards as well.
         if self.enemyGuarded:
             self.displayBattleButtons['attack'].setText(f"{self.currentEnemy[self.currentEnemyIndex].name} guarded!")
+        
+        # Displays dialogue for when the player guards.
+        elif self.playerGuarded:
+            self.displayBattleButtons['attack'].setText(f"Player guarded!")
         else:
             self.displayBattleButtons['attack'].setText(f"{self.skillUsed} infliced {self.skillDamage} damage!")
 
@@ -272,17 +277,42 @@ class Game:
 
         # Prioties the use of the highr skills becasue they are probably stronger.
         elif move[1].is_available() and self.currentEnemy[self.currentEnemyIndex].sp >= move[1].get_sp_cost():
+            
+            # Gets the name of the skill used to display on dialogue box.
             self.skillUsed = move[1].name
+
+            # Gets the damage of the skill used for dialogue box and to subtract from player's health.
             self.skillDamage = move[1].use()
             self.currentEnemy[self.currentEnemyIndex].sp -= move[1].get_sp_cost()
+
+            # If the player is guarding, the damage is halved.
+            if self.playerGuarded:
+                self.skillDamage = self.skillDamage // 2
             self.player.currentHp -= self.skillDamage
+
+            # Have to toggle player guard off or player guarding will display for 
+            # the display battle screen for the enemy's attack.
+            self.playerGuarded = False
 
         elif move[0].is_available() and self.currentEnemy[self.currentEnemyIndex].sp >= move[0].get_sp_cost():
+            
+            # Gets the name of the skill used to display on dialogue box.
             self.skillUsed = move[0].name
+            
+            # Gets the damage of the skill used for dialogue box and to subtract from player's health.
             self.skillDamage = move[0].use()
-
             self.currentEnemy[self.currentEnemyIndex].sp -= move[0].get_sp_cost()
+
+            # If the player is guarding, the damage is halved.
+            if self.playerGuarded:
+                self.skillDamage = self.skillDamage // 2
             self.player.currentHp -= self.skillDamage
+
+            # Have to toggle player guard off or player guarding will display for 
+            # the display battle screen for the enemy's attack.
+            self.playerGuarded = False
+
+
         
         # Enemey guards if their health is below 50% half of the time to prevent spamming of guard.
         elif self.currentEnemy[self.currentEnemyIndex].currentHp < self.currentEnemy[self.currentEnemyIndex].maxHp//2 and random.random() < .5:
@@ -290,9 +320,22 @@ class Game:
             self.skillUsed = "Guard"
             print(f"{self.currentEnemy[self.currentEnemyIndex].name} is guarding.")
         else:
+
+            # Gets the name of the basic attack to display on dialogue box.
             self.skillUsed = "Strike"
+
+            # Gets the damage of the basic attack for dialogue box and to subtract from player's health.
             self.skillDamage = int(self.currentEnemy[self.currentEnemyIndex].basicAttack())
+            
+            # If the player is guarding, the damage is halved.
+            if self.playerGuarded:
+                self.skillDamage = self.skillDamage // 2
             self.player.currentHp -= self.skillDamage
+            
+            # Have to toggle player guard off or player guarding will display for 
+            # the display battle screen for the enemy's attack.
+            self.playerGuarded = False
+
             print(f"{self.currentEnemy[self.currentEnemyIndex].name} uses {self.skillUsed} for {self.skillDamage} damage.")
 
     def drawBars(self):
@@ -843,6 +886,17 @@ class Game:
                                 elif self.battle['Guard'].rect.collidepoint(mousePos):
                                     action_selected = True
                                     move = 0
+
+                                    # Need to toggle used skill or the cooldowns of 
+                                    # skills will not reduce when guarding.
+                                    self.hasUsedSkill = True
+                                    # Sets the player's guard state to True.
+                                    self.playerGuarded = True
+                                    self.skillUsed = "Guard"
+
+                                    # Transitions to the display battle screen.
+                                    self.gameStates['battle'] = False
+                                    self.gameStates['displayBattle'] = True
 
                             elif current_menu == 'skills':
 
