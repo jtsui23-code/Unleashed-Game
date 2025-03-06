@@ -185,7 +185,6 @@ class Game:
             'Infection': 0
         }
 
-
         # Flags to track if certain music are playing.
         self.intermissionMusicPlaying = False
         self.titleMusicPlaying = False
@@ -264,6 +263,31 @@ class Game:
             self.enemies[firstEnemyKey],
             self.enemies[secondEnemyKey]
         ]
+
+    # Checks if the enemy will guard or not.
+    # If so, guard ahead of time to initiate the guard for the
+    # player's current attack. Otherwise, the enemy will always be guarding 
+    # against the player's next attack.
+    def enemyWillGuard(self):
+        # Stores the all of the enemy skills to check for their cooldowns.
+        move = self.currentEnemy[self.currentEnemyIndex].Skills
+        
+        # If the enemy will be using a skill on its next turn, then the 
+        # enemy will not be guarding.
+        if move[1].is_available() and self.currentEnemy[self.currentEnemyIndex].sp >= move[1].get_sp_cost():
+            return False
+        elif move[0].is_available() and self.currentEnemy[self.currentEnemyIndex].sp >= move[0].get_sp_cost():
+            return False
+
+        # If the enemy will guard next turn, then the enemy will guard ahead of time.
+        # Before the player's current attack starts.
+        elif self.currentEnemy[self.currentEnemyIndex].currentHp < self.currentEnemy[self.currentEnemyIndex].maxHp//2 and random.random() < .5:
+            return True
+
+        # If the enemy will do its basic attack, then the enemy will not guard.
+        else:
+            return False
+            
     
     def enemyTurn(self):
         
@@ -315,8 +339,12 @@ class Game:
 
         
         # Enemey guards if their health is below 50% half of the time to prevent spamming of guard.
-        elif self.currentEnemy[self.currentEnemyIndex].currentHp < self.currentEnemy[self.currentEnemyIndex].maxHp//2 and random.random() < .5:
-            self.enemyGuarded = True
+        # enemyGuarded was set ahead of time to initiate the guard for the player's current attack.
+        # Otherwise the enemy will always be guarding against the player's next attack.
+        # enemyGuarded is determined by the enemyWillGuard function which accounts for the 
+        # enemy's current health, skill cooldowns, and 50% guard change.
+        elif self.currentEnemy[self.currentEnemyIndex].currentHp < self.currentEnemy[self.currentEnemyIndex].maxHp//2 and self.enemyGuarded:
+            self.enemyGuarded = False
             self.skillUsed = "Guard"
             print(f"{self.currentEnemy[self.currentEnemyIndex].name} is guarding.")
         else:
@@ -536,6 +564,10 @@ class Game:
 
                         # After pressing left or right button, create a 50% chance for a battle and a 50% chance for a bonus intermission
                         elif self.gameStates['intermission']:
+
+                            # If the player clicks on the right button,
+                            # there is a 50% chance to go to the prebattle state or to get
+                            # an item.
                             if self.intermission['right'].rect.collidepoint(mousePos):
                                 if random.random() < .5:
                                     self.gameStates['intermission'] = False
@@ -544,6 +576,9 @@ class Game:
                                     self.gameStates['intermission'] = False
                                     self.gameStates['itemReward'] = True
                             
+                            # If the player clicks on the left button, 
+                            # there is a 50% chance to go to the prebattle state or to get
+                            # an item.
                             elif self.intermission['left'].rect.collidepoint(mousePos):
                                 if random.random() < .5:
                                     self.gameStates['intermission'] = False
@@ -576,20 +611,28 @@ class Game:
                             for button in self.shopOptions.values():
                                 button.isHovered = button.rect.collidepoint(mousePos)
 
+                            # Checks if the player clicks on the back button in the shop menu.
+                            # If so, return back to the title screen.
                             if self.shopOptions['Back'].rect.collidepoint(mousePos):
                                 self.gameStates['shop'] = False
                                 self.gameStates['main'] = True
                                 self.intermissionMusicPlaying = False
                                 self.assets['intermissionSong'].stop()
 
+                            # Checks if the player has clicked on the attack upgrade button.
+                            # If so, upgrade the player's attack.
                             elif self.shopOptions['Attack'].rect.collidepoint(mousePos):
                                 if self.upgrades['Attack'] < 4:
                                     self.upgrades['Attack']+= 1
 
+                            # Checks if the player has clicked on the infection upgrade button.
+                            # If so, upgrade the player's infection.
                             elif self.shopOptions['Infection'].rect.collidepoint(mousePos):
                                 if self.upgrades['Infection'] < 4:
                                     self.upgrades['Infection'] += 1
 
+                            # Checks if the player has clicked on the SP upgrade button.
+                            # If so, upgrade the player's SP.
                             elif self.shopOptions['SP'].rect.collidepoint(mousePos):
                                 if self.upgrades['SP'] < 4:
                                     self.upgrades['SP']+= 1
@@ -814,6 +857,8 @@ class Game:
                 # attack indefinitely.
                 self.isEnemeyTurn = True
 
+                self.enemyGuarded = self.enemyWillGuard()
+
                 while not action_selected:
                     # Clear screen EVERY FRAME
                     self.screen.fill((0, 0, 0))
@@ -856,7 +901,6 @@ class Game:
                                     # If the enemy is guarding, the damage dealt is halved.
                                     if self.enemyGuarded:
                                         damage = damage // 2
-                                        self.enemyGuarded = False
 
                                     self.currentEnemy[self.currentEnemyIndex].currentHp -= damage
 
@@ -899,11 +943,11 @@ class Game:
                                     self.gameStates['displayBattle'] = True
 
                             elif current_menu == 'skills':
-
-
+                                # If the back button is clicked, return to the battle menu.
                                 if self.moves['Back'].rect.collidepoint(mousePos):
                                     current_menu = 'battle'
                                 
+                                # If a skill button is clicked, use the skill.
                                 elif self.moves['Skill0'].rect.collidepoint(mousePos):
                                     action_selected = True
                                     move = self.player.Skills[0]
@@ -917,7 +961,6 @@ class Game:
                                         # If the enemy is guarding, the damage dealt is halved.
                                         if self.enemyGuarded:
                                             damage = damage // 2
-                                            self.enemyGuarded = False
 
                                         self.skillDamage = damage
 
@@ -931,11 +974,13 @@ class Game:
                                         self.gameStates['battle'] = False
                                         self.gameStates['displayBattle'] = True
 
-                                
+                                # If a skill button is clicked, use the skill.
                                 elif self.moves['Skill1'].rect.collidepoint(mousePos):
                                     action_selected = True
                                     move = self.player.Skills[1]
 
+                                    # Checks if the 2nd skill is available and the
+                                    # player has enough SP to use it.
                                     if move.is_available() and self.player.sp >= move.get_sp_cost():
                                         self.player.sp -= move.get_sp_cost()
                                         action_selected = True
@@ -945,7 +990,6 @@ class Game:
                                         # If the enemy is guarding, the damage dealt is halved.
                                         if self.enemyGuarded:
                                             damage = damage // 2
-                                            self.enemyGuarded = False
 
                                         self.skillDamage = damage
 
@@ -959,11 +1003,13 @@ class Game:
                                         self.gameStates['battle'] = False
                                         self.gameStates['displayBattle'] = True
 
-                                
+                                # If a skill button is clicked, use the skill.
                                 elif self.moves['Skill2'].rect.collidepoint(mousePos):
                                     action_selected = True
                                     move = self.player.Skills[2]
 
+                                    # Checks if the 3rd skill is available and the 
+                                    # player has enough SP to use it.
                                     if move.is_available() and self.player.sp >= move.get_sp_cost():
                                         self.player.sp -= move.get_sp_cost()
                                         action_selected = True
@@ -971,17 +1017,14 @@ class Game:
                                         # If the enemy is guarding, the damage dealt is halved.
                                         if self.enemyGuarded:
                                             damage = damage // 2
-                                            self.enemyGuarded = False
 
                                         damage = move.use()
                                         self.skillDamage = damage
 
                                         self.hasUsedSkill = True
 
-
                                         self.currentEnemy[self.currentEnemyIndex].currentHp -= damage
                                         
-
                                         # Saves the skill used as a string to display in the display battle screen.
                                         self.skillUsed = self.player.Skills[2].name
                                         self.gameStates['battle'] = False
@@ -992,6 +1035,9 @@ class Game:
                         pygame.display.flip()
                         pygame.time.Clock().tick(60)    
                 
+                # Checks if the player has taken an action before reducing the cooldowns of skills.
+                # Otherwise the cooldowns will be reduced by toggling back and forth between the
+                # Skills menu.
                 if self.hasUsedSkill:
                     # Reduces the cooldown of skills only after the player has 
                     # selected a viable action. Otherwise the cooldown for 
@@ -999,9 +1045,6 @@ class Game:
                     # Reduce cooldowns for all skills.
                     for i in range(3):
                         self.player.Skills[i].reduceCD()
-
-    
-    
 
                 # # Handle post-battle logic
                 # result = self.currentBattle.fight(move)
