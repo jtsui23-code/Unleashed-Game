@@ -97,8 +97,8 @@ class RSoldier(Enemy):
         self.skillCooldown = []
 
         # Skills
-        BSlash = skill('Big Slash', 20, 3, 10)
-        SBash = skill('Shield Bash', 10, 2, 5)
+        BSlash = skill('Big Slash', 50, 3, 10)
+        SBash = skill('Shield Bash', 2, 2, 5)
 
         self.Skills = [BSlash, SBash]
         self.attackFlip = False
@@ -220,7 +220,7 @@ class Ghoul(Enemy):
 
         # Skills
         Claw = skill('Claw Strike', 30, 2, 20)
-        Rage = skill('Devilish Rage', 50, 4, 40)
+        Rage = skill('Devilish Rage', 45, 4, 40)
 
         self.Skills = [Claw, Rage]
         self.attackFlip = False
