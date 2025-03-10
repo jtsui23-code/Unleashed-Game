@@ -25,6 +25,7 @@ class Game:
         self.screen = pygame.display.set_mode((1280 , 720 ))
 
         self.titleColor = (200, 50, 50)
+        self.black = (0, 0, 0)
 
         # Tracks which enemy is being hovered over
         # 0 - firsts enemy 
@@ -45,6 +46,7 @@ class Game:
 
         self.fonts = {
             'fanta': pygame.font.Font('Media/Assets/Fonts/fantasy.ttf', 100),
+            'arial': pygame.font.Font('Media/Assets/Fonts/Ariall.ttf', 50),
         }
         
         self.dialogue = DialogueManager()
@@ -124,8 +126,7 @@ class Game:
 
         self.inventoryMenu = {
             'Text': TextBox(200, 75, 900, 600, text=''),
-            'Inventory' : Button(500, 400, 280, 50, f"Potion: {self.item}"),
-
+            'Inventory' : Button(300, 150, 70, 25, "", self.black),
 
         }
         # Maintains the game state to determine which menu to display.
@@ -246,7 +247,6 @@ class Game:
 
     def blinkEnemySprite(self, enemyIndex):
 
-        print("Blinking")
         # Creates a blinking effect for the hovered enemy sprite.
 
         # Gets the current time in Pygame.
@@ -739,10 +739,8 @@ class Game:
 
                 # Checks if the mouse is hovering over an enemy to apply the blinking effect.
                 if enemy_rect1.collidepoint(mousePos):
-                    print("Hovering over enemy 1")
                     self.hoveredEnemy = 0
                 elif enemy_rect2.collidepoint(mousePos):
-                    print("Hovering over enemy 2")
                     self.hoveredEnemy = 1
                 
 
@@ -861,11 +859,13 @@ class Game:
                 self.gameStates['enemyTurn'] = False
                 self.gameStates['displayBattle'] = True
 
+
             # Displays the inventory of the player.
             if self.gameStates['inventory']:
                 
                 # Displays the inventory menu to the player.
                 self.screen.fill((0,0,0))
+                self.inventoryMenu['Inventory'].text = f"Potion: {self.item}"
                 self.drawMenu(self.inventoryMenu)
 
 
@@ -961,8 +961,12 @@ class Game:
                                 
                                 # If the guard button is clicked, set the action to guard.
                                 elif self.battle['Inventory'].rect.collidepoint(mousePos):
-                                    self.gameStates['battle'] = False
+                                    print("Inventory button was clicked.")
+                                    action_selected = True
+                                    self.hasUsedSkill = True
                                     self.gameStates['inventory'] = True
+                                    self.gameStates['battle'] = False
+
 
                                 
                                 # If the guard button is clicked, set the action to guard.
