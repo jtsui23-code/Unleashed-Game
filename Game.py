@@ -126,7 +126,9 @@ class Game:
 
         self.inventoryMenu = {
             'Text': TextBox(200, 75, 900, 600, text=''),
-            'Inventory' : Button(300, 150, 70, 25, "", self.black),
+            'Potion' : Button(300, 150, 70, 25, "", self.black),
+            'Back': Button(20, 620, 140, 50, 'Back'),     
+
 
         }
         # Maintains the game state to determine which menu to display.
@@ -232,6 +234,23 @@ class Game:
         elif self.playerGuarded:
             self.displayBattleButtons['attack'].setText(f"Player guarded!")
         
+        # Displays dialogue for when the player uses potion.
+        elif self.skillUsed == 'Potion':
+            self.displayBattleButtons['attack'].setText("Player used potion!")
+        
+
+    # Uses the potion if avaible to heal player's healt.
+    def usePotion(self):
+
+        if self.item > 0:
+            self.item -= 1
+            self.player.currentHp + 50
+            self.hasUsedSkill = True
+            self.skillUsed = 'Potion'
+        else:
+            pass
+            
+
 
     # Returns a copy of the enemy sprite with different shade of color 
     # to create a blinking effect.
@@ -865,7 +884,29 @@ class Game:
                 
                 # Displays the inventory menu to the player.
                 self.screen.fill((0,0,0))
-                self.inventoryMenu['Inventory'].text = f"Potion: {self.item}"
+                
+                # Updates the display of number of potions the users has.
+                self.inventoryMenu['Potion'].text = f"Potion: {self.item}"
+
+
+
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                            pygame.quit()
+                            sys.exit()
+                            
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                        if event.button == 1:
+
+                            mousePos = pygame.mouse.get_pos()
+                            if self.inventoryMenu['Potion'].rect.collidepoint(mousePos):
+                                self.usePotion()
+                                print("Clicked on Potion")
+                                
+                            elif self.inventoryMenu['back'].rect.collidepoint(mousePos):
+                                self.gameStates['inventory'] = False
+                                self.gameStates['battle'] = True
+
                 self.drawMenu(self.inventoryMenu)
 
 
@@ -963,7 +1004,6 @@ class Game:
                                 elif self.battle['Inventory'].rect.collidepoint(mousePos):
                                     print("Inventory button was clicked.")
                                     action_selected = True
-                                    self.hasUsedSkill = True
                                     self.gameStates['inventory'] = True
                                     self.gameStates['battle'] = False
 
