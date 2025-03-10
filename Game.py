@@ -122,6 +122,12 @@ class Game:
             'Back': Button(20, 620, 140, 50, 'Back')
         }
 
+        self.inventoryMenu = {
+            'Text': TextBox(200, 75, 900, 600, text=''),
+            'Inventory' : Button(500, 400, 280, 50, f"Potion: {self.item}"),
+
+
+        }
         # Maintains the game state to determine which menu to display.
         self.gameStates = {
             'main': True, 
@@ -134,12 +140,17 @@ class Game:
             'itemReward': False,
             'infectMode': False,
             'displayBattle': False,
-            'enemyTurn': False
+            'enemyTurn': False,
+            'inventory': False
             
         }
         self.hasUsedSkill = False
         self.skillDamage = 0
         self.skillUsed = "None"
+        
+        # Need the duplicate for when the enemy guards since the enemy and player both
+        # share self.skillUsed.
+        self.skillPlayerUsed = "None"
         self.skillDialogueSet = False
 
         self.displayBattleButtons = {
@@ -205,12 +216,21 @@ class Game:
         # Displays dialogue for when enemy guards as well.
         if self.enemyGuarded:
             self.displayBattleButtons['attack'].setText(f"{self.currentEnemy[self.currentEnemyIndex].name} guarded!")
-        
+            
+            print(f"self.skillUsed is {self.skillUsed}")
+            print(f"self.skillPlayerUsed is {self.skillPlayerUsed}")
+            # Needs to set back self.skillUsed to the name of the player's skill used.
+            # Otherwise, self.skillUsed will contain the string "Guard" from the enemy's guard.
+            self.skillUsed = self.skillPlayerUsed
+            
+        # Displays the dialogue for the player's skill used.
+        elif not self.enemyGuarded and not self.playerGuarded:
+                self.displayBattleButtons['attack'].setText(f"{self.skillUsed} infliced {self.skillDamage} damage!")
+
         # Displays dialogue for when the player guards.
         elif self.playerGuarded:
             self.displayBattleButtons['attack'].setText(f"Player guarded!")
-        else:
-            self.displayBattleButtons['attack'].setText(f"{self.skillUsed} infliced {self.skillDamage} damage!")
+        
 
     # Returns a copy of the enemy sprite with different shade of color 
     # to create a blinking effect.
@@ -304,6 +324,7 @@ class Game:
             
             # Gets the name of the skill used to display on dialogue box.
             self.skillUsed = move[1].name
+            
 
             # Gets the damage of the skill used for dialogue box and to subtract from player's health.
             self.skillDamage = move[1].use()
@@ -322,6 +343,7 @@ class Game:
             
             # Gets the name of the skill used to display on dialogue box.
             self.skillUsed = move[0].name
+
             
             # Gets the damage of the skill used for dialogue box and to subtract from player's health.
             self.skillDamage = move[0].use()
@@ -345,8 +367,7 @@ class Game:
         # enemy's current health, skill cooldowns, and 50% guard change.
         elif self.currentEnemy[self.currentEnemyIndex].currentHp < self.currentEnemy[self.currentEnemyIndex].maxHp//2 and self.enemyGuarded:
             self.enemyGuarded = False
-            self.skillUsed = "Guard"
-            print(f"{self.currentEnemy[self.currentEnemyIndex].name} is guarding.")
+
         else:
 
             # Gets the name of the basic attack to display on dialogue box.
@@ -364,7 +385,6 @@ class Game:
             # the display battle screen for the enemy's attack.
             self.playerGuarded = False
 
-            print(f"{self.currentEnemy[self.currentEnemyIndex].name} uses {self.skillUsed} for {self.skillDamage} damage.")
 
     def drawBars(self):
         # PLAYER'S HEALTH AND SP BARS (at top left)
@@ -841,6 +861,14 @@ class Game:
                 self.gameStates['enemyTurn'] = False
                 self.gameStates['displayBattle'] = True
 
+            # Displays the inventory of the player.
+            if self.gameStates['inventory']:
+                
+                # Displays the inventory menu to the player.
+                self.screen.fill((0,0,0))
+                self.drawMenu(self.inventoryMenu)
+
+
 
             if self.gameStates['battle']:
                 # Background for battle
@@ -898,13 +926,22 @@ class Game:
                                     damage = int(self.player.basicAttack())
                                     self.skillDamage = damage
 
+                                    
+
                                     # If the enemy is guarding, the damage dealt is halved.
                                     if self.enemyGuarded:
-                                        damage = damage // 2
+                                        self.skillDamage = damage // 2
 
-                                    self.currentEnemy[self.currentEnemyIndex].currentHp -= damage
+                                    self.currentEnemy[self.currentEnemyIndex].currentHp -= self.skillDamage
 
+                                    # Stores the string of the attack used to display in the 
+                                    # display battle screen.
                                     self.skillUsed = "Strike"
+
+                                    # Needed for when the enemy guards since the 
+                                    # enemy and player both share self.skillUsed.
+                                    self.skillPlayerUsed = "Strike"
+
                                     self.gameStates['battle'] = False
                                     self.gameStates['displayBattle'] = True
 
@@ -924,7 +961,9 @@ class Game:
                                 
                                 # If the guard button is clicked, set the action to guard.
                                 elif self.battle['Inventory'].rect.collidepoint(mousePos):
-                                    pass  # Add inventory logic here
+                                    self.gameStates['battle'] = False
+                                    self.gameStates['inventory'] = True
+
                                 
                                 # If the guard button is clicked, set the action to guard.
                                 elif self.battle['Guard'].rect.collidepoint(mousePos):
@@ -934,9 +973,14 @@ class Game:
                                     # Need to toggle used skill or the cooldowns of 
                                     # skills will not reduce when guarding.
                                     self.hasUsedSkill = True
+
                                     # Sets the player's guard state to True.
                                     self.playerGuarded = True
                                     self.skillUsed = "Guard"
+
+                                    # Needed for when the enemy guards since the 
+                                    # enemy and player both share self.skillUsed.
+                                    self.skillPlayerUsed = "Guard"
 
                                     # Transitions to the display battle screen.
                                     self.gameStates['battle'] = False
@@ -971,6 +1015,10 @@ class Game:
 
                                         # Saves the skill used as a string to display in the display battle screen.
                                         self.skillUsed = self.player.Skills[0].name
+
+                                        # Needed for when the enemy guards since the 
+                                        self.skillPlayerUsed = self.player.Skills[0].name
+
                                         self.gameStates['battle'] = False
                                         self.gameStates['displayBattle'] = True
 
@@ -1000,6 +1048,11 @@ class Game:
 
                                         # Saves the skill used as a string to display in the display battle screen.
                                         self.skillUsed = self.player.Skills[1].name
+
+                                        # Needed for when the enemy guards since the 
+                                        # enemy and player both share self.skillUsed.
+                                        self.skillPlayerUsed = self.player.Skills[1].name
+
                                         self.gameStates['battle'] = False
                                         self.gameStates['displayBattle'] = True
 
@@ -1027,6 +1080,11 @@ class Game:
                                         
                                         # Saves the skill used as a string to display in the display battle screen.
                                         self.skillUsed = self.player.Skills[2].name
+
+                                        # Needed for when the enemy guards since the 
+                                        # enemy and player both share self.skillUsed.
+                                        self.skillPlayerUsed = self.player.Skills[2].name
+
                                         self.gameStates['battle'] = False
                                         self.gameStates['displayBattle'] = True
 
