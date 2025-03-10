@@ -124,13 +124,14 @@ class TextBox:
         return (255 - r, 255 - g, 255 - b, 255-t)
             
 class Button:
-    def __init__(self, x, y, width, height, text, action=None):
+    def __init__(self, x, y, width, height, text, action=None, borderColor = WHITE):
         self.rect = pygame.Rect(x, y, width, height)
         self.text = text
         self.action = action
         self.color = TBLACK
         self.hoverColor = WHITE
         self.isHovered = False
+        self.borderColor = borderColor
         
     def draw(self, surface):
         # Draw button background
