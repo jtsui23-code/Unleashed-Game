@@ -137,7 +137,7 @@ class Button:
         # Draw button background
         color = self.hoverColor if self.isHovered else self.color  
         pygame.draw.rect(surface, color, self.rect)
-        pygame.draw.rect(surface, WHITE, self.rect, 2)  # White border
+        pygame.draw.rect(surface, self.borderColor, self.rect, 2)  # White border
         
         # Choose text color based on background
         text_color = BLACK if self.isHovered else WHITE
