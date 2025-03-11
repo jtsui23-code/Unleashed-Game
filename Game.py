@@ -162,7 +162,7 @@ class Game:
 
         # Item reward screen buttons - now has only a Continue button
         self.itemRewardOptions = {
-            'Title': Text(500, 200, 280, 50, 'You found an item!', self.fonts['fanta'], self.titleColor),
+            'Title': Text(500, 200, 280, 50, 'You found a potion!', self.fonts['fanta'], self.titleColor),
             'Continue': Button(500, 450, 280, 50, 'Continue')
         }
 
@@ -256,7 +256,6 @@ class Game:
     # to create a blinking effect.
     def colorize(self, image, new_color):
 
-        print("Colorize")
         colored = image.copy()
 
         # Adds the color given to the rgb value of the enemy sprite.
@@ -553,9 +552,7 @@ class Game:
                                         break
 
                                 if enemyIndex is not None:
-                                    print(f"Enemy {enemyIndex + 1} clicked")  # Debug print
                                     self.player.infect(self.currentEnemy[enemyIndex])
-                                    print(f"Player infects {self.currentEnemy[enemyIndex].name}")
 
                                     if enemyIndex == 0:
                                         self.currentEnemyIndex = 1
@@ -581,7 +578,6 @@ class Game:
 
                             # Checks if the infect button was clicked ont the prebattle screen.
                             elif self.preBattle['infect'].rect.collidepoint(mousePos):
-                                print("Infect button clicked")  # Debug print
 
                                 # if enemyIndex is not None:
                                 #     self.player.infect(self.currentEnemy[enemyIndex])
@@ -904,6 +900,7 @@ class Game:
                                 print("Clicked on Potion")
                                 
                             elif self.inventoryMenu['back'].rect.collidepoint(mousePos):
+                                print("Clicked on back button")
                                 self.gameStates['inventory'] = False
                                 self.gameStates['battle'] = True
 
@@ -1002,7 +999,6 @@ class Game:
                                 
                                 # If the guard button is clicked, set the action to guard.
                                 elif self.battle['Inventory'].rect.collidepoint(mousePos):
-                                    print("Inventory button was clicked.")
                                     action_selected = True
                                     self.gameStates['inventory'] = True
                                     self.gameStates['battle'] = False
