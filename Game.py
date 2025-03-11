@@ -244,7 +244,7 @@ class Game:
 
         if self.item > 0:
             self.item -= 1
-            self.player.currentHp + 50
+            self.player.currentHp += 50
             self.hasUsedSkill = True
             self.skillUsed = 'Potion'
         else:
@@ -721,13 +721,13 @@ class Game:
             
             # Needed for creating hover effect on the buttons in the shop menu
             # and for adding functionality to the upgrade buttons.
-            if self.gameStates['shop']:
+            elif self.gameStates['shop']:
                 mousePos = pygame.mouse.get_pos()
                 for button in self.shopOptions.values():
                     button.isHovered = button.rect.collidepoint(mousePos)
 
             # Renders the infect 
-            if self.gameStates['infectMode']:
+            elif self.gameStates['infectMode']:
                 self.screen.fill((0, 0, 0))
 
                 # # Makes a rect object of the enemies on the screen so can apply blinking effect.
@@ -767,7 +767,7 @@ class Game:
 
 
             # intermission state
-            if self.gameStates['intermission']:
+            elif self.gameStates['intermission']:
                 # Get mouse position for hover effect on buttons.
                 mousePos = pygame.mouse.get_pos()
                 for button in self.intermission.values():
@@ -779,7 +779,7 @@ class Game:
                 self.drawMenu(self.intermission)
 
             # SIMPLIFIED itemReward state handling - just display background and continue button
-            if self.gameStates['itemReward']:
+            elif self.gameStates['itemReward']:
                 # Display the background
                 self.screen.blit(self.assets['itemRewardBackground'], (0, 0))
                 
@@ -792,7 +792,7 @@ class Game:
                 # Draw all components of the itemReward screen
                 self.drawMenu(self.itemRewardOptions)
 
-            if self.gameStates['prebattle']:
+            elif self.gameStates['prebattle']:
                 self.screen.fill((0, 0, 0))
 
                 if self.currentFloor == 1:
@@ -819,7 +819,7 @@ class Game:
                     button.isHovered = button.rect.collidepoint(mousePos)
 
 
-            if self.gameStates['displayBattle']:
+            elif self.gameStates['displayBattle']:
                 self.screen.fill((0,0,0))
 
                 self.hasUsedSkill = False
@@ -868,7 +868,7 @@ class Game:
                             else:
                                 self.dialogue.current_dialogue.skipTyping()
                                 
-            if self.gameStates['enemyTurn']:
+            elif self.gameStates['enemyTurn']:
                 self.isEnemeyTurn = False   
                 self.enemyTurn()
                 self.gameStates['enemyTurn'] = False
@@ -876,38 +876,53 @@ class Game:
 
 
             # Displays the inventory of the player.
-            if self.gameStates['inventory']:
+            elif self.gameStates['inventory']:
                 # Displays the inventory menu to the player.
                 self.screen.fill((0,0,0))
-                self.drawMenu(self.inventoryMenu)
 
+                # Drawing the individual components of the inventory 
+                # menu because the potions button will not be rendered 
+                # if the player has zero potions.
+                self.inventoryMenu['Text'].draw(self.screen)
+                self.inventoryMenu['Back'].draw(self.screen)
+
+                if self.item > 0:
+                    self.inventoryMenu['Potion'].draw(self.screen)
                 
                 # Updates the display of number of potions the users has.
                 self.inventoryMenu['Potion'].text = f"Potion: {self.item}"
 
-                mousePos = pygame.mouse.get_pos()
-                for event in pygame.event.get():
 
+                # Applies hover effect to the inventory buttons.
+                mousePos = pygame.mouse.get_pos()
+                for item in self.inventoryMenu.values():
+                    if isinstance(item, Button):
+                        item.isHovered = item.rect.collidepoint(mousePos)
+
+                # Checks for input by the player for registering when to 
+                # use a potion and go back to the skills menu.
+                for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                             pygame.quit()
                             sys.exit()
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+
+                        if event.button == 1 :
+                            mousePos = pygame.mouse.get_pos()
+
+                            if self.item > 0 and self.inventoryMenu['Potion'].rect.collidepoint(mousePos):
+                                self.usePotion()
+                                self.gameStates['inventory'] = False
+                                self.gameStates['displayBattle'] = True
+                                print("Clicked on Potion")
                             
-                    if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 :
-                        if self.inventoryMenu['Potion'].rect.collidepoint(mousePos) and self.inventoryMenu['Potion']:
-                            self.usePotion()
-                            self.gameStates['inventory'] = False
-                            self.gameStates['displayBattle'] = True
-                            print("Clicked on Potion")
-                            
-                        elif self.inventoryMenu['Back'].rect.collidepoint(mousePos):
-                            print("Clicked on back button")
-                            self.gameStates['inventory'] = False
-                            self.gameStates['battle'] = True
+                            elif self.inventoryMenu['Back'].rect.collidepoint(mousePos):
+                                print("Clicked on back button")
+                                self.gameStates['inventory'] = False
+                                self.gameStates['battle'] = True
 
 
-
-
-            if self.gameStates['battle']:
+            elif self.gameStates['battle']:
                 # Background for battle
 
 
