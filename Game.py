@@ -217,6 +217,9 @@ class Game:
 
         # Updates the textbox of the display battle screen to show the skill used.
         # Displays dialogue for when enemy guards as well.
+
+        print(f"The value of self.skillUsed is {self.skillUsed}")
+
         if self.enemyGuarded:
             self.displayBattleButtons['attack'].setText(f"{self.currentEnemy[self.currentEnemyIndex].name} guarded!")
             
@@ -227,7 +230,7 @@ class Game:
             self.skillUsed = self.skillPlayerUsed
             
         # Displays the dialogue for the player's skill used.
-        elif not self.enemyGuarded and not self.playerGuarded:
+        elif not self.enemyGuarded and not self.playerGuarded and self.skillUsed != 'Potion':
                 self.displayBattleButtons['attack'].setText(f"{self.skillUsed} infliced {self.skillDamage} damage!")
 
         # Displays dialogue for when the player guards.
@@ -235,7 +238,8 @@ class Game:
             self.displayBattleButtons['attack'].setText(f"Player guarded!")
         
         # Displays dialogue for when the player uses potion.
-        elif self.skillUsed == 'Potion':
+        elif self.skillUsed == 'Potion' or self.skillUsed == "Potion":
+            print("Potion was used probably.")
             self.displayBattleButtons['attack'].setText("Player used potion!")
         
 
@@ -244,7 +248,16 @@ class Game:
 
         if self.item > 0:
             self.item -= 1
-            self.player.currentHp += 50
+
+            # Only add HP to player if their health has been lower and do not 
+            # overflow the player's health over their max health.
+            if self.player.currentHp == self.player.maxHp:
+                pass
+            elif (self.player.maxHp - self.player.currentHp) < 50:
+                self.player.currentHp += (self.player.maxHp - self.player.currentHp)
+            else:
+                self.player.currentHp += 50
+                
             self.hasUsedSkill = True
             self.skillUsed = 'Potion'
         else:
@@ -621,6 +634,25 @@ class Game:
                                 else:
                                     self.gameStates['intermission'] = False
                                     self.gameStates['itemReward'] = True
+
+                        elif self.gameStates['inventory']:
+
+                            # Uses potion if player has any.
+                            if self.item > 0 and self.inventoryMenu['Potion'].rect.collidepoint(mousePos):
+                                self.usePotion()
+                                self.gameStates['inventory'] = False
+                                self.gameStates['displayBattle'] = True
+                                print("Clicked on Potion")
+                            
+                            # Goes back to the skills menu.
+                            elif self.inventoryMenu['Back'].rect.collidepoint(mousePos):
+                                print("Clicked on back button")
+                                self.gameStates['inventory'] = False
+                                self.gameStates['battle'] = True
+
+
+
+                            
                                                                                    
                         # Switches to the shop menu when the shop button is clicked.
                         elif self.gameStates['main']:
@@ -892,34 +924,11 @@ class Game:
                 # Updates the display of number of potions the users has.
                 self.inventoryMenu['Potion'].text = f"Potion: {self.item}"
 
-
-                # Applies hover effect to the inventory buttons.
                 mousePos = pygame.mouse.get_pos()
+                # Applies hovering in the inventory menu.
                 for item in self.inventoryMenu.values():
                     if isinstance(item, Button):
                         item.isHovered = item.rect.collidepoint(mousePos)
-
-                # Checks for input by the player for registering when to 
-                # use a potion and go back to the skills menu.
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                            pygame.quit()
-                            sys.exit()
-                    if event.type == pygame.MOUSEBUTTONDOWN:
-
-                        if event.button == 1 :
-                            mousePos = pygame.mouse.get_pos()
-
-                            if self.item > 0 and self.inventoryMenu['Potion'].rect.collidepoint(mousePos):
-                                self.usePotion()
-                                self.gameStates['inventory'] = False
-                                self.gameStates['displayBattle'] = True
-                                print("Clicked on Potion")
-                            
-                            elif self.inventoryMenu['Back'].rect.collidepoint(mousePos):
-                                print("Clicked on back button")
-                                self.gameStates['inventory'] = False
-                                self.gameStates['battle'] = True
 
 
             elif self.gameStates['battle']:
@@ -1014,6 +1023,7 @@ class Game:
                                 # If the guard button is clicked, set the action to guard.
                                 elif self.battle['Inventory'].rect.collidepoint(mousePos):
                                     action_selected = True
+                                    self.skillUsed = 'Potion'
                                     self.gameStates['inventory'] = True
                                     self.gameStates['battle'] = False
 
