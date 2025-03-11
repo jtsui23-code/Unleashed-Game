@@ -879,8 +879,15 @@ class Game:
             if self.gameStates['inventory']:
                 # Displays the inventory menu to the player.
                 self.screen.fill((0,0,0))
-                self.drawMenu(self.inventoryMenu)
 
+                # Drawing the individual components of the inventory 
+                # menu because the potions button will not be rendered 
+                # if the player has zero potions.
+                self.inventoryMenu['Text']
+                self.inventoryMenu['Back'].draw(self.screen)
+
+                if self.item > 0:
+                    self.inventoryMenu['Potion'].draw(self.screen)
                 
                 # Updates the display of number of potions the users has.
                 self.inventoryMenu['Potion'].text = f"Potion: {self.item}"
@@ -893,7 +900,7 @@ class Game:
                             sys.exit()
                             
                     if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 :
-                        if self.inventoryMenu['Potion'].rect.collidepoint(mousePos) and self.inventoryMenu['Potion']:
+                        if self.inventoryMenu['Potion'].rect.collidepoint(mousePos):
                             self.usePotion()
                             self.gameStates['inventory'] = False
                             self.gameStates['displayBattle'] = True
