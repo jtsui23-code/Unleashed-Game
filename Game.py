@@ -25,12 +25,16 @@ class Game:
         self.screen = pygame.display.set_mode((1280 , 720 ))
 
         self.titleColor = (200, 50, 50)
+        self.black = (0, 0, 0)
 
         # Tracks which enemy is being hovered over
         # 0 - firsts enemy 
         # 1 - second enemy
         self.hoveredEnemy = None
-        
+
+        self.turnNum = 1
+
+
         # Stores the enemy rects to apply blinking effect onto them.
         self.enemyRect = []
 
@@ -42,6 +46,7 @@ class Game:
 
         self.fonts = {
             'fanta': pygame.font.Font('Media/Assets/Fonts/fantasy.ttf', 100),
+            'arial': pygame.font.Font('Media/Assets/Fonts/Ariall.ttf', 50),
         }
         
         self.dialogue = DialogueManager()
@@ -102,7 +107,11 @@ class Game:
             'boss': wiz(self, (0, 0), (100, 100))           # Create an instance of wiz
         }
         
+        self.currentEnemyIndex = 0
         self.currentEnemy = []
+        self.playerGuarded = False
+        self.enemyGuarded = False
+        self.isEnemeyTurn = True
         self.currentFloor = 1
         
         # Stores the Button objects for the shop menu.
@@ -115,6 +124,13 @@ class Game:
             'Back': Button(20, 620, 140, 50, 'Back')
         }
 
+        self.inventoryMenu = {
+            'Text': TextBox(200, 75, 900, 600, text=''),
+            'Potion' : Button(250, 100, 200, 50, "", borderColor=self.black),
+            'Back': Button(20, 620, 140, 50, 'Back'),     
+        }
+
+        
         # Maintains the game state to determine which menu to display.
         self.gameStates = {
             'main': True, 
@@ -127,10 +143,17 @@ class Game:
             'itemReward': False,
             'infectMode': False,
             'displayBattle': False,
+            'enemyTurn': False,
+            'inventory': False
             
         }
-
+        self.hasUsedSkill = False
+        self.skillDamage = 0
         self.skillUsed = "None"
+        
+        # Need the duplicate for when the enemy guards since the enemy and player both
+        # share self.skillUsed.
+        self.skillPlayerUsed = "None"
         self.skillDialogueSet = False
 
         self.displayBattleButtons = {
@@ -139,7 +162,7 @@ class Game:
 
         # Item reward screen buttons - now has only a Continue button
         self.itemRewardOptions = {
-            'Title': Text(500, 200, 280, 50, 'You found an item!', self.fonts['fanta'], self.titleColor),
+            'Title': Text(500, 200, 280, 50, 'You found a potion!', self.fonts['fanta'], self.titleColor),
             'Continue': Button(500, 450, 280, 50, 'Continue')
         }
 
@@ -159,6 +182,7 @@ class Game:
             'shopBackground': pygame.transform.scale(loadImage('/background/shop.png'), (1280, 720)),
             'enemy1': pygame.transform.scale(loadImage('/enemies/Knight.png').convert_alpha(), (400, 500)),
             'enemy2': pygame.transform.scale(loadImage('/enemies/Ghost.png').convert_alpha(), (400, 300)),
+            'arena': pygame.transform.scale(loadImage('/background/Arena.png').convert_alpha(), (1280, 720))
         }
 
         # Stores the buttons for the intermission screen.
@@ -174,7 +198,6 @@ class Game:
             'SP': 0, 
             'Infection': 0
         }
-
 
         # Flags to track if certain music are playing.
         self.intermissionMusicPlaying = False
@@ -193,13 +216,59 @@ class Game:
     def skillDialogue(self, skill):
 
         # Updates the textbox of the display battle screen to show the skill used.
-        self.displayBattleButtons['attack'].setText(f"{self.skillUsed} was used!")
+        # Displays dialogue for when enemy guards as well.
+
+        print(f"The value of self.skillUsed is {self.skillUsed}")
+
+        if self.enemyGuarded:
+            self.displayBattleButtons['attack'].setText(f"{self.currentEnemy[self.currentEnemyIndex].name} guarded!")
+            
+            print(f"self.skillUsed is {self.skillUsed}")
+            print(f"self.skillPlayerUsed is {self.skillPlayerUsed}")
+            # Needs to set back self.skillUsed to the name of the player's skill used.
+            # Otherwise, self.skillUsed will contain the string "Guard" from the enemy's guard.
+            self.skillUsed = self.skillPlayerUsed
+            
+        # Displays the dialogue for the player's skill used.
+        elif not self.enemyGuarded and not self.playerGuarded and self.skillUsed != 'Potion':
+                self.displayBattleButtons['attack'].setText(f"{self.skillUsed} infliced {self.skillDamage} damage!")
+
+        # Displays dialogue for when the player guards.
+        elif self.playerGuarded:
+            self.displayBattleButtons['attack'].setText(f"Player guarded!")
+        
+        # Displays dialogue for when the player uses potion.
+        elif self.skillUsed == 'Potion' or self.skillUsed == "Potion":
+            print("Potion was used probably.")
+            self.displayBattleButtons['attack'].setText("Player used potion!")
+        
+
+    # Uses the potion if avaible to heal player's healt.
+    def usePotion(self):
+
+        if self.item > 0:
+            self.item -= 1
+
+            # Only add HP to player if their health has been lower and do not 
+            # overflow the player's health over their max health.
+            if self.player.currentHp == self.player.maxHp:
+                pass
+            elif (self.player.maxHp - self.player.currentHp) < 50:
+                self.player.currentHp += (self.player.maxHp - self.player.currentHp)
+            else:
+                self.player.currentHp += 50
+                
+            self.hasUsedSkill = True
+            self.skillUsed = 'Potion'
+        else:
+            pass
+            
+
 
     # Returns a copy of the enemy sprite with different shade of color 
     # to create a blinking effect.
     def colorize(self, image, new_color):
 
-        print("Colorize")
         colored = image.copy()
 
         # Adds the color given to the rgb value of the enemy sprite.
@@ -209,7 +278,6 @@ class Game:
 
     def blinkEnemySprite(self, enemyIndex):
 
-        print("Blinking")
         # Creates a blinking effect for the hovered enemy sprite.
 
         # Gets the current time in Pygame.
@@ -246,6 +314,167 @@ class Game:
             self.enemies[firstEnemyKey],
             self.enemies[secondEnemyKey]
         ]
+
+    # Checks if the enemy will guard or not.
+    # If so, guard ahead of time to initiate the guard for the
+    # player's current attack. Otherwise, the enemy will always be guarding 
+    # against the player's next attack.
+    def enemyWillGuard(self):
+        # Stores the all of the enemy skills to check for their cooldowns.
+        move = self.currentEnemy[self.currentEnemyIndex].Skills
+        
+        # If the enemy will be using a skill on its next turn, then the 
+        # enemy will not be guarding.
+        if move[1].is_available() and self.currentEnemy[self.currentEnemyIndex].sp >= move[1].get_sp_cost():
+            return False
+        elif move[0].is_available() and self.currentEnemy[self.currentEnemyIndex].sp >= move[0].get_sp_cost():
+            return False
+
+        # If the enemy will guard next turn, then the enemy will guard ahead of time.
+        # Before the player's current attack starts.
+        elif self.currentEnemy[self.currentEnemyIndex].currentHp < self.currentEnemy[self.currentEnemyIndex].maxHp//2 and random.random() < .5:
+            return True
+
+        # If the enemy will do its basic attack, then the enemy will not guard.
+        else:
+            return False
+            
+    
+    def enemyTurn(self):
+        
+        # Stores the all of the enemy skills to check for their cooldowns.
+        move = self.currentEnemy[self.currentEnemyIndex].Skills
+        
+        # Checks if the enemy has been defeated.
+        if self.currentEnemy[self.currentEnemyIndex].currentHp <= 0:
+            print(f"{self.currentEnemy[self.currentEnemyIndex].name} has been defeated.")
+            return 0
+
+        # Prioties the use of the highr skills becasue they are probably stronger.
+        elif move[1].is_available() and self.currentEnemy[self.currentEnemyIndex].sp >= move[1].get_sp_cost():
+            
+            # Gets the name of the skill used to display on dialogue box.
+            self.skillUsed = move[1].name
+            
+
+            # Gets the damage of the skill used for dialogue box and to subtract from player's health.
+            self.skillDamage = move[1].use()
+            self.currentEnemy[self.currentEnemyIndex].sp -= move[1].get_sp_cost()
+
+            # If the player is guarding, the damage is halved.
+            if self.playerGuarded:
+                self.skillDamage = self.skillDamage // 2
+            self.player.currentHp -= self.skillDamage
+
+            # Have to toggle player guard off or player guarding will display for 
+            # the display battle screen for the enemy's attack.
+            self.playerGuarded = False
+
+        elif move[0].is_available() and self.currentEnemy[self.currentEnemyIndex].sp >= move[0].get_sp_cost():
+            
+            # Gets the name of the skill used to display on dialogue box.
+            self.skillUsed = move[0].name
+
+            
+            # Gets the damage of the skill used for dialogue box and to subtract from player's health.
+            self.skillDamage = move[0].use()
+            self.currentEnemy[self.currentEnemyIndex].sp -= move[0].get_sp_cost()
+
+            # If the player is guarding, the damage is halved.
+            if self.playerGuarded:
+                self.skillDamage = self.skillDamage // 2
+            self.player.currentHp -= self.skillDamage
+
+            # Have to toggle player guard off or player guarding will display for 
+            # the display battle screen for the enemy's attack.
+            self.playerGuarded = False
+
+
+        
+        # Enemey guards if their health is below 50% half of the time to prevent spamming of guard.
+        # enemyGuarded was set ahead of time to initiate the guard for the player's current attack.
+        # Otherwise the enemy will always be guarding against the player's next attack.
+        # enemyGuarded is determined by the enemyWillGuard function which accounts for the 
+        # enemy's current health, skill cooldowns, and 50% guard change.
+        elif self.currentEnemy[self.currentEnemyIndex].currentHp < self.currentEnemy[self.currentEnemyIndex].maxHp//2 and self.enemyGuarded:
+            self.enemyGuarded = False
+
+        else:
+
+            # Gets the name of the basic attack to display on dialogue box.
+            self.skillUsed = "Strike"
+
+            # Gets the damage of the basic attack for dialogue box and to subtract from player's health.
+            self.skillDamage = int(self.currentEnemy[self.currentEnemyIndex].basicAttack())
+            
+            # If the player is guarding, the damage is halved.
+            if self.playerGuarded:
+                self.skillDamage = self.skillDamage // 2
+            self.player.currentHp -= self.skillDamage
+            
+            # Have to toggle player guard off or player guarding will display for 
+            # the display battle screen for the enemy's attack.
+            self.playerGuarded = False
+
+
+    def drawBars(self):
+        # PLAYER'S HEALTH AND SP BARS (at top left)
+        
+        # Player HP bar calculation
+        playerHpPercent = self.player.currentHp / self.player.maxHp
+        playerHpWidth = 300 * playerHpPercent
+        
+        # Player SP bar calculation
+        playerSpPercent = self.player.sp / self.player.maxSp
+        playerSpWidth = 300 * playerSpPercent
+        
+        # Draw player's HP bar (top left)
+        # HP bar background
+        pygame.draw.rect(self.screen, (100, 100, 100), (20, 20, 300, 30))
+        # HP bar fill
+        pygame.draw.rect(self.screen, (255, 0, 0), (20, 20, playerHpWidth, 30))
+        # HP bar outline
+        pygame.draw.rect(self.screen, (0, 0, 0), (20, 20, 300, 30), 2)
+        # HP text - explicitly labeled as "Player HP"
+        hpText = pygame.font.Font(None, 24).render(f"Player HP: {self.player.currentHp}/{self.player.maxHp}", True, (255, 255, 255))
+        self.screen.blit(hpText, (25, 30))
+        
+        # Draw player's SP bar (below player's HP)
+        # SP bar background
+        pygame.draw.rect(self.screen, (100, 100, 100), (20, 50, 300, 30))
+        # SP bar fill
+        pygame.draw.rect(self.screen, (0, 0, 255), (20, 50, playerSpWidth, 30))
+        # SP bar outline
+        pygame.draw.rect(self.screen, (0, 0, 0), (20, 50, 300, 30), 2)
+        # SP text
+        spText = pygame.font.Font(None, 24).render(f"Player SP: {self.player.sp}/{self.player.maxSp}", True, (255, 255, 255))
+        self.screen.blit(spText, (25, 60))
+        
+        # ENEMY HEALTH BAR (only for non-infected enemy at top right)
+        # Only draw when in battle-related states
+        if self.gameStates['battle'] or self.gameStates['displayBattle'] or self.gameStates['infectMode']:
+            # In the infection scenario, we only want to show the health bar for the non-infected enemy
+            # Assuming currentEnemy[0] is the one the player didn't infect 
+            enemy = self.currentEnemy[self.currentEnemyIndex]  # The non-infected enemy
+            
+            if enemy.currentHp > 0:  # Only draw HP for living enemy
+                # Position the bar in the top right
+                hpX = 960  # 1280 - 300 - 20 (screen width - bar width - margin)
+                hpY = 20  # 20px from top
+                
+                # Calculate HP percentage
+                enemyHpPercent = enemy.currentHp / enemy.maxHp
+                enemyHpWidth = 300 * enemyHpPercent
+                
+                # HP bar background
+                pygame.draw.rect(self.screen, (100, 100, 100), (hpX, hpY, 300, 30))
+                # HP bar fill
+                pygame.draw.rect(self.screen, (255, 0, 0), (hpX, hpY, enemyHpWidth, 30))
+                # HP bar outline
+                pygame.draw.rect(self.screen, (0, 0, 0), (hpX, hpY, 300, 30), 2)
+                # HP text
+                hpText = pygame.font.Font(None, 24).render(f"{enemy.name}", True, (255, 255, 255))
+                self.screen.blit(hpText, (hpX + 5, hpY + 10))
 
         # The running loop
     def run(self):
@@ -336,12 +565,15 @@ class Game:
                                         break
 
                                 if enemyIndex is not None:
-                                    print(f"Enemy {enemyIndex + 1} clicked")  # Debug print
                                     self.player.infect(self.currentEnemy[enemyIndex])
-                                    print(f"Player infects {self.currentEnemy[enemyIndex].name}")
+
+                                    if enemyIndex == 0:
+                                        self.currentEnemyIndex = 1
+                                    else:
+                                        self.currentEnemyIndex = 0
 
                                     # Move to battle state
-                                    self.gameStates['infectionMode'] = False
+                                    self.gameStates['infectMode'] = False
                                     self.gameStates['battle'] = True
                                     self.currentBattle = Battle(self.player, self.currentEnemy[0])
 
@@ -359,7 +591,6 @@ class Game:
 
                             # Checks if the infect button was clicked ont the prebattle screen.
                             elif self.preBattle['infect'].rect.collidepoint(mousePos):
-                                print("Infect button clicked")  # Debug print
 
                                 # if enemyIndex is not None:
                                 #     self.player.infect(self.currentEnemy[enemyIndex])
@@ -381,6 +612,10 @@ class Game:
 
                         # After pressing left or right button, create a 50% chance for a battle and a 50% chance for a bonus intermission
                         elif self.gameStates['intermission']:
+
+                            # If the player clicks on the right button,
+                            # there is a 50% chance to go to the prebattle state or to get
+                            # an item.
                             if self.intermission['right'].rect.collidepoint(mousePos):
                                 if random.random() < .5:
                                     self.gameStates['intermission'] = False
@@ -389,6 +624,9 @@ class Game:
                                     self.gameStates['intermission'] = False
                                     self.gameStates['itemReward'] = True
                             
+                            # If the player clicks on the left button, 
+                            # there is a 50% chance to go to the prebattle state or to get
+                            # an item.
                             elif self.intermission['left'].rect.collidepoint(mousePos):
                                 if random.random() < .5:
                                     self.gameStates['intermission'] = False
@@ -396,6 +634,25 @@ class Game:
                                 else:
                                     self.gameStates['intermission'] = False
                                     self.gameStates['itemReward'] = True
+
+                        elif self.gameStates['inventory']:
+
+                            # Uses potion if player has any.
+                            if self.item > 0 and self.inventoryMenu['Potion'].rect.collidepoint(mousePos):
+                                self.usePotion()
+                                self.gameStates['inventory'] = False
+                                self.gameStates['displayBattle'] = True
+                                print("Clicked on Potion")
+                            
+                            # Goes back to the skills menu.
+                            elif self.inventoryMenu['Back'].rect.collidepoint(mousePos):
+                                print("Clicked on back button")
+                                self.gameStates['inventory'] = False
+                                self.gameStates['battle'] = True
+
+
+
+                            
                                                                                    
                         # Switches to the shop menu when the shop button is clicked.
                         elif self.gameStates['main']:
@@ -421,20 +678,28 @@ class Game:
                             for button in self.shopOptions.values():
                                 button.isHovered = button.rect.collidepoint(mousePos)
 
+                            # Checks if the player clicks on the back button in the shop menu.
+                            # If so, return back to the title screen.
                             if self.shopOptions['Back'].rect.collidepoint(mousePos):
                                 self.gameStates['shop'] = False
                                 self.gameStates['main'] = True
                                 self.intermissionMusicPlaying = False
                                 self.assets['intermissionSong'].stop()
 
+                            # Checks if the player has clicked on the attack upgrade button.
+                            # If so, upgrade the player's attack.
                             elif self.shopOptions['Attack'].rect.collidepoint(mousePos):
                                 if self.upgrades['Attack'] < 4:
                                     self.upgrades['Attack']+= 1
 
+                            # Checks if the player has clicked on the infection upgrade button.
+                            # If so, upgrade the player's infection.
                             elif self.shopOptions['Infection'].rect.collidepoint(mousePos):
                                 if self.upgrades['Infection'] < 4:
                                     self.upgrades['Infection'] += 1
 
+                            # Checks if the player has clicked on the SP upgrade button.
+                            # If so, upgrade the player's SP.
                             elif self.shopOptions['SP'].rect.collidepoint(mousePos):
                                 if self.upgrades['SP'] < 4:
                                     self.upgrades['SP']+= 1
@@ -473,26 +738,28 @@ class Game:
                 for event in pygame.event.get():
                     if event.type == pygame.MOUSEBUTTONDOWN:
                         if event.button == 1:
-                            # If the text is not finsihed typing, 
-                            # and the user clicks the screen, skip the typing animation.
-                            if self.dialogue.is_active and self.dialogue.current_dialogue.isTyping():
-                                self.dialogue.handleEvent(event)
-                            # If the text is finished typing, performs an
-                            # additional click which will exist the 
-                            # exposition.
-                            else:
+                            # If the text has finished typing, 
+                            # and the user clicks the screen, the game will
+                            # move to the intermission state.
+                            if not self.dialogue.current_dialogue.isTyping():
                                 self.gameStates['Start'] = False
                                 self.gameStates['intermission'] = True
+                            # If the text is typing, the user can skip the typing animation 
+                            # by clicking on the screen.
+                            else:
+                                self.dialogue.current_dialogue.skipTyping()
+
+                                
             
             # Needed for creating hover effect on the buttons in the shop menu
             # and for adding functionality to the upgrade buttons.
-            if self.gameStates['shop']:
+            elif self.gameStates['shop']:
                 mousePos = pygame.mouse.get_pos()
                 for button in self.shopOptions.values():
                     button.isHovered = button.rect.collidepoint(mousePos)
 
             # Renders the infect 
-            if self.gameStates['infectMode']:
+            elif self.gameStates['infectMode']:
                 self.screen.fill((0, 0, 0))
 
                 # # Makes a rect object of the enemies on the screen so can apply blinking effect.
@@ -519,10 +786,8 @@ class Game:
 
                 # Checks if the mouse is hovering over an enemy to apply the blinking effect.
                 if enemy_rect1.collidepoint(mousePos):
-                    print("Hovering over enemy 1")
                     self.hoveredEnemy = 0
                 elif enemy_rect2.collidepoint(mousePos):
-                    print("Hovering over enemy 2")
                     self.hoveredEnemy = 1
                 
 
@@ -534,7 +799,7 @@ class Game:
 
 
             # intermission state
-            if self.gameStates['intermission']:
+            elif self.gameStates['intermission']:
                 # Get mouse position for hover effect on buttons.
                 mousePos = pygame.mouse.get_pos()
                 for button in self.intermission.values():
@@ -546,7 +811,7 @@ class Game:
                 self.drawMenu(self.intermission)
 
             # SIMPLIFIED itemReward state handling - just display background and continue button
-            if self.gameStates['itemReward']:
+            elif self.gameStates['itemReward']:
                 # Display the background
                 self.screen.blit(self.assets['itemRewardBackground'], (0, 0))
                 
@@ -559,7 +824,7 @@ class Game:
                 # Draw all components of the itemReward screen
                 self.drawMenu(self.itemRewardOptions)
 
-            if self.gameStates['prebattle']:
+            elif self.gameStates['prebattle']:
                 self.screen.fill((0, 0, 0))
 
                 if self.currentFloor == 1:
@@ -586,12 +851,21 @@ class Game:
                     button.isHovered = button.rect.collidepoint(mousePos)
 
 
-            if self.gameStates['displayBattle']:
+            elif self.gameStates['displayBattle']:
                 self.screen.fill((0,0,0))
+
+                self.hasUsedSkill = False
+                
+                # Display the battle screen background.
+                self.screen.blit(self.assets['arena'], (0, 0))
+                self.isFirstTurn = False
 
                 # Display enemy sprites on the display battle screen.
                 self.screen.blit(self.assets['enemy1'], (200, 100))
                 self.screen.blit(self.assets['enemy2'], (500, 100))
+
+                # Health Bar and SP bar for the player and enemies.
+                self.drawBars()
 
                 # Render textbox for the skill used in the display battle screen.
 
@@ -603,15 +877,76 @@ class Game:
 
                 self.displayBattleButtons['attack'].update(dt)
                 self.displayBattleButtons['attack'].draw(self.screen)
-
-
-
-            if self.gameStates['battle']:
-                # Background for battle
                 
+                # Waits for the user to click the screen to exit the display battle screen.
+                # Also returns to the battle screen with all of the skills available.
+                for event in pygame.event.get():
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                        if event.button == 1:
+                            # If the text has finsihed typing, 
+                            # and the user clicks the screen, switch the battle screen
+                            # with all of the skills.
+                            if not self.dialogue.current_dialogue.isTyping():
+                                self.gameStates['displayBattle'] = False
+                                if self.isEnemeyTurn:
+                                    self.gameStates['enemyTurn'] = True
+                                else:
+                                    self.gameStates['battle'] = True
+                                self.skillUsed = "None"
+                                self.skillDialogueSet = False
+
+                            # If the text is still typing, the user can skip the typing animation
+                            # by clicking on the screen.
+                            else:
+                                self.dialogue.current_dialogue.skipTyping()
+                                
+            elif self.gameStates['enemyTurn']:
+                self.isEnemeyTurn = False   
+                self.enemyTurn()
+                self.gameStates['enemyTurn'] = False
+                self.gameStates['displayBattle'] = True
+
+
+            # Displays the inventory of the player.
+            elif self.gameStates['inventory']:
+                # Displays the inventory menu to the player.
+                self.screen.fill((0,0,0))
+
+                # Drawing the individual components of the inventory 
+                # menu because the potions button will not be rendered 
+                # if the player has zero potions.
+                self.inventoryMenu['Text'].draw(self.screen)
+                self.inventoryMenu['Back'].draw(self.screen)
+
+                if self.item > 0:
+                    self.inventoryMenu['Potion'].draw(self.screen)
+                
+                # Updates the display of number of potions the users has.
+                self.inventoryMenu['Potion'].text = f"Potion: {self.item}"
+
+                mousePos = pygame.mouse.get_pos()
+                # Applies hovering in the inventory menu.
+                for item in self.inventoryMenu.values():
+                    if isinstance(item, Button):
+                        item.isHovered = item.rect.collidepoint(mousePos)
+
+
+            elif self.gameStates['battle']:
+                # Background for battle
+
+
                 action_selected = False
                 move = 0
                 current_menu = 'battle'  # Track which menu we're showing
+
+                self.turnNum += 1
+                
+                
+                # Allows the enemy to attack after the player's turn needed or the enemy will
+                # attack indefinitely.
+                self.isEnemeyTurn = True
+
+                self.enemyGuarded = self.enemyWillGuard()
 
                 while not action_selected:
                     # Clear screen EVERY FRAME
@@ -643,101 +978,203 @@ class Game:
                             
                         if event.type == pygame.MOUSEBUTTONDOWN:
                             if current_menu == 'battle':
+
+
                                 if self.battle['Attack'].rect.collidepoint(mousePos):
                                     action_selected = True
-                                    move = self.player.basicAttack()
-                                
+
+                                    # Deals the default amount of damage to the enemy.
+                                    damage = int(self.player.basicAttack())
+                                    self.skillDamage = damage
+
+                                    
+
+                                    # If the enemy is guarding, the damage dealt is halved.
+                                    if self.enemyGuarded:
+                                        self.skillDamage = damage // 2
+
+                                    self.currentEnemy[self.currentEnemyIndex].currentHp -= self.skillDamage
+
+                                    # Stores the string of the attack used to display in the 
+                                    # display battle screen.
+                                    self.skillUsed = "Strike"
+
+                                    # Needed for when the enemy guards since the 
+                                    # enemy and player both share self.skillUsed.
+                                    self.skillPlayerUsed = "Strike"
+
+                                    self.gameStates['battle'] = False
+                                    self.gameStates['displayBattle'] = True
+
+
                                 # If the skill button is clicked, switch to the skills menu.
                                 elif self.battle['Skill'].rect.collidepoint(mousePos):
+
+                                    for i in range(3):  # Assuming 3 skills
+                                        if self.player.Skills[i].currentCD > 0:
+                                            self.moves[f'Skill{i}'].text = str(self.player.Skills[i].currentCD)
+
+                                        else:
+                                            self.moves[f'Skill{i}'].text = self.player.Skills[i].name
+
                                     
-                                    # Updates the text for the skills menu.
-                                    self.moves['Skill1'].text = self.player.Skills[1].name
-                                    self.moves['Skill2'].text = self.player.Skills[2].name
                                     current_menu = 'skills'
                                 
                                 # If the guard button is clicked, set the action to guard.
                                 elif self.battle['Inventory'].rect.collidepoint(mousePos):
-                                    pass  # Add inventory logic here
+                                    action_selected = True
+                                    self.skillUsed = 'Potion'
+                                    self.gameStates['inventory'] = True
+                                    self.gameStates['battle'] = False
+
+
                                 
                                 # If the guard button is clicked, set the action to guard.
                                 elif self.battle['Guard'].rect.collidepoint(mousePos):
                                     action_selected = True
                                     move = 0
 
+                                    # Need to toggle used skill or the cooldowns of 
+                                    # skills will not reduce when guarding.
+                                    self.hasUsedSkill = True
+
+                                    # Sets the player's guard state to True.
+                                    self.playerGuarded = True
+                                    self.skillUsed = "Guard"
+
+                                    # Needed for when the enemy guards since the 
+                                    # enemy and player both share self.skillUsed.
+                                    self.skillPlayerUsed = "Guard"
+
+                                    # Transitions to the display battle screen.
+                                    self.gameStates['battle'] = False
+                                    self.gameStates['displayBattle'] = True
+
                             elif current_menu == 'skills':
+                                # If the back button is clicked, return to the battle menu.
                                 if self.moves['Back'].rect.collidepoint(mousePos):
                                     current_menu = 'battle'
                                 
+                                # If a skill button is clicked, use the skill.
                                 elif self.moves['Skill0'].rect.collidepoint(mousePos):
                                     action_selected = True
                                     move = self.player.Skills[0]
 
-                                    if move.is_available() and self.player.sp > move.get_sp_cost():
+                                    if move.is_available() and self.player.sp >= move.get_sp_cost():
                                         self.player.sp -= move.get_sp_cost()
                                         action_selected = True
 
                                         damage = move.use()
-                                        self.currentEnemy[1].currentHp -= damage
-                                        print(f"Skill: {self.player.Skills[0].name} does  {damage} DMG")
-                                        print(f"Player sp {self.player.sp}")
-                                        print(f"Enenmys '{self.currentEnemy[1].currentHp}'.")
+
+                                        # If the enemy is guarding, the damage dealt is halved.
+                                        if self.enemyGuarded:
+                                            damage = damage // 2
+
+                                        self.skillDamage = damage
+
+                                        self.currentEnemy[self.currentEnemyIndex].currentHp -= damage
+                                        
+                                        
+                                        self.hasUsedSkill = True
 
                                         # Saves the skill used as a string to display in the display battle screen.
                                         self.skillUsed = self.player.Skills[0].name
+
+                                        # Needed for when the enemy guards since the 
+                                        self.skillPlayerUsed = self.player.Skills[0].name
+
                                         self.gameStates['battle'] = False
                                         self.gameStates['displayBattle'] = True
 
-                                
+                                # If a skill button is clicked, use the skill.
                                 elif self.moves['Skill1'].rect.collidepoint(mousePos):
                                     action_selected = True
                                     move = self.player.Skills[1]
 
-                                    if move.is_available() and self.player.sp > move.get_sp_cost():
+                                    # Checks if the 2nd skill is available and the
+                                    # player has enough SP to use it.
+                                    if move.is_available() and self.player.sp >= move.get_sp_cost():
                                         self.player.sp -= move.get_sp_cost()
                                         action_selected = True
                                         
                                         damage = move.use()
-                                        self.currentEnemy[1].currentHp -= damage
-                                        print(f"Skill: {self.player.Skills[1].name} does  {damage} DMG")
-                                        print(f"Player sp {self.player.sp}")
-                                        print(f"Enenmys '{self.currentEnemy[1].currentHp}'.")
+
+                                        # If the enemy is guarding, the damage dealt is halved.
+                                        if self.enemyGuarded:
+                                            damage = damage // 2
+
+                                        self.skillDamage = damage
+
+                                        self.hasUsedSkill = True
+
+                                        self.currentEnemy[self.currentEnemyIndex].currentHp -= damage
+                                        
 
                                         # Saves the skill used as a string to display in the display battle screen.
                                         self.skillUsed = self.player.Skills[1].name
+
+                                        # Needed for when the enemy guards since the 
+                                        # enemy and player both share self.skillUsed.
+                                        self.skillPlayerUsed = self.player.Skills[1].name
+
                                         self.gameStates['battle'] = False
                                         self.gameStates['displayBattle'] = True
 
-                                
+                                # If a skill button is clicked, use the skill.
                                 elif self.moves['Skill2'].rect.collidepoint(mousePos):
                                     action_selected = True
                                     move = self.player.Skills[2]
 
-                                    if move.is_available() and self.player.sp > move.get_sp_cost():
+                                    # Checks if the 3rd skill is available and the 
+                                    # player has enough SP to use it.
+                                    if move.is_available() and self.player.sp >= move.get_sp_cost():
                                         self.player.sp -= move.get_sp_cost()
                                         action_selected = True
                                         
-                                        damage = move.use()
-                                        self.currentEnemy[1].currentHp -= damage
-                                        print(f"Skill: {self.player.Skills[2].name} does  {damage} DMG")
-                                        print(f"Player sp {self.player.sp}")
-                                        print(f"Enenmys '{self.currentEnemy[1].currentHp}'.")
+                                        # If the enemy is guarding, the damage dealt is halved.
+                                        if self.enemyGuarded:
+                                            damage = damage // 2
 
+                                        damage = move.use()
+                                        self.skillDamage = damage
+
+                                        self.hasUsedSkill = True
+
+                                        self.currentEnemy[self.currentEnemyIndex].currentHp -= damage
+                                        
                                         # Saves the skill used as a string to display in the display battle screen.
                                         self.skillUsed = self.player.Skills[2].name
+
+                                        # Needed for when the enemy guards since the 
+                                        # enemy and player both share self.skillUsed.
+                                        self.skillPlayerUsed = self.player.Skills[2].name
+
                                         self.gameStates['battle'] = False
                                         self.gameStates['displayBattle'] = True
 
 
-                    # Update display EVERY FRAME
-                    pygame.display.flip()
-                    pygame.time.Clock().tick(60)
+                        # Update display EVERY FRAME
+                        pygame.display.flip()
+                        pygame.time.Clock().tick(60)    
+                
+                # Checks if the player has taken an action before reducing the cooldowns of skills.
+                # Otherwise the cooldowns will be reduced by toggling back and forth between the
+                # Skills menu.
+                if self.hasUsedSkill:
+                    # Reduces the cooldown of skills only after the player has 
+                    # selected a viable action. Otherwise the cooldown for 
+                    # skills will be reduced every frame.
+                    # Reduce cooldowns for all skills.
+                    for i in range(3):
+                        self.player.Skills[i].reduceCD()
 
-                # Handle post-battle logic
-                result = self.currentBattle.fight(move)
-                if result == 0:
-                    self.gameStates['battle'] = False
-                    self.gameStates['intermission'] = True
+                # # Handle post-battle logic
+                # result = self.currentBattle.fight(move)
+                # if result == 0:
+                #     self.gameStates['battle'] = False
+                #     self.gameStates['intermission'] = True
 
+            
             # Display the screen
             pygame.display.flip()
 

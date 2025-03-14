@@ -124,19 +124,20 @@ class TextBox:
         return (255 - r, 255 - g, 255 - b, 255-t)
             
 class Button:
-    def __init__(self, x, y, width, height, text, action=None):
+    def __init__(self, x, y, width, height, text, action=None, borderColor = WHITE):
         self.rect = pygame.Rect(x, y, width, height)
         self.text = text
         self.action = action
         self.color = TBLACK
         self.hoverColor = WHITE
         self.isHovered = False
+        self.borderColor = borderColor
         
     def draw(self, surface):
         # Draw button background
         color = self.hoverColor if self.isHovered else self.color  
         pygame.draw.rect(surface, color, self.rect)
-        pygame.draw.rect(surface, WHITE, self.rect, 2)  # White border
+        pygame.draw.rect(surface, self.borderColor, self.rect, 2)  # White border
         
         # Choose text color based on background
         text_color = BLACK if self.isHovered else WHITE
