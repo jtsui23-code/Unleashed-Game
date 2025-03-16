@@ -24,7 +24,7 @@ class Game:
         # Treat the (_,_) as order pairs inside of ( (_,_) ).
         self.screen = pygame.display.set_mode((12800 , 720 ))
 
-        self.titleColor = (200, 50, 50)
+        self.titleColor = (2000, 50, 50)
         self.black = (0, 0, 0)
 
         # Tracks which enemy is being hovered over
