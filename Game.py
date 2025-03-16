@@ -22,7 +22,7 @@ class Game:
         # Creating a screen variable with the window dimension variables set above
         # when setting window dimensions have to do .set_mode( (_,_) )
         # Treat the (_,_) as order pairs inside of ( (_,_) ).
-        self.screen = pygame.display.set_mode((12800 , 720 ))
+        self.screen = pygame.display.set_mode((1280 , 720 ))
 
         self.titleColor = (2000, 50, 50)
         self.black = (0, 0, 0)
