@@ -131,6 +131,12 @@ class Game:
             'Back': Button(20, 620, 140, 50, 'Back')
         }
 
+        self.gameOverMenu = {
+            'GameOver': Text(500, 120, 280, 50, 'Game Over', self.fonts['fanta'], self.titleColor),
+            'Coin': TextBox(340, 600, 600, 100, text='')
+
+        }
+
         self.inventoryMenu = {
             'Text': TextBox(200, 75, 900, 600, text=''),
             'Potion' : Button(250, 100, 200, 50, "", borderColor=self.black),
@@ -151,7 +157,8 @@ class Game:
             'infectMode': False,
             'displayBattle': False,
             'enemyTurn': False,
-            'inventory': False
+            'inventory': False,
+            'gameOver': False
             
         }
         self.hasUsedSkill = False
@@ -1184,6 +1191,12 @@ class Game:
                     # Reduce cooldowns for all skills.
                     for i in range(3):
                         self.player.Skills[i].reduceCD()
+
+            elif self.gameStates['gameOver']:
+                self.blit(self.screen, (0,0,0))
+                self.drawMenu(self.gameOverMenu)
+
+                
 
                 # # Handle post-battle logic
                 # result = self.currentBattle.fight(move)
