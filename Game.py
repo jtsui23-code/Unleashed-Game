@@ -124,10 +124,17 @@ class Game:
         self.shopOptions = {
             'Box': TextBox(200, 75, 900, 600, '', (43, 44, 58, 160)),
             'Title': Text(500, 120, 280, 50, 'Upgrades', self.fonts['fanta'], self.titleColor),
-            'Attack':Button(275, 500, 140,50, 'Attack'),
-            'Infection': Button(575, 500, 140, 50, 'Infect'),
-            'SP': Button(875, 500, 140, 50, 'SP'),
+            'Attack':Button(275, 500, 190,50, 'Attack'),
+            'Infection': Button(475, 500, 190, 50, 'Infect Rate'),
+            'SP': Button(675, 500, 190, 50, 'SP'),
+            'Heal': Button(875, 500, 190, 50, 'Free Heal'),
             'Back': Button(20, 620, 140, 50, 'Back')
+        }
+
+        self.gameOverMenu = {
+            'GameOver': Text(500, 120, 280, 50, 'Game Over', self.fonts['fanta'], self.titleColor),
+            'Coin': TextBox(340, 600, 600, 100, text='')
+
         }
 
         self.inventoryMenu = {
@@ -150,7 +157,8 @@ class Game:
             'infectMode': False,
             'displayBattle': False,
             'enemyTurn': False,
-            'inventory': False
+            'inventory': False,
+            'gameOver': False
             
         }
         self.hasUsedSkill = False
@@ -298,7 +306,6 @@ class Game:
         enemy1Image = self.assets['enemy1']
         enemy2Image = self.assets['enemy2']
     
-
         if self.blinkState:
             # highlightRect = self.currentEnemy[enemyIndex].rect
             # pygame.draw.rect(self.screen, (255, 0, 0), highlightRect, 5)
@@ -669,9 +676,7 @@ class Game:
                                 self.gameStates['battle'] = True
 
 
-
-                            
-                                                                                   
+                                  
                         # Switches to the shop menu when the shop button is clicked.
                         elif self.gameStates['main']:
                             if self.mainMenuOptions['Shop'].rect.collidepoint(mousePos):
@@ -686,15 +691,16 @@ class Game:
 
                             # Starts game when start button is hit.
                             if self.mainMenuOptions['Start'].rect.collidepoint(mousePos):
-                                self.gameStates['Start'] = True
+                                self.gameStates['startGame'] = True
                                 self.gameStates['main'] = False
                                 self.gameStates['shop'] = False
 
                         # Switches back to the main menu when the back button is clicked.
                         elif self.gameStates['shop']:
                             # Changes color of shop buttons if hovering over them.
-                            for button in self.shopOptions.values():
-                                button.isHovered = button.rect.collidepoint(mousePos)
+                            for option in self.shopOptions.values():
+                                if isinstance(option, Button):  # Only process Buttons
+                                    option.isHovered = option.rect.collidepoint(mousePos)
 
                             # Checks if the player clicks on the back button in the shop menu.
                             # If so, return back to the title screen.
@@ -732,13 +738,8 @@ class Game:
                 self.screen.blit((self.assets['titleBackground']), (0,0))
                 # Draws the Main Menu when the game is in the main menu state.
                 self.drawMenu(self.mainMenuOptions)
-
-            # Draws the Shop Menu when the game is in the shop state.
-            elif self.gameStates['shop']:
-                self.screen.blit(self.assets['shopBackground'], (0, 0))
-                self.drawMenu(self.shopOptions)
             
-            elif self.gameStates['Start']:
+            elif self.gameStates['startGame']:
                 # Changes the background when the intro exposition starts.
                 self.screen.fill((0,0,0))
 
@@ -760,7 +761,7 @@ class Game:
                             # and the user clicks the screen, the game will
                             # move to the intermission state.
                             if not self.dialogue.current_dialogue.isTyping():
-                                self.gameStates['Start'] = False
+                                self.gameStates['startGame'] = False
                                 self.gameStates['intermission'] = True
                             # If the text is typing, the user can skip the typing animation 
                             # by clicking on the screen.
@@ -772,6 +773,9 @@ class Game:
             # Needed for creating hover effect on the buttons in the shop menu
             # and for adding functionality to the upgrade buttons.
             elif self.gameStates['shop']:
+                self.screen.blit(self.assets['shopBackground'], (0, 0))
+                self.drawMenu(self.shopOptions)
+                
                 mousePos = pygame.mouse.get_pos()
                 for button in self.shopOptions.values():
                     button.isHovered = button.rect.collidepoint(mousePos)
@@ -1187,6 +1191,12 @@ class Game:
                     # Reduce cooldowns for all skills.
                     for i in range(3):
                         self.player.Skills[i].reduceCD()
+
+            elif self.gameStates['gameOver']:
+                self.blit(self.screen, (0,0,0))
+                self.drawMenu(self.gameOverMenu)
+
+                
 
                 # # Handle post-battle logic
                 # result = self.currentBattle.fight(move)
