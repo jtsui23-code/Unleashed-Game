@@ -41,6 +41,10 @@ class Game:
         self.blinkTimer = 0
         self.blinkInterval = 500
 
+        self.playerPos = (200, 100)
+        self.enemyPos = (700, 100)
+        self.flipSprites = False
+
         # Invisiblity is for the blinking effect.
         self.blinkState = True # True for visible, False for invisible
 
@@ -109,6 +113,8 @@ class Game:
         
         self.currentEnemyIndex = 0
         self.currentEnemy = []
+
+        self.currentEnemyAsset = []
         self.playerGuarded = False
         self.enemyGuarded = False
         self.isEnemeyTurn = True
@@ -299,11 +305,11 @@ class Game:
 
             if enemyIndex == 0:
                 newImage = self.colorize(enemy1Image, (30, 30, 30))
-                self.screen.blit(newImage, (200, 200))
+                self.screen.blit(newImage, (200, 100))
             
             elif enemyIndex == 1:
                 newImage = self.colorize(enemy2Image, (30, 30, 30))
-                self.screen.blit(newImage, (500, 200))
+                self.screen.blit(newImage, (700, 100))
 
     def setEnemyPair(self, firstEnemyKey, secondEnemyKey):
         """
@@ -565,12 +571,24 @@ class Game:
                                         break
 
                                 if enemyIndex is not None:
+
+                                    # Infects the enemy that the player clicked on.
                                     self.player.infect(self.currentEnemy[enemyIndex])
 
+                                    # The remaining enemy because the opponent of the 
+                                    # player in battle. Also repositions the 
+                                    # player to the left side along with flipping the 
+                                    # sprites of the player and enemy if needed.
                                     if enemyIndex == 0:
                                         self.currentEnemyIndex = 1
+                                        self.playerPos = (200, 100)
+                                        self.enemyPos = (700, 100)
+                                        self.flipSprites = False
                                     else:
                                         self.currentEnemyIndex = 0
+                                        self.playerPos = (700, 100)
+                                        self.enemyPos = (200, 100)
+                                        self.flipSprites = True
 
                                     # Move to battle state
                                     self.gameStates['infectMode'] = False
@@ -773,8 +791,8 @@ class Game:
                 enemy2_image = self.assets['enemy2']
 
                 # Create rects based on where the images are drawn and their size
-                enemy_rect1 = pygame.Rect(200, 200, enemy1_image.get_width(), enemy1_image.get_height())
-                enemy_rect2 = pygame.Rect(500, 200, enemy2_image.get_width(), enemy2_image.get_height())
+                enemy_rect1 = pygame.Rect(200, 100, enemy1_image.get_width(), enemy1_image.get_height())
+                enemy_rect2 = pygame.Rect(700, 100, enemy2_image.get_width(), enemy2_image.get_height())
                 self.enemyRect = [enemy_rect1, enemy_rect2]
                 
                 # Handle hover effect on the buttons
@@ -790,9 +808,11 @@ class Game:
                 elif enemy_rect2.collidepoint(mousePos):
                     self.hoveredEnemy = 1
                 
+                # Flip the enemy on the left side or the enemy will be facing the wrong
+                # direction.
 
-                self.screen.blit(self.assets['enemy1'], (200, 200))
-                self.screen.blit(self.assets['enemy2'], (500, 200))
+                self.screen.blit(self.assets['enemy1'], (200, 100))
+                self.screen.blit(self.assets['enemy2'], (700, 100))
 
                 if self.hoveredEnemy is not None:
                     self.blinkEnemySprite(self.hoveredEnemy)
@@ -840,8 +860,8 @@ class Game:
 
 
                # Draw the enemies on the screen without blinking effect.
-                self.screen.blit(self.assets['enemy1'], (200, 200))
-                self.screen.blit(self.assets['enemy2'], (500, 200))
+                self.screen.blit(self.assets['enemy1'], (200, 100))
+                self.screen.blit(self.assets['enemy2'], (700, 100))
 
                 
                 # Draw the menu to prompt the user to fight or infect the enemies
@@ -859,10 +879,13 @@ class Game:
                 # Display the battle screen background.
                 self.screen.blit(self.assets['arena'], (0, 0))
                 self.isFirstTurn = False
+                enemy1 = pygame.transform.flip(self.assets['enemy1'], self.flipSprites, False)
+                enemy2 = pygame.transform.flip(self.assets['enemy2'], self.flipSprites, False)
+
 
                 # Display enemy sprites on the display battle screen.
-                self.screen.blit(self.assets['enemy1'], (200, 100))
-                self.screen.blit(self.assets['enemy2'], (500, 100))
+                self.screen.blit(enemy1, self.playerPos)
+                self.screen.blit(enemy2, self.enemyPos)
 
                 # Health Bar and SP bar for the player and enemies.
                 self.drawBars()
@@ -982,13 +1005,12 @@ class Game:
 
                                 if self.battle['Attack'].rect.collidepoint(mousePos):
                                     action_selected = True
+                                    self.hasUsedSkill = True
 
                                     # Deals the default amount of damage to the enemy.
                                     damage = int(self.player.basicAttack())
                                     self.skillDamage = damage
-
                                     
-
                                     # If the enemy is guarding, the damage dealt is halved.
                                     if self.enemyGuarded:
                                         self.skillDamage = damage // 2
@@ -1006,7 +1028,6 @@ class Game:
                                     self.gameStates['battle'] = False
                                     self.gameStates['displayBattle'] = True
 
-
                                 # If the skill button is clicked, switch to the skills menu.
                                 elif self.battle['Skill'].rect.collidepoint(mousePos):
 
@@ -1017,7 +1038,6 @@ class Game:
                                         else:
                                             self.moves[f'Skill{i}'].text = self.player.Skills[i].name
 
-                                    
                                     current_menu = 'skills'
                                 
                                 # If the guard button is clicked, set the action to guard.

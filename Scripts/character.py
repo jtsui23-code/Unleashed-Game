@@ -88,7 +88,7 @@ class Player(Character):
         self.gold = 0
         self.surface = surface
 
-        self.sprite = pygame.transform.scale(loadImage('enemies/2.png').convert_alpha(), (100, 100))
+        self.sprite = pygame.transform.scale(loadImage('player/1.png').convert_alpha(), (100, 100))
 
         # Skill points will be the unit expensed when using a skill.
         self.currentSp = self.maxSp
