@@ -34,6 +34,36 @@ class Game:
 
         self.turnNum = 1
 
+        
+        self.currentEnemyIndex = 0
+        self.currentEnemy = []
+        self.item = 0
+        self.currentEnemyAsset = []
+        self.playerGuarded = False
+        self.enemyGuarded = False
+        self.isEnemeyTurn = True
+        self.currentFloor = 1
+        self.currentCoin = 0
+        self.totalCoin = 0
+
+        self.hasUsedSkill = False
+        self.skillDamage = 0
+        self.skillUsed = "None"
+        
+        # Need the duplicate for when the enemy guards since the enemy and player both
+        # share self.skillUsed.
+        self.skillPlayerUsed = "None"
+        self.skillDialogueSet = False
+
+        # Stores the selected button by the player.
+        self.selectedOption = None
+
+        # Flags to track if certain music are playing.
+        self.intermissionMusicPlaying = False
+        self.titleMusicPlaying = False
+        self.battleMusicPlaying = False
+        self.midBossMusicPlaying = False
+        self.finalBossMusicPlaying = False
 
         # Stores the enemy rects to apply blinking effect onto them.
         self.enemyRect = []
@@ -47,6 +77,10 @@ class Game:
 
         # Invisiblity is for the blinking effect.
         self.blinkState = True # True for visible, False for invisible
+
+        # Create an instance of the Player class
+        self.player = Player(self, (0, 0), (100, 100), self.screen)
+
 
         self.fonts = {
             'fanta': pygame.font.Font('Media/Assets/Fonts/fantasy.ttf', 100),
@@ -76,10 +110,6 @@ class Game:
             'infect': Button(500, 460, 280, 50, 'Infect')
         }
 
-        # Create an instance of the Player class
-        self.player = Player(self, (0, 0), (100, 100), self.screen)
-
-        self.item = 0
 
         # Stores the Button objects for the battle menu.
         self.battle = {
@@ -111,14 +141,8 @@ class Game:
             'boss': wiz(self, (0, 0), (100, 100))           # Create an instance of wiz
         }
         
-        self.currentEnemyIndex = 0
-        self.currentEnemy = []
+        
 
-        self.currentEnemyAsset = []
-        self.playerGuarded = False
-        self.enemyGuarded = False
-        self.isEnemeyTurn = True
-        self.currentFloor = 1
         
         # Stores the Button objects for the shop menu.
         self.shopOptions = {
@@ -161,17 +185,10 @@ class Game:
             'gameOver': False
             
         }
-        self.hasUsedSkill = False
-        self.skillDamage = 0
-        self.skillUsed = "None"
         
-        # Need the duplicate for when the enemy guards since the enemy and player both
-        # share self.skillUsed.
-        self.skillPlayerUsed = "None"
-        self.skillDialogueSet = False
 
         self.displayBattleButtons = {
-        'attack': TextBox(340, 600, 600, 100, text='')
+        'attack': TextBox(50, 600, 1200, 100, text='')
         }
 
         # Item reward screen buttons - now has only a Continue button
@@ -179,9 +196,6 @@ class Game:
             'Title': Text(500, 200, 280, 50, 'You found a potion!', self.fonts['fanta'], self.titleColor),
             'Continue': Button(500, 450, 280, 50, 'Continue')
         }
-
-        # Stores the selected button by the player.
-        self.selectedOption = None
 
         # Stores battle music
         self.assets = {
@@ -210,15 +224,9 @@ class Game:
         self.upgrades = {
             'Attack':0,
             'SP': 0, 
-            'Infection': 0
+            'Infection': 0,
+            'FullHeal': 0
         }
-
-        # Flags to track if certain music are playing.
-        self.intermissionMusicPlaying = False
-        self.titleMusicPlaying = False
-        self.battleMusicPlaying = False
-        self.midBossMusicPlaying = False
-        self.finalBossMusicPlaying = False
 
         # Stores the current battle instance
     def drawMenu(self, menu):
@@ -679,6 +687,7 @@ class Game:
                                   
                         # Switches to the shop menu when the shop button is clicked.
                         elif self.gameStates['main']:
+
                             if self.mainMenuOptions['Shop'].rect.collidepoint(mousePos):
                                 self.gameStates['main'] = False
                                 self.gameStates['shop'] = True
@@ -930,8 +939,15 @@ class Game:
             elif self.gameStates['enemyTurn']:
                 self.isEnemeyTurn = False   
                 self.enemyTurn()
-                self.gameStates['enemyTurn'] = False
-                self.gameStates['displayBattle'] = True
+
+                # Transitions to the game over screen if 
+                # the player's health is less than zero.
+                if self.player.currentHp <= 0:
+                    self.gameStates['enemyTurn'] = False
+                    self.gameStates['gameOver'] = True
+                else:
+                    self.gameStates['enemyTurn'] = False
+                    self.gameStates['displayBattle'] = True
 
 
             # Displays the inventory of the player.
@@ -960,6 +976,13 @@ class Game:
 
             elif self.gameStates['battle']:
                 # Background for battle
+
+                # Switches to the game over screen if the player loses all of their
+                # health.
+                if self.player.currentHp < 1:
+                    print("Player is defeated!")
+                    self.gameStates['battle'] = False
+                    self.gameStates['gameOver'] = True
 
 
                 action_selected = False
@@ -1191,9 +1214,9 @@ class Game:
                     # Reduce cooldowns for all skills.
                     for i in range(3):
                         self.player.Skills[i].reduceCD()
-
+            
             elif self.gameStates['gameOver']:
-                self.blit(self.screen, (0,0,0))
+                self.screen.fill((0,0,0))
                 self.drawMenu(self.gameOverMenu)
 
                 
