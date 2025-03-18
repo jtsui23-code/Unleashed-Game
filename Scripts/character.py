@@ -10,6 +10,7 @@ class skill:
         self.max_cooldown = cooldown  # Store the max cooldown
         self.currentCD = 0  # Current cooldown starts at 0
         self.sp = cost
+        self.currentHost
         self.text = Text(200, 75, 900, 600, name + '!', 
                         pygame.font.Font('Media/Assets/Fonts/fantasy.ttf', 100), 
                         (255, 255, 255))
@@ -232,6 +233,7 @@ class Player(Character):
         self.Skills[2] = enemy.Skills[1]
         self.attackDmg = enemy.attackDmg
         self.attackstat = enemy.attackstat
+        self.currentHost = enemy.name
 
     def GetGold(self, enemy):
         self.gold += enemy.gold
