@@ -28,6 +28,7 @@ class Game:
         # Treat the (_,_) as order pairs inside of ( (_,_) ).
         self.screen = pygame.display.set_mode((self.screenWidth , self.screenHeight ))
 
+        self.goldColor = (255, 223, 0)
         self.titleColor = (200, 50, 50)
         self.black = (0, 0, 0)
 
@@ -149,9 +150,24 @@ class Game:
             'carrion': Carrion(self, (0, 0), (100, 100)),   # Create an instance of Carrion
             'boss': wiz(self, (0, 0), (100, 100))           # Create an instance of wiz
         }
-        
-        
 
+        # Maintains and increments the numbers of upgrades purchased in
+        # the shop.
+        self.upgrades = {
+            'Attack':0,
+            'SP': 0, 
+            'Infection': 0,
+            'FullHeal': 0
+        }
+        
+        # Maintains the cost of upgrade prices.
+        self.cost = {
+            'Attack':50,
+            'SP':90,
+            'Infect': 135,
+            'Heal': 200
+        }
+        
         # Inside __init__ method of Game class:
         self.shopSlabs = {
             'Attack': Slab(275, 360, 190, 10, 5),      # Positioned above Attack button
@@ -167,7 +183,13 @@ class Game:
             'Infection': Button(475, 380, 190, 50, 'Infect Rate'),
             'SP': Button(675, 380, 190, 50, 'SP'),
             'FullHeal': Button(875, 380, 190, 50, 'Free Heal'),
-            'Back': Button(20, 620, 140, 50, 'Back')
+            'Back': Button(20, 620, 140, 50, 'Back'),
+            'AttackCost': Text(300, 435, 140, 50, str(self.cost['Attack']), self.fonts['arial'], self.goldColor),
+            'SPCost': Text(500, 435, 140, 50, str(self.cost['SP']), self.fonts['arial'], self.goldColor),
+            'InfectCost': Text(700, 435, 140, 50, str(self.cost['Infect']), self.fonts['arial'], self.goldColor),
+            'HealCost': Text(900, 435, 140, 50, str(self.cost['Heal']), self.fonts['arial'], self.goldColor),
+            'Coin': Text(530, 600, 200, 50, ('Coins: ' + str(self.totalCoin)), self.fonts['arial'], self.goldColor),
+
         }
 
         self.gameOverMenu = {
@@ -234,14 +256,7 @@ class Game:
             'right': Button(1000, 300, 200, 100, 'Right')
         }
         
-        # Maintains and increments the numbers of upgrades purchased in
-        # the shop.
-        self.upgrades = {
-            'Attack':0,
-            'SP': 0, 
-            'Infection': 0,
-            'FullHeal': 0
-        }
+        
 
         # Stores the current battle instance
     def drawMenu(self, menu):
