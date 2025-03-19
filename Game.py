@@ -742,6 +742,8 @@ class Game:
 
                         # Switches back to the main menu when the back button is clicked.
                         elif self.gameStates['shop']:
+
+                            
                             # Changes color of shop buttons if hovering over them.
                             for option in self.shopOptions.values():
                                 if isinstance(option, Button):  # Only process Buttons
@@ -776,6 +778,9 @@ class Game:
                             elif self.shopOptions['FullHeal'].rect.collidepoint(mousePos):
                                 if self.upgrades['FullHeal'] < 2:
                                     self.upgrades['FullHeal'] += 1
+
+                            
+
                         
             # main state    
             if self.gameStates['main']:
@@ -825,6 +830,9 @@ class Game:
                 self.screen.blit(self.assets['shopBackground'], (0, 0))
                 self.drawMenu(self.shopOptions)
 
+                # Syncs the values in the upgrade dictionary with the shopSlab dictionary. 
+                # This makes it so the shopSlab will share the same functionality with the 
+                # upgrade dictionary when the upgrade buttons are clicked in the shop.
                 for upgrade_key, slab in self.shopSlabs.items():
                     slab.set_upgrades(self.upgrades[upgrade_key])
                     slab.draw(self.screen)
