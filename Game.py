@@ -19,10 +19,13 @@ class Game:
         # Sets the name of the window icon to "Rogue-like"
         pygame.display.set_caption("Unleeched")
 
+        self.screenWidth = 1280
+        self.screenHeight = 720
+
         # Creating a screen variable with the window dimension variables set above
         # when setting window dimensions have to do .set_mode( (_,_) )
         # Treat the (_,_) as order pairs inside of ( (_,_) ).
-        self.screen = pygame.display.set_mode((1280 , 720 ))
+        self.screen = pygame.display.set_mode((self.screenWidth , self.screenHeight ))
 
         self.titleColor = (200, 50, 50)
         self.black = (0, 0, 0)
@@ -80,6 +83,11 @@ class Game:
 
         # Create an instance of the Player class
         self.player = Player(self, (0, 0), (100, 100), self.screen)
+
+        self.textX = int(self.screenWidth * (150/1280))    # 11.72% of screen width
+        self.textY = int(self.screenHeight * (600/720))    # 83.33% of screen height
+        self.textWidth = int(self.screenWidth * (1000/1280)) # 78.13% of screen width
+        self.textHeight = int(self.screenHeight * (100/720))# 13.89% of screen height
 
 
         self.fonts = {
@@ -157,7 +165,7 @@ class Game:
 
         self.gameOverMenu = {
             'GameOver': Text(500, 120, 280, 50, 'Game Over', self.fonts['fanta'], self.titleColor),
-            'Coin': TextBox(340, 600, 600, 100, text='')
+            'Coin': TextBox(self.textX , self.textY, self.textWidth, self.textHeight, text='')
 
         }
 
@@ -188,7 +196,7 @@ class Game:
         
 
         self.displayBattleButtons = {
-        'attack': TextBox(50, 600, 1200, 100, text='')
+        'attack': TextBox(self.textX , self.textY, self.textWidth, self.textHeight, text='')
         }
 
         # Item reward screen buttons - now has only a Continue button
@@ -233,6 +241,15 @@ class Game:
         # Draw the menu options for the main menu.
         for option in menu.values():
             option.draw(self.screen)
+
+    def clearFloorCoin(self):
+        clearReward = 1.25 * (self.currentFloor - 1) * 10
+        return clearReward
+
+    def coinDialogue(self):
+        self.gameOverMenu['Coin'].setText(f"You earned {self.currentCoin} coins!")
+        self.currentCoin = 0
+
 
     # Displays the dialogue for the skills menu.
     def skillDialogue(self, skill):
@@ -387,6 +404,10 @@ class Game:
                 self.skillDamage = self.skillDamage // 2
             self.player.currentHp -= self.skillDamage
 
+            # Sets player health to 0 if player's health becomes negative.
+            if self.player.currentHp <= 0:
+                self.player.currentHp = 0
+
             # Have to toggle player guard off or player guarding will display for 
             # the display battle screen for the enemy's attack.
             self.playerGuarded = False
@@ -405,6 +426,10 @@ class Game:
             if self.playerGuarded:
                 self.skillDamage = self.skillDamage // 2
             self.player.currentHp -= self.skillDamage
+
+            # Sets player health to 0 if player's health becomes negative.
+            if self.player.currentHp <= 0:
+                self.player.currentHp = 0
 
             # Have to toggle player guard off or player guarding will display for 
             # the display battle screen for the enemy's attack.
@@ -432,6 +457,10 @@ class Game:
             if self.playerGuarded:
                 self.skillDamage = self.skillDamage // 2
             self.player.currentHp -= self.skillDamage
+
+            # Sets player health to 0 if player's health becomes negative.
+            if self.player.currentHp <= 0:
+                self.player.currentHp = 0
             
             # Have to toggle player guard off or player guarding will display for 
             # the display battle screen for the enemy's attack.
@@ -907,6 +936,8 @@ class Game:
 
                 dt = clock.tick(60) / 1  # Time in seconds since last frame.
 
+                # Sets the recently used skill by the player or the 
+                # enemy to the dialouge so it can be displayed.
                 if self.skillDialogueSet == False:
                     self.skillDialogue(self.skillUsed)
                     self.skillDialogueSet = True
@@ -927,8 +958,16 @@ class Game:
                                 if self.isEnemeyTurn:
                                     self.gameStates['enemyTurn'] = True
                                 else:
-                                    self.gameStates['battle'] = True
-                                self.skillUsed = "None"
+                                    # Transitions to the game over screen if
+                                    # the player health hits zero.
+                                    if self.player.currentHp <= 0:
+                                        self.currentCoin = int(0.5 * self.currentFloor + self.currentEnemy[self.currentEnemyIndex].maxHp - self.currentEnemy[self.currentEnemyIndex].currentHp + 2 + self.clearFloorCoin())
+                                        self.coinDialogue()
+                                        self.gameStates['enemyTurn'] = False
+                                        self.gameStates['gameOver'] = True
+                                    else:
+                                        self.gameStates['battle'] = True
+                                # self.skillUsed = "None"
                                 self.skillDialogueSet = False
 
                             # If the text is still typing, the user can skip the typing animation
@@ -939,15 +978,9 @@ class Game:
             elif self.gameStates['enemyTurn']:
                 self.isEnemeyTurn = False   
                 self.enemyTurn()
-
-                # Transitions to the game over screen if 
-                # the player's health is less than zero.
-                if self.player.currentHp <= 0:
-                    self.gameStates['enemyTurn'] = False
-                    self.gameStates['gameOver'] = True
-                else:
-                    self.gameStates['enemyTurn'] = False
-                    self.gameStates['displayBattle'] = True
+                
+                self.gameStates['enemyTurn'] = False
+                self.gameStates['displayBattle'] = True
 
 
             # Displays the inventory of the player.
@@ -1217,8 +1250,31 @@ class Game:
             
             elif self.gameStates['gameOver']:
                 self.screen.fill((0,0,0))
-                self.drawMenu(self.gameOverMenu)
+                
 
+                # Needed for the animated typing
+                dt = clock.tick(60) / 1 # Time in seconds since last frame.
+
+                # Updates the coin dialouge.
+                self.gameOverMenu['Coin'].update(dt)
+
+                # Have to render the game over menu after the typing
+                # animation of dialouge or the animation will not work.
+                self.drawMenu(self.gameOverMenu)
+                self.gameOverMenu['Coin'].draw(self.screen)
+                
+                # Waits for the user to click the screen to exit the game over screen.
+                for event in pygame.event.get():
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                        if event.button == 1:
+                            # If the text has finsihed typing, 
+                            # and the user clicks the screen, switch the main menu screen
+                            if not self.dialogue.current_dialogue.isTyping():
+                                self.gameStates['gameOver'] = False
+                                self.gameStates['main'] = True
+
+                            else:
+                                self.dialogue.current_dialogue.skipTyping()
                 
 
                 # # Handle post-battle logic
