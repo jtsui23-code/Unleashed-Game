@@ -759,17 +759,6 @@ class Game:
                         # Switches back to the main menu when the back button is clicked.
                         elif self.gameStates['shop']:
                             
-                            # Updates the value of the player's coins on display.
-                            self.shopOptions['Coin'].text = f'Coins: {self.totalCoin}'
-
-                            # Updates the display of the price upgrades.
-                            self.shopOptions['AttackCost'].text = f'{self.cost['Attack']}'
-                            self.shopOptions['SPCost'].text = f'{self.cost['SP']}'
-                            self.shopOptions['InfectCost'].text = f'{self.cost['Infect']}'
-                            self.shopOptions['HealCost'].text = f'{self.cost['Heal']}'
-
-
-                            
                             # Changes color of shop buttons if hovering over them.
                             for option in self.shopOptions.values():
                                 if isinstance(option, Button):  # Only process Buttons
@@ -788,7 +777,16 @@ class Game:
                             elif self.shopOptions['Attack'].rect.collidepoint(mousePos):
                                 if self.upgrades['Attack'] < 5 and self.totalCoin >= self.cost['Attack']:
                                     self.upgrades['Attack']+= 1
+
+                                    # Spends the player's coin on the upgrade.
+                                    self.totalCoin -= self.cost['Attack']
+                                    # Updates the value of the player's coins on display.
+                                    self.shopOptions['Coin'].text = f'Coins: {self.totalCoin}'
+
                                     self.cost['Attack'] = int(self.cost['Attack'] * 1.25)
+
+                                    # Updates the display of the attack price upgrades.
+                                    self.shopOptions['AttackCost'].text = f'{self.cost['Attack']}'
 
 
                             # Checks if the player has clicked on the infection upgrade button.
@@ -796,26 +794,50 @@ class Game:
                             elif self.shopOptions['Infection'].rect.collidepoint(mousePos):
                                 if self.upgrades['Infection'] < 3 and self.totalCoin >= self.cost['Infect']:
                                     self.upgrades['Infection'] += 1
+
+                                    # Spends the player's coin on the upgrade.
+                                    self.totalCoin -= self.cost['Infect']
+                                    # Updates the value of the player's coins on display.
+                                    self.shopOptions['Coin'].text = f'Coins: {self.totalCoin}'
+
                                     self.cost['Infect'] = int(self.cost['Infect'] * 1.40)
+                                    # Updates the display of the Infect price upgrades.
+                                    self.shopOptions['InfectCost'].text = f'{self.cost['Infect']}'
+
 
                             # Checks if the player has clicked on the SP upgrade button.
                             # If so, upgrade the player's SP and updates cost.
                             elif self.shopOptions['SP'].rect.collidepoint(mousePos):
                                 if self.upgrades['SP'] < 5 and self.totalCoin >= self.cost['SP']:
                                     self.upgrades['SP']+= 1
+
+                                    # Spends the player's coin on the upgrade.
+                                    self.totalCoin -= self.cost['SP']
+                                    # Updates the value of the player's coins on display.
+                                    self.shopOptions['Coin'].text = f'Coins: {self.totalCoin}'
+
                                     self.cost['SP'] = int(self.cost['SP'] * 1.25)
+
+                                    # Updates the display of the SP price upgrades.
+                                    self.shopOptions['SPCost'].text = f'{self.cost['SP']}'
+
 
                             # Checks if the player has clicked on the heal upgrade button.
                             # If so, gives player free heal and updates cost.
                             elif self.shopOptions['FullHeal'].rect.collidepoint(mousePos):
                                 if self.upgrades['FullHeal'] < 2 and self.totalCoin >= self.cost['Heal']:
                                     self.upgrades['FullHeal'] += 1
+
+                                    # Spends the player's coin on the upgrade.
+                                    self.totalCoin -= self.cost['Heal']
+                                    # Updates the value of the player's coins on display.
+                                    self.shopOptions['Coin'].text = f'Coins: {self.totalCoin}'
+                                    
                                     self.cost['Heal'] *= 2
+                                    
+                                    # Updates the display of the Heal price upgrades.
+                                    self.shopOptions['HealCost'].text = f'{self.cost['Heal']}'
 
-
-                            
-
-                        
             # main state    
             if self.gameStates['main']:
                 # Get mouse position for hover effect on buttons.
