@@ -23,7 +23,7 @@ class TextBox:
         self.text = text
         self.animated_text = ''     # Characters that have been drawn
         self.animation_speed = 0.2  # Characters per frame
-        self.animation_timer = 0    
+        self.animation_timer = 0
         self.current_char = 0
         self.line_height = TEXT_FONT.get_linesize()
         self.max_chars_per_line = (width - 20) // TEXT_FONT.size('A')[0]

@@ -10,7 +10,6 @@ class skill:
         self.max_cooldown = cooldown  # Store the max cooldown
         self.currentCD = 0  # Current cooldown starts at 0
         self.sp = cost
-        self.currentHost
         self.text = Text(200, 75, 900, 600, name + '!', 
                         pygame.font.Font('Media/Assets/Fonts/fantasy.ttf', 100), 
                         (255, 255, 255))
@@ -88,6 +87,7 @@ class Player(Character):
         self.name = 'You'
         self.gold = 0
         self.surface = surface
+        self.currentHost = ''
 
         self.sprite = pygame.transform.scale(loadImage('player/1.png').convert_alpha(), (100, 100))
 
