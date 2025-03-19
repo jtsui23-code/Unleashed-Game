@@ -2,6 +2,7 @@ import pygame
 import sys
 import random
 from Scripts.ui import Button, Text, TextBox
+from Scripts.upgrade import Slab
 from Scripts.util import loadImage
 from Scripts.dialogue import DialogueManager
 from Scripts.allDialogues import dialogues
@@ -151,15 +152,21 @@ class Game:
         
         
 
-        
+        # Inside __init__ method of Game class:
+        self.shopSlabs = {
+            'Attack': Slab(275, 360, 190, 10, 5),      # Positioned above Attack button
+            'Infection': Slab(475, 360, 190, 10, 3),   # Above Infection button
+            'SP': Slab(675, 360, 190, 10, 5),          # Above SP button
+            'FullHeal': Slab(875, 360, 190, 10, 2)      # Above Heal button
+        }
         # Stores the Button objects for the shop menu.
         self.shopOptions = {
             'Box': TextBox(200, 75, 900, 600, '', (43, 44, 58, 160)),
             'Title': Text(500, 120, 280, 50, 'Upgrades', self.fonts['fanta'], self.titleColor),
-            'Attack':Button(275, 500, 190,50, 'Attack'),
-            'Infection': Button(475, 500, 190, 50, 'Infect Rate'),
-            'SP': Button(675, 500, 190, 50, 'SP'),
-            'Heal': Button(875, 500, 190, 50, 'Free Heal'),
+            'Attack':Button(275, 380, 190,50, 'Attack'),
+            'Infection': Button(475, 380, 190, 50, 'Infect Rate'),
+            'SP': Button(675, 380, 190, 50, 'SP'),
+            'FullHeal': Button(875, 380, 190, 50, 'Free Heal'),
             'Back': Button(20, 620, 140, 50, 'Back')
         }
 
@@ -751,20 +758,24 @@ class Game:
                             # Checks if the player has clicked on the attack upgrade button.
                             # If so, upgrade the player's attack.
                             elif self.shopOptions['Attack'].rect.collidepoint(mousePos):
-                                if self.upgrades['Attack'] < 4:
+                                if self.upgrades['Attack'] < 5:
                                     self.upgrades['Attack']+= 1
 
                             # Checks if the player has clicked on the infection upgrade button.
                             # If so, upgrade the player's infection.
                             elif self.shopOptions['Infection'].rect.collidepoint(mousePos):
-                                if self.upgrades['Infection'] < 4:
+                                if self.upgrades['Infection'] < 3:
                                     self.upgrades['Infection'] += 1
 
                             # Checks if the player has clicked on the SP upgrade button.
                             # If so, upgrade the player's SP.
                             elif self.shopOptions['SP'].rect.collidepoint(mousePos):
-                                if self.upgrades['SP'] < 4:
+                                if self.upgrades['SP'] < 5:
                                     self.upgrades['SP']+= 1
+
+                            elif self.shopOptions['FullHeal'].rect.collidepoint(mousePos):
+                                if self.upgrades['FullHeal'] < 2:
+                                    self.upgrades['FullHeal'] += 1
                         
             # main state    
             if self.gameStates['main']:
@@ -813,6 +824,10 @@ class Game:
             elif self.gameStates['shop']:
                 self.screen.blit(self.assets['shopBackground'], (0, 0))
                 self.drawMenu(self.shopOptions)
+
+                for upgrade_key, slab in self.shopSlabs.items():
+                    slab.set_upgrades(self.upgrades[upgrade_key])
+                    slab.draw(self.screen)
                 
                 mousePos = pygame.mouse.get_pos()
                 for button in self.shopOptions.values():
