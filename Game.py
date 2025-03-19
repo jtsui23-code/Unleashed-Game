@@ -38,21 +38,45 @@ class Game:
         self.hoveredEnemy = None
 
         self.turnNum = 1
-
         
-        self.currentEnemyIndex = 0
+        # Stores all of the enemies on each floor and replaces with the old ones.
         self.currentEnemy = []
+        # Tracks which of the enemy the player is fighting.
+        self.currentEnemyIndex = 0
+
+        # Tracks number of potions the player has.
         self.item = 0
+
+        # Stores sprites of the enemies on the current floor.
         self.currentEnemyAsset = []
+
+        # Checks if the player or enemy has guraded for defense logic.
         self.playerGuarded = False
         self.enemyGuarded = False
-        self.isEnemeyTurn = True
-        self.currentFloor = 1
-        self.currentCoin = 0
-        self.totalCoin = 10000
 
+        # Checks if it is the enemies turn to start the enemy battle AI.
+        self.isEnemeyTurn = True
+
+        # Tracks the current floor that the player is on for 
+        # calculating coins player has earned and for swapping the self.currentEnemy
+        # with the new enemies.
+        self.currentFloor = 1
+
+        # The coins the player has accumulated on their current round.
+        self.currentCoin = 0
+
+        # Stores the total of all of the coins the player has.
+        self.totalCoin = 0
+        
+        # Checks if either the player or enemy has used a skill
+        # needed for battle dialouge.
         self.hasUsedSkill = False
+
+        # Storing the skill's damage to display on the battle UI.
         self.skillDamage = 0
+
+        # Storing the name of the skill to indicate what skill
+        # was used on the battle UI.
         self.skillUsed = "None"
         
         # Need the duplicate for when the enemy guards since the enemy and player both
@@ -72,10 +96,15 @@ class Game:
 
         # Stores the enemy rects to apply blinking effect onto them.
         self.enemyRect = []
-
+        
+        # Needed for the blinking effect when hovering over an enemy in the
+        # infect screen.
         self.blinkTimer = 0
         self.blinkInterval = 500
 
+        # Storing the player's and enemy's position to 
+        # properly align them on the correct side of the screen no matter 
+        # which enemy the player decides to infect.
         self.playerPos = (200, 100)
         self.enemyPos = (700, 100)
         self.flipSprites = False
@@ -86,19 +115,25 @@ class Game:
         # Create an instance of the Player class
         self.player = Player(self, (0, 0), (100, 100), self.screen)
 
+        # Proportions for the text box used in the battle screen and game over 
+        # menu. This is useful because the text box scales with any window 
+        # dimensions.
         self.textX = int(self.screenWidth * (150/1280))    # 11.72% of screen width
         self.textY = int(self.screenHeight * (600/720))    # 83.33% of screen height
         self.textWidth = int(self.screenWidth * (1000/1280)) # 78.13% of screen width
         self.textHeight = int(self.screenHeight * (100/720))# 13.89% of screen height
 
 
+        # stores the fonts used in the text and text box.
         self.fonts = {
             'fanta': pygame.font.Font('Media/Assets/Fonts/fantasy.ttf', 100),
             'arial': pygame.font.Font('Media/Assets/Fonts/Ariall.ttf', 50),
         }
         
+        # Creating DialougeManager obect to control all of the dialouge in the game.
         self.dialogue = DialogueManager()
         
+        # Loading all of the dialouages into the dialouge object.
         for key, params in dialogues.items():
             x, y, width, height, text = params
             self.dialogue.addDialogue(key, TextBox(x, y, width, height, text=text))
@@ -192,12 +227,14 @@ class Game:
 
         }
 
+        # Contains the game over menu components.
         self.gameOverMenu = {
             'GameOver': Text(500, 120, 280, 50, 'Game Over', self.fonts['fanta'], self.titleColor),
             'Coin': TextBox(self.textX , self.textY, self.textWidth, self.textHeight, text='')
 
         }
 
+        # Contains the inventory menu components.
         self.inventoryMenu = {
             'Text': TextBox(200, 75, 900, 600, text=''),
             'Potion' : Button(250, 100, 200, 50, "", borderColor=self.black),
@@ -224,6 +261,8 @@ class Game:
         }
         
 
+        # Stores the text boxed used in the battle screen which indicates moves of 
+        # both player and the enemy.
         self.displayBattleButtons = {
         'attack': TextBox(self.textX , self.textY, self.textWidth, self.textHeight, text='')
         }
@@ -258,7 +297,7 @@ class Game:
         
         
 
-        # Stores the current battle instance
+    # Stores the current battle instance
     def drawMenu(self, menu):
         # Draw the menu options for the main menu.
         for option in menu.values():
@@ -292,7 +331,14 @@ class Game:
             
         # Displays the dialogue for the player's skill used.
         elif not self.enemyGuarded and not self.playerGuarded and self.skillUsed != 'Potion':
-                self.displayBattleButtons['attack'].setText(f"{self.skillUsed} infliced {self.skillDamage} damage!")
+                
+                # Indicates in the battle UI text box who is performing the skill.
+                if self.isEnemeyTurn:
+                    # Indicates that the player is attacking or using a skill in the dialouge.
+                    self.displayBattleButtons['attack'].setText(f"Player used {self.skillUsed} which infliced {self.skillDamage} damage!")
+                else:
+                    # Indicates the enemy is attacking or using a skill in the dialouge.
+                    self.displayBattleButtons['attack'].setText(f"{self.currentEnemy[self.currentEnemyIndex].name} used {self.skillUsed} which infliced {self.skillDamage} damage!")
 
         # Displays dialogue for when the player guards.
         elif self.playerGuarded:
@@ -821,7 +867,6 @@ class Game:
                                     # Updates the display of the SP price upgrades.
                                     self.shopOptions['SPCost'].text = f'{self.cost['SP']}'
 
-
                             # Checks if the player has clicked on the heal upgrade button.
                             # If so, gives player free heal and updates cost.
                             elif self.shopOptions['FullHeal'].rect.collidepoint(mousePos):
@@ -832,7 +877,7 @@ class Game:
                                     self.totalCoin -= self.cost['Heal']
                                     # Updates the value of the player's coins on display.
                                     self.shopOptions['Coin'].text = f'Coins: {self.totalCoin}'
-                                    
+
                                     self.cost['Heal'] *= 2
                                     
                                     # Updates the display of the Heal price upgrades.
