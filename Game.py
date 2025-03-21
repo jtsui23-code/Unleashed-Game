@@ -30,7 +30,7 @@ class Game:
 
         self.goldColor = (255, 223, 0)
         self.titleColor = (200, 50, 50)
-        self.black = (0, 0, 0)
+        self.black = (00, 0, 0)
 
         # Tracks which enemy is being hovered over
         # 0 - firsts enemy 
