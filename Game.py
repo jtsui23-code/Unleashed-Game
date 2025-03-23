@@ -28,7 +28,7 @@ class Game:
         # Treat the (_,_) as order pairs inside of ( (_,_) ).
         self.screen = pygame.display.set_mode((self.screenWidth , self.screenHeight ))
 
-        self.goldColor = (25555, 223, 0)
+        self.goldColor = (255, 223, 0)
         self.titleColor = (200, 50, 50)
         self.black = (0, 0, 0)
 
