@@ -333,6 +333,7 @@ class Game:
         elif not self.enemyGuarded and not self.playerGuarded and self.skillUsed != 'Potion':
                 
                 # Indicates in the battle UI text box who is performing the skill.
+                # Has to be enemy turn as true because the player's skill is used.
                 if self.isEnemeyTurn:
                     # Indicates that the player is attacking or using a skill in the dialouge.
                     self.displayBattleButtons['attack'].setText(f"Player used {self.skillUsed} which infliced {self.skillDamage} damage!")
@@ -929,6 +930,10 @@ class Game:
             # and for adding functionality to the upgrade buttons.
             elif self.gameStates['shop']:
                 self.screen.blit(self.assets['shopBackground'], (0, 0))
+
+                # Udaptes the display of the player's coins.
+                self.shopOptions['Coin'].text = f'Coins: {self.totalCoin}'
+
                 self.drawMenu(self.shopOptions)
 
                 # Syncs the values in the upgrade dictionary with the shopSlab dictionary. 
@@ -1090,6 +1095,7 @@ class Game:
                                         # current enemy's remaining health.
                                         self.currentCoin = int(0.5 * self.currentFloor + self.currentEnemy[self.currentEnemyIndex].maxHp - self.currentEnemy[self.currentEnemyIndex].currentHp + 2 + self.clearFloorCoin()) // 2
                                         self.totalCoin += self.currentCoin
+                                        
                                         self.coinDialogue()
                                         self.gameStates['enemyTurn'] = False
                                         self.gameStates['gameOver'] = True
