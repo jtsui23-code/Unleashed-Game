@@ -57,6 +57,8 @@ class Game:
         # Checks if it is the enemies turn to start the enemy battle AI.
         self.isEnemeyTurn = True
 
+        self.haveAppliedUpgrades = False
+
         # Tracks the current floor that the player is on for 
         # calculating coins player has earned and for swapping the self.currentEnemy
         # with the new enemies.
@@ -66,7 +68,7 @@ class Game:
         self.currentCoin = 0
 
         # Stores the total of all of the coins the player has.
-        self.totalCoin = 0
+        self.totalCoin = 10000
         
         # Checks if either the player or enemy has used a skill
         # needed for battle dialouge.
@@ -1144,6 +1146,15 @@ class Game:
             elif self.gameStates['battle']:
                 # Background for battle
 
+                # Needs to check the upgrades have been applied to the player's stats.
+                # Otherwise the player buffs will be continuously applied.
+                if not self.haveAppliedUpgrades:
+                    # Increasese the player's max sp by 5 for 
+                    # each sp upgrade they have.
+                    self.player.maxSp += self.upgrades['SP'] * 5
+                    self.player.sp = self.player.maxSp
+                    self. haveAppliedUpgrades = True
+
                 # Switches to the game over screen if the player loses all of their
                 # health.
                 if self.player.currentHp < 1:
@@ -1202,7 +1213,12 @@ class Game:
                                     self.hasUsedSkill = True
 
                                     # Deals the default amount of damage to the enemy.
-                                    damage = int(self.player.basicAttack())
+                                    
+                                    # Apply attack upgrade to player's attack.
+                                    if self.upgrades['Attack'] > 0:
+                                        damage = int(self.player.basicAttack() * (1.05 + self.upgrades['Attack'] * 0.05))
+                                    else:
+                                        damage = int(self.player.basicAttack())
                                     self.skillDamage = damage
                                     
                                     # If the enemy is guarding, the damage dealt is halved.
@@ -1278,7 +1294,12 @@ class Game:
                                         self.player.sp -= move.get_sp_cost()
                                         action_selected = True
 
-                                        damage = move.use()
+                                        # Apply attack upgrade to player's attack.
+                                        if self.upgrades['Attack'] > 0:
+                                            damage = int(move.use() * (1.05 + self.upgrades['Attack'] * 0.05))
+                                        else:
+                                            damage = int(move.use())
+
 
                                         # If the enemy is guarding, the damage dealt is halved.
                                         if self.enemyGuarded:
@@ -1311,7 +1332,11 @@ class Game:
                                         self.player.sp -= move.get_sp_cost()
                                         action_selected = True
                                         
-                                        damage = move.use()
+                                        # Apply attack upgrade to player's attack.
+                                        if self.upgrades['Attack'] > 0:
+                                            damage = int(move.use() * (1.05 + self.upgrades['Attack'] * 0.05))
+                                        else:
+                                            damage = int(move.use())
 
                                         # If the enemy is guarding, the damage dealt is halved.
                                         if self.enemyGuarded:
@@ -1344,12 +1369,17 @@ class Game:
                                     if move.is_available() and self.player.sp >= move.get_sp_cost():
                                         self.player.sp -= move.get_sp_cost()
                                         action_selected = True
+
+                                        # Apply attack upgrade to player's attack.
+                                        if self.upgrades['Attack'] > 0:
+                                            damage = int(move.use() * (1.05 + self.upgrades['Attack'] * 0.05))
+                                        else:
+                                            damage = int(move.use())
                                         
                                         # If the enemy is guarding, the damage dealt is halved.
                                         if self.enemyGuarded:
                                             damage = damage // 2
 
-                                        damage = move.use()
                                         self.skillDamage = damage
 
                                         self.hasUsedSkill = True
