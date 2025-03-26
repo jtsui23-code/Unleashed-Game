@@ -20,8 +20,8 @@ class Game:
         # Sets the name of the window icon to "Rogue-like"
         pygame.display.set_caption("Unleeched")
 
-        self.screenWidth = 12800
-        self.screenHeight = 7200
+        self.screenWidth = 1280
+        self.screenHeight = 720
 
         # Creating a screen variable with the window dimension variables set above
         # when setting window dimensions have to do .set_mode( (_,_) )
