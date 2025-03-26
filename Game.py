@@ -44,6 +44,8 @@ class Game:
         # Tracks which of the enemy the player is fighting.
         self.currentEnemyIndex = 0
 
+        self.enemyDefeated = False
+
         # Tracks number of potions the player has.
         self.item = 0
 
@@ -266,7 +268,10 @@ class Game:
         # Stores the text boxed used in the battle screen which indicates moves of 
         # both player and the enemy.
         self.displayBattleButtons = {
-        'attack': TextBox(self.textX , self.textY, self.textWidth, self.textHeight, text='')
+        'attack': TextBox(self.textX , self.textY, self.textWidth, self.textHeight, text=''),
+        'result': TextBox(self.textX , self.textY, self.textWidth, self.textHeight, text='')
+
+
         }
 
         # Item reward screen buttons - now has only a Continue button
@@ -313,14 +318,15 @@ class Game:
         self.gameOverMenu['Coin'].setText(f"You earned {self.currentCoin} coins!")
         self.currentCoin = 0
 
+    def winDialogue(self):
+        self.displayBattleButtons['result'].setText(f"You have defeated {self.currentEnemy[self.currentEnemyIndex].name}!")
+
 
     # Displays the dialogue for the skills menu.
     def skillDialogue(self, skill):
 
         # Updates the textbox of the display battle screen to show the skill used.
         # Displays dialogue for when enemy guards as well.
-
-        print(f"The value of self.skillUsed is {self.skillUsed}")
 
         if self.enemyGuarded:
             self.displayBattleButtons['attack'].setText(f"{self.currentEnemy[self.currentEnemyIndex].name} guarded!")
@@ -1067,14 +1073,22 @@ class Game:
 
                 dt = clock.tick(60) / 1  # Time in seconds since last frame.
 
-                # Sets the recently used skill by the player or the 
-                # enemy to the dialouge so it can be displayed.
-                if self.skillDialogueSet == False:
-                    self.skillDialogue(self.skillUsed)
-                    self.skillDialogueSet = True
+                # Continue to display the battle dialouge with the skills being used 
+                # by the player and the enemy when the enemy's health is above zero.
+                if not self.enemyDefeated:
+                    # Sets the recently used skill by the player or the 
+                    # enemy to the dialouge so it can be displayed.
+                    if self.skillDialogueSet == False:
+                        self.skillDialogue(self.skillUsed)
+                        self.skillDialogueSet = True
 
-                self.displayBattleButtons['attack'].update(dt)
-                self.displayBattleButtons['attack'].draw(self.screen)
+                    self.displayBattleButtons['attack'].update(dt)
+                    self.displayBattleButtons['attack'].draw(self.screen)
+                
+                # If the enemy's health is zero, display the winning dialogue.
+                else:
+                    self.displayBattleButtons['result'].update(dt)
+                    self.displayBattleButtons['result'].draw(self.screen)
                 
                 # Waits for the user to click the screen to exit the display battle screen.
                 # Also returns to the battle screen with all of the skills available.
@@ -1145,6 +1159,12 @@ class Game:
 
             elif self.gameStates['battle']:
                 # Background for battle
+
+                # Checks if the player has defeated the enemy and displays the winning dialouge if so.
+                if self.currentEnemy[self.currentEnemyIndex].currentHp <= 0:
+                    self.winDialogue()
+                    self.enemyDefeated = True
+
 
                 # Needs to check the upgrades have been applied to the player's stats.
                 # Otherwise the player buffs will be continuously applied.
