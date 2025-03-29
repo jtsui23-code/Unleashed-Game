@@ -335,17 +335,18 @@ class Game:
         # If this is not accounted for, the player's next skill will be displayed as "Guard".
         if self.enemyGuarded and self.playerGuarded:
             self.displayBattleButtons['attack'].setText(f"Player and {self.currentEnemy[self.currentEnemyIndex].name} both guarded!")
-            self.skillUsed = "None"
+
+            self.enemyGuarded = False
+            self.playerGuarded = False
+            self.isEnemeyTurn = False
+
 
         elif self.enemyGuarded:
             self.displayBattleButtons['attack'].setText(f"{self.currentEnemy[self.currentEnemyIndex].name} guarded!")
             
-           
-
             # Needs to set back self.skillUsed to the name of the player's skill used.
             # Otherwise, self.skillUsed will contain the string "Guard" from the enemy's guard.
             self.skillUsed = self.skillPlayerUsed
-
 
          # Displays dialogue for when the player guards.
         elif self.playerGuarded:
@@ -1137,6 +1138,8 @@ class Game:
                                         self.gameStates['battle'] = True
                                 # self.skillUsed = "None"
                                 self.skillDialogueSet = False
+
+                
 
                             # If the text is still typing, the user can skip the typing animation
                             # by clicking on the screen.
