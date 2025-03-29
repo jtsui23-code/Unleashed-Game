@@ -330,16 +330,34 @@ class Game:
         # Updates the textbox of the display battle screen to show the skill used.
         # Displays dialogue for when enemy guards as well.
 
-        if self.enemyGuarded:
+
+        # Need to account for if the player is also guarding. 
+        # If this is not accounted for, the player's next skill will be displayed as "Guard".
+        if self.enemyGuarded and self.playerGuarded:
+            self.displayBattleButtons['attack'].setText(f"Player and {self.currentEnemy[self.currentEnemyIndex].name} both guarded!")
+            self.skillUsed = "None"
+
+        elif self.enemyGuarded:
             self.displayBattleButtons['attack'].setText(f"{self.currentEnemy[self.currentEnemyIndex].name} guarded!")
             
+           
+
             # Needs to set back self.skillUsed to the name of the player's skill used.
             # Otherwise, self.skillUsed will contain the string "Guard" from the enemy's guard.
             self.skillUsed = self.skillPlayerUsed
-            self.playerDialougeOffsetted = True
+
+
+         # Displays dialogue for when the player guards.
+        elif self.playerGuarded:
+            self.displayBattleButtons['attack'].setText(f"Player guarded!")
+
+        # Displays dialogue for when the player uses potion.
+        elif self.skillUsed == 'Potion':
+            print("Potion was used probably.")
+            self.displayBattleButtons['attack'].setText("Player used potion!")
             
         # Displays the dialogue for the player's skill used.
-        elif not self.enemyGuarded and not self.playerGuarded and self.skillUsed != 'Potion':
+        else:
                 
                 # Indicates in the battle UI text box who is performing the skill.
                 # Has to be enemy turn as true because the player's skill is used.
@@ -354,14 +372,9 @@ class Game:
                     print(f"Enemy is performing an action that is not guarding.")
                     self.displayBattleButtons['attack'].setText(f"{self.currentEnemy[self.currentEnemyIndex].name} used {self.skillUsed} which inflicted {self.skillDamage} damage!")
 
-        # Displays dialogue for when the player guards.
-        elif self.playerGuarded:
-            self.displayBattleButtons['attack'].setText(f"Player guarded!")
+       
         
-        # Displays dialogue for when the player uses potion.
-        elif self.skillUsed == 'Potion' or self.skillUsed == "Potion":
-            print("Potion was used probably.")
-            self.displayBattleButtons['attack'].setText("Player used potion!")
+        
         
 
     # Uses the potion if avaible to heal player's healt.
