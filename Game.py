@@ -330,7 +330,6 @@ class Game:
         # Updates the textbox of the display battle screen to show the skill used.
         # Displays dialogue for when enemy guards as well.
 
-
         # Need to account for if the player is also guarding. 
         # If this is not accounted for, the player's next skill will be displayed as "Guard".
         if self.enemyGuarded and self.playerGuarded:
@@ -339,39 +338,39 @@ class Game:
             self.enemyGuarded = False
             self.playerGuarded = False
             self.isEnemeyTurn = False
+            self.playerDialougeOffsetted = True
 
 
         elif self.enemyGuarded:
             self.displayBattleButtons['attack'].setText(f"{self.currentEnemy[self.currentEnemyIndex].name} guarded!")
-            
-            # Needs to set back self.skillUsed to the name of the player's skill used.
-            # Otherwise, self.skillUsed will contain the string "Guard" from the enemy's guard.
-            self.skillUsed = self.skillPlayerUsed
+
 
          # Displays dialogue for when the player guards.
         elif self.playerGuarded:
             self.displayBattleButtons['attack'].setText(f"Player guarded!")
 
         # Displays dialogue for when the player uses potion.
-        elif self.skillUsed == 'Potion':
+        elif self.skillUsed == 'Potion' or self.skillPlayerUsed == 'Potion':
             print("Potion was used probably.")
-            self.displayBattleButtons['attack'].setText("Player used potion!")
+            self.displayBattleButtons['attack'].setText(f"Player used potion!")
+            self.skillUsed = "None"
+            
             
         # Displays the dialogue for the player's skill used.
         else:
                 
-                # Indicates in the battle UI text box who is performing the skill.
-                # Has to be enemy turn as true because the player's skill is used.
-                if self.isEnemeyTurn or self.playerDialougeOffsetted:
-                    print(f"Player is performing an action that is not guarding or using a potion.")
-                    # Indicates that the player is attacking or using a skill in the dialouge.
-                    self.displayBattleButtons['attack'].setText(f"Player used {self.skillUsed} which inflicted {self.skillDamage} damage!")
-                    self.playerDialougeOffsetted = False
-                elif not self.isEnemeyTurn:
-                    # Indicates the enemy is attacking or using a skill in the dialouge.
+            # Indicates in the battle UI text box who is performing the skill.
+            # Has to be enemy turn as true because the player's skill is used.
+            if  self.isEnemeyTurn or self.playerDialougeOffsetted:
+                print(f"Player is performing an action that is not guarding or using a potion.")
+                # Indicates that the player is attacking or using a skill in the dialouge.
+                self.displayBattleButtons['attack'].setText(f"Player used {self.skillUsed} which inflicted {self.skillDamage} damage!")
+                self.playerDialougeOffsetted = False
+            elif not self.isEnemeyTurn:
+                # Indicates the enemy is attacking or using a skill in the dialouge.
 
-                    print(f"Enemy is performing an action that is not guarding.")
-                    self.displayBattleButtons['attack'].setText(f"{self.currentEnemy[self.currentEnemyIndex].name} used {self.skillUsed} which inflicted {self.skillDamage} damage!")
+                print(f"Enemy is performing an action that is not guarding.")
+                self.displayBattleButtons['attack'].setText(f"{self.currentEnemy[self.currentEnemyIndex].name} used {self.skillUsed} which inflicted {self.skillDamage} damage!")
 
        
         
