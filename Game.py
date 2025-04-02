@@ -321,7 +321,7 @@ class Game:
         self.currentCoin = 0
 
     def winDialogue(self):
-        self.displayBattleButtons['result'].setText(f"You have defeated {self.currentEnemy[self.currentEnemyIndex].name}!")
+        self.displayBattleButtons['result'].setText(f"You have defeated {self.currentEnemy[self.currentEnemyIndex].name} and now proceed to the next floor!")
 
 
     # Displays the dialogue for the skills menu.
@@ -1118,9 +1118,14 @@ class Game:
                             # with all of the skills.
                             if not self.dialogue.current_dialogue.isTyping():
                                 self.gameStates['displayBattle'] = False
+
+                                # Transitions from the display battle screen to 
+                                # enemyTurn state to allow the enemy to attack.
                                 if self.isEnemeyTurn:
                                     self.gameStates['enemyTurn'] = True
-                                else:
+
+                                # If the enemy is not defeated, the game will return to the battle screen.
+                                elif not self.enemyDefeated:
                                     # Transitions to the game over screen if
                                     # the player health hits zero.
                                     if self.player.currentHp <= 0:
@@ -1135,6 +1140,14 @@ class Game:
                                         self.gameStates['gameOver'] = True
                                     else:
                                         self.gameStates['battle'] = True
+                                
+                                # If the enemy is defeated, the game will
+                                # proceed to the next floor which includes the intermission state.
+                                elif self.enemyDefeated:
+                                    self.currentFloor += 1
+                                    self.enemyDefeated = False
+                                    self.gameStates['intermission'] = False
+                                    
                                 # self.skillUsed = "None"
                                 self.skillDialogueSet = False
 
@@ -1184,6 +1197,7 @@ class Game:
                 if self.currentEnemy[self.currentEnemyIndex].currentHp <= 0:
                     self.winDialogue()
                     self.enemyDefeated = True
+                   
 
 
                 # Needs to check the upgrades have been applied to the player's stats.
