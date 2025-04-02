@@ -59,7 +59,7 @@ class Game:
         self.enemyGuarded = False
 
         # Checks if it is the enemies turn to start the enemy battle AI.
-        self.isEnemeyTurn = True
+        self.isEnemyTurn = True
 
         self.haveAppliedUpgrades = False
 
@@ -337,8 +337,8 @@ class Game:
 
             self.enemyGuarded = False
             self.playerGuarded = False
-            self.isEnemeyTurn = False
-            self.playerDialougeOffsetted = True
+            self.isEnemyTurn = False
+            self.playerDialougeOffsetted = not self.playerDialougeOffsetted
 
 
         elif self.enemyGuarded:
@@ -361,12 +361,12 @@ class Game:
                 
             # Indicates in the battle UI text box who is performing the skill.
             # Has to be enemy turn as true because the player's skill is used.
-            if  self.isEnemeyTurn or self.playerDialougeOffsetted:
+            if  self.isEnemyTurn or self.playerDialougeOffsetted:
                 print(f"Player is performing an action that is not guarding or using a potion.")
                 # Indicates that the player is attacking or using a skill in the dialouge.
                 self.displayBattleButtons['attack'].setText(f"Player used {self.skillUsed} which inflicted {self.skillDamage} damage!")
                 self.playerDialougeOffsetted = False
-            elif not self.isEnemeyTurn:
+            elif not self.isEnemyTurn:
                 # Indicates the enemy is attacking or using a skill in the dialouge.
 
                 print(f"Enemy is performing an action that is not guarding.")
@@ -925,7 +925,7 @@ class Game:
                 # Changes the background when the intro exposition starts.
                 self.screen.fill((0,0,0))
 
-                dt = clock.tick(60) / 1  # Time in seconds since last frame.
+                dt = clock.tick(600) / 1  # Time in seconds since last frame.
 
                 # Picks the intro dialogue and starts the typing animation.
                 self.dialogue.startDialogue('intro')
@@ -1089,7 +1089,7 @@ class Game:
 
                 # Render textbox for the skill used in the display battle screen.
 
-                dt = clock.tick(60) / 1  # Time in seconds since last frame.
+                dt = clock.tick(600) / 1  # Time in seconds since last frame.
 
                 # Continue to display the battle dialouge with the skills being used 
                 # by the player and the enemy when the enemy's health is above zero.
@@ -1119,9 +1119,22 @@ class Game:
                             if not self.dialogue.current_dialogue.isTyping():
                                 self.gameStates['displayBattle'] = False
 
+
+                                # If the enemy is defeated, the game will
+                                # proceed to the next floor which includes the intermission state.
+                                if self.enemyDefeated:
+                                    self.currentFloor += 1
+                                    self.enemyDefeated = False
+                                    self.gameStates['intermission'] = True
+                                    self.skillDialogueSet = False
+                                    self.skillUsed = "None"
+                                    self.isEnemyTurn = False
+
+
+
                                 # Transitions from the display battle screen to 
                                 # enemyTurn state to allow the enemy to attack.
-                                if self.isEnemeyTurn:
+                                elif self.isEnemyTurn:
                                     self.gameStates['enemyTurn'] = True
 
                                 # If the enemy is not defeated, the game will return to the battle screen.
@@ -1141,12 +1154,7 @@ class Game:
                                     else:
                                         self.gameStates['battle'] = True
                                 
-                                # If the enemy is defeated, the game will
-                                # proceed to the next floor which includes the intermission state.
-                                elif self.enemyDefeated:
-                                    self.currentFloor += 1
-                                    self.enemyDefeated = False
-                                    self.gameStates['intermission'] = False
+                                
                                     
                                 # self.skillUsed = "None"
                                 self.skillDialogueSet = False
@@ -1159,7 +1167,7 @@ class Game:
                                 self.dialogue.current_dialogue.skipTyping()
                                 
             elif self.gameStates['enemyTurn']:
-                self.isEnemeyTurn = False   
+                self.isEnemyTurn = False   
                 self.enemyTurn()
                 
                 self.gameStates['enemyTurn'] = False
@@ -1226,7 +1234,7 @@ class Game:
                 
                 # Allows the enemy to attack after the player's turn needed or the enemy will
                 # attack indefinitely.
-                self.isEnemeyTurn = True
+                self.isEnemyTurn = True
 
                 self.enemyGuarded = self.enemyWillGuard()
 
@@ -1471,7 +1479,7 @@ class Game:
                 
 
                 # Needed for the animated typing
-                dt = clock.tick(60) / 1 # Time in seconds since last frame.
+                dt = clock.tick(600) / 1 # Time in seconds since last frame.
 
                 # Updates the coin dialouge.
                 self.gameOverMenu['Coin'].update(dt)
