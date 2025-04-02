@@ -396,9 +396,8 @@ class Game:
             self.skillUsed = 'Potion'
         else:
             pass
+
             
-
-
     # Returns a copy of the enemy sprite with different shade of color 
     # to create a blinking effect.
     def colorize(self, image, new_color):
@@ -1068,6 +1067,7 @@ class Game:
                     button.isHovered = button.rect.collidepoint(mousePos)
 
 
+
             elif self.gameStates['displayBattle']:
                 self.screen.fill((0,0,0))
 
@@ -1205,6 +1205,11 @@ class Game:
                 if self.currentEnemy[self.currentEnemyIndex].currentHp <= 0:
                     self.winDialogue()
                     self.enemyDefeated = True
+                    self.skillUsed = "None"
+                    self.skillPlayerUsed = "None"
+                    self.isEnemyTurn = False
+                    self.gameStates['battle'] = False
+                    self.gameStates['displayBattle'] = True
                    
 
 
