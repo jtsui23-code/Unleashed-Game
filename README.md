@@ -1,6 +1,6 @@
-# _2025-Game-Jam-by-Pirate-Software_
+# Unleashed - Turn-Based Roguelike (Python, Pygame)
 ## **Unleeched**
-A work in progress turn-based rpg game developed by Jack Tsui, Zachary Barrentine, Zach Lewis, and Gage Ahlmark. The inital plan was for the game to be finished in time for the Spring 2025 PirateSoftware Game Jam, however the scale of the project grew dramatically until it no longer was feasible to release within the Game Jam's short time frame.
+A turn-based roguelike game using Python and Pygame developed by Jack Tsui, Zachary Barrentine, Zach Lewis, and Gage Ahlmark. The inital plan was for the game to be a small prototype, the game has grown into a larger project.
 
 
 ### The following game file contents can be accessed below:
