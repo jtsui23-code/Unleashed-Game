@@ -18,7 +18,7 @@ class Game:
         pygame.init()
 
         # Sets the name of the window icon to "Rogue-like"
-        pygame.display.set_caption("Unleeched")
+        pygame.display.set_caption("Unleashed")
 
         self.screenWidth = 1280
         self.screenHeight = 720
