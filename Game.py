@@ -42,7 +42,7 @@ class Game:
         # Stores all of the enemies on each floor and replaces with the old ones.
         self.currentEnemy = []
         # Tracks which of the enemy the player is fighting.
-        self.currentEnemyIndex = 0
+        self.currentEnemyIndex = 00
 
         self.playerDialougeOffsetted = False
 
