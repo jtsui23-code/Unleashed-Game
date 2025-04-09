@@ -41,7 +41,8 @@ class Game:
         
         # Stores all of the enemies on each floor and replaces with the old ones.
         self.currentEnemy = []
-        # Tracks which of the enemy the player is fighting.
+
+        # Tracks which enemy the player is fighting.
         self.currentEnemyIndex = 0
 
         self.playerDialougeOffsetted = False
@@ -51,14 +52,14 @@ class Game:
         # Tracks number of potions the player has.
         self.item = 0
 
-        # Stores sprites of the enemies on the current floor.
+        # Stores sprites of the enemies on the current floor. Max size of 2
         self.currentEnemyAsset = []
 
         # Checks if the player or enemy has guraded for defense logic.
         self.playerGuarded = False
         self.enemyGuarded = False
 
-        # Checks if it is the enemies turn to start the enemy battle AI.
+        # Checks if it is the enemies turn to start the enemy's battle AI.
         self.isEnemyTurn = True
 
         self.haveAppliedUpgrades = False
@@ -72,7 +73,7 @@ class Game:
         self.currentCoin = 0
 
         # Stores the total of all of the coins the player has.
-        self.totalCoin = 10000
+        self.totalCoin = 0
         
         # Checks if either the player or enemy has used a skill
         # needed for battle dialouge.
@@ -149,7 +150,7 @@ class Game:
 
         # Stores the Button objects for the main menu.
         self.mainMenuOptions = {
-            'Title': Text(500, 200, 280, 50, 'Unleeched', self.fonts['fanta'], self.titleColor),
+            'Title': Text(500, 200, 280, 50, 'Unleashed', self.fonts['fanta'], self.titleColor),
             'Start': Button(500, 375, 280, 50, 'Start'),
             'Shop': Button(500, 450, 280, 50, 'Shop'),
             'Exit': Button(500, 525, 280, 50, 'Exit')
@@ -262,7 +263,6 @@ class Game:
             'displayBattle': False,
             'enemyTurn': False,
             'inventory': False,
-            'gameOver': False
             
         }
         
@@ -696,7 +696,6 @@ class Game:
                         if self.gameStates['itemReward']:
                             if self.itemRewardOptions['Continue'].rect.collidepoint(mousePos):
                                 self.item += 1
-                                print(F" Have {self.item} number of items.")
                                 self.gameStates['itemReward'] = False
                                 self.gameStates['prebattle'] = True
                         
