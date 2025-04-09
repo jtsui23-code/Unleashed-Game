@@ -20,7 +20,7 @@ LIGHT_GRAY = (220, 220, 220)
 
 
 class TextBox:
-    def __init__(self, x, y, width, height, text='', bgColor=(0, 0, 0, 128)):
+    def __init__(self, x, y, width, height, text='', bgColor=(0, 0, 0, 128), borderColor=True):
         self.rect = pygame.Rect(x, y, width, height)
         self.text = text
         self.animated_text = ''     # Characters that have been drawn
@@ -33,7 +33,9 @@ class TextBox:
         # Wrap text to fit in the box.
         self.lines = self.wrap_text()
         self.boxColor = bgColor
+        self.hasBorder = borderColor
 
+        
         self.isFinished = False
 
     def setText(self, newText):
@@ -97,9 +99,23 @@ class TextBox:
 
     def draw(self, surface):
 
-        pygame.draw.rect(surface, self.boxColor, self.rect)
-        pygame.draw.rect(surface, WHITE, self.rect, 2)
-        
+        # pygame.draw.rect(surface, self.boxColor, self.rect)
+
+
+        # Cannot draw the text box with transparent color on Pygame Rect because 
+        # Pygame Rect ignores the transparnet value in the color.
+        # So we need to draw the text box on a separate surface and then blit it to the main surface.
+        # The tempSurface needs pygame.SRCALPHA to support transparency.
+        # SRCALPHA is screen alpha, which means that the surface will support transparency.
+        tempSurface = pygame.Surface((self.rect.width, self.rect.height), pygame.SRCALPHA)
+        tempSurface.fill(self.boxColor)  # Fill it with the color (including alpha)
+        surface.blit(tempSurface, (self.rect.x, self.rect.y))
+
+        # Draw the text box outline which is White.
+        # The border of the text box is only drawn if the object of the class is created with a border.
+        if self.hasBorder:
+            pygame.draw.rect(surface, WHITE, self.rect, 2)
+
         y = self.rect.y + 10
         visible_text = self.animated_text
         
@@ -119,6 +135,7 @@ class TextBox:
             
             if y + self.line_height > self.rect.bottom - 10:
                 break
+
 
     # Inverts the color of the text box for outline of the text box.
     def invertColor(self, color):

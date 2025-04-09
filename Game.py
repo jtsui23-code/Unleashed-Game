@@ -166,7 +166,7 @@ class Game:
         # Stores the Button objects for the battle menu.
         self.battle = {
             # The text box is at the beginning of the map because it will be the first thing to be drawn.
-            'Text': TextBox(self.screenWidth//2 - 450 //2, self.screenHeight - 300, 450, 300, text=''),
+            'Text': TextBox(self.screenWidth//2 - 450 //2, self.screenHeight - 300, 450, 300, text='', bgColor=(40, 40, 40, 5), borderColor=False),
             'Attack': Button((self.screenWidth - 280) // 2, self.screenHeight - (self.screenHeight -440) , 280, 50, 'Attack'),
             'Skill': Button((self.screenWidth - 280) // 2, self.screenHeight - (self.screenHeight - 510), 280, 50, 'Skills'),
             'Guard': Button((self.screenWidth - 280) // 2, self.screenHeight - (self.screenHeight -580) , 280, 50, 'Guard'),
