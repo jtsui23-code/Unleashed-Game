@@ -166,11 +166,11 @@ class Game:
         # Stores the Button objects for the battle menu.
         self.battle = {
             # The text box is at the beginning of the map because it will be the first thing to be drawn.
-            'Text': TextBox(200, 100, 900, 600, text=''),
-            'Attack': Button(500, 375, 280, 50, 'Attack'),
-            'Skill': Button(500, 450, 280, 50, 'Skills'),
-            'Guard': Button(500, 525, 280, 50, 'Guard'),
-            'Inventory': Button(500, 600, 280, 50, 'Inventory'),
+            'Text': TextBox(self.screenWidth//2 - 450 //2, self.screenHeight - 300, 450, 300, text=''),
+            'Attack': Button((self.screenWidth - 280) // 2, self.screenHeight - (self.screenHeight -440) , 280, 50, 'Attack'),
+            'Skill': Button((self.screenWidth - 280) // 2, self.screenHeight - (self.screenHeight - 510), 280, 50, 'Skills'),
+            'Guard': Button((self.screenWidth - 280) // 2, self.screenHeight - (self.screenHeight -580) , 280, 50, 'Guard'),
+            'Inventory': Button((self.screenWidth - 280) // 2, self.screenHeight - (self.screenHeight -650), 280, 50, 'Inventory'),
         }
 
         # Stores the Button objects for the battle menu.
@@ -1199,6 +1199,18 @@ class Game:
 
             elif self.gameStates['battle']:
                 # Background for battle
+                self.screen.blit(self.assets['arena'], (0, 0))
+                self.isFirstTurn = False
+                enemy1 = pygame.transform.flip(self.assets['enemy1'], self.flipSprites, False)
+                enemy2 = pygame.transform.flip(self.assets['enemy2'], self.flipSprites, False)
+
+
+                # Display enemy sprites on the display battle screen.
+                self.screen.blit(enemy1, self.playerPos)
+                self.screen.blit(enemy2, self.enemyPos)
+
+                # Health Bar and SP bar for the player and enemies.
+                self.drawBars()
 
                 # Checks if the player has defeated the enemy and displays the winning dialouge if so.
                 if self.currentEnemy[self.currentEnemyIndex].currentHp <= 0:
@@ -1244,7 +1256,6 @@ class Game:
 
                 while not action_selected:
                     # Clear screen EVERY FRAME
-                    self.screen.fill((0, 0, 0))
 
                     # Update mouse position and hover states FIRST
                     mousePos = pygame.mouse.get_pos()
