@@ -18,7 +18,7 @@ class Game:
         pygame.init()
 
         # Sets the name of the window icon to "Rogue-like"
-        pygame.display.set_caption("Unleeched")
+        pygame.display.set_caption("Unleashed")
 
         self.screenWidth = 1280
         self.screenHeight = 720
@@ -41,7 +41,8 @@ class Game:
         
         # Stores all of the enemies on each floor and replaces with the old ones.
         self.currentEnemy = []
-        # Tracks which of the enemy the player is fighting.
+
+        # Tracks which enemy the player is fighting.
         self.currentEnemyIndex = 0
 
         self.playerDialougeOffsetted = False
@@ -51,15 +52,15 @@ class Game:
         # Tracks number of potions the player has.
         self.item = 0
 
-        # Stores sprites of the enemies on the current floor.
+        # Stores sprites of the enemies on the current floor. Max size of 2
         self.currentEnemyAsset = []
 
         # Checks if the player or enemy has guraded for defense logic.
         self.playerGuarded = False
         self.enemyGuarded = False
 
-        # Checks if it is the enemies turn to start the enemy battle AI.
-        self.isEnemeyTurn = True
+        # Checks if it is the enemies turn to start the enemy's battle AI.
+        self.isEnemyTurn = True
 
         self.haveAppliedUpgrades = False
 
@@ -149,7 +150,7 @@ class Game:
 
         # Stores the Button objects for the main menu.
         self.mainMenuOptions = {
-            'Title': Text(500, 200, 280, 50, 'Unleeched', self.fonts['fanta'], self.titleColor),
+            'Title': Text(500, 200, 280, 50, 'Unleashed', self.fonts['fanta'], self.titleColor),
             'Start': Button(500, 375, 280, 50, 'Start'),
             'Shop': Button(500, 450, 280, 50, 'Shop'),
             'Exit': Button(500, 525, 280, 50, 'Exit')
@@ -165,11 +166,11 @@ class Game:
         # Stores the Button objects for the battle menu.
         self.battle = {
             # The text box is at the beginning of the map because it will be the first thing to be drawn.
-            'Text': TextBox(200, 100, 900, 600, text=''),
-            'Attack': Button(500, 375, 280, 50, 'Attack'),
-            'Skill': Button(500, 450, 280, 50, 'Skills'),
-            'Guard': Button(500, 525, 280, 50, 'Guard'),
-            'Inventory': Button(500, 600, 280, 50, 'Inventory'),
+            # 'Text': TextBox(self.screenWidth//2 - 300 //2, self.screenHeight - 300, 300, 300, text='', bgColor=(10, 10, 40, 0), borderColor=False),
+            'Attack': Button((self.screenWidth - 280) // 2, self.screenHeight - (self.screenHeight -440) , 280, 50, 'Attack'),
+            'Skill': Button((self.screenWidth - 280) // 2, self.screenHeight - (self.screenHeight - 510), 280, 50, 'Skills'),
+            'Guard': Button((self.screenWidth - 280) // 2, self.screenHeight - (self.screenHeight -580) , 280, 50, 'Guard'),
+            'Inventory': Button((self.screenWidth - 280) // 2, self.screenHeight - (self.screenHeight -650), 280, 50, 'Inventory'),
         }
 
         # Stores the Button objects for the battle menu.
@@ -262,7 +263,6 @@ class Game:
             'displayBattle': False,
             'enemyTurn': False,
             'inventory': False,
-            'gameOver': False
             
         }
         
@@ -321,7 +321,7 @@ class Game:
         self.currentCoin = 0
 
     def winDialogue(self):
-        self.displayBattleButtons['result'].setText(f"You have defeated {self.currentEnemy[self.currentEnemyIndex].name}!")
+        self.displayBattleButtons['result'].setText(f"You have defeated {self.currentEnemy[self.currentEnemyIndex].name} and now proceed to the next floor!")
 
 
     # Displays the dialogue for the skills menu.
@@ -330,38 +330,51 @@ class Game:
         # Updates the textbox of the display battle screen to show the skill used.
         # Displays dialogue for when enemy guards as well.
 
-        if self.enemyGuarded:
+        # Need to account for if the player is also guarding. 
+        # If this is not accounted for, the player's next skill will be displayed as "Guard".
+        if self.enemyGuarded and self.playerGuarded:
+            self.displayBattleButtons['attack'].setText(f"Player and {self.currentEnemy[self.currentEnemyIndex].name} both guarded!")
+
+            self.enemyGuarded = False
+            self.playerGuarded = False
+            self.isEnemyTurn = False
+            self.playerDialougeOffsetted = not self.playerDialougeOffsetted
+
+
+        elif self.enemyGuarded:
             self.displayBattleButtons['attack'].setText(f"{self.currentEnemy[self.currentEnemyIndex].name} guarded!")
-            
-            # Needs to set back self.skillUsed to the name of the player's skill used.
-            # Otherwise, self.skillUsed will contain the string "Guard" from the enemy's guard.
-            self.skillUsed = self.skillPlayerUsed
-            self.playerDialougeOffsetted = True
-            
-        # Displays the dialogue for the player's skill used.
-        elif not self.enemyGuarded and not self.playerGuarded and self.skillUsed != 'Potion':
-                
-                # Indicates in the battle UI text box who is performing the skill.
-                # Has to be enemy turn as true because the player's skill is used.
-                if self.isEnemeyTurn or self.playerDialougeOffsetted:
-                    print(f"Player is performing an action that is not guarding or using a potion.")
-                    # Indicates that the player is attacking or using a skill in the dialouge.
-                    self.displayBattleButtons['attack'].setText(f"Player used {self.skillUsed} which inflicted {self.skillDamage} damage!")
-                    self.playerDialougeOffsetted = False
-                elif not self.isEnemeyTurn:
-                    # Indicates the enemy is attacking or using a skill in the dialouge.
 
-                    print(f"Enemy is performing an action that is not guarding.")
-                    self.displayBattleButtons['attack'].setText(f"{self.currentEnemy[self.currentEnemyIndex].name} used {self.skillUsed} which inflicted {self.skillDamage} damage!")
 
-        # Displays dialogue for when the player guards.
+         # Displays dialogue for when the player guards.
         elif self.playerGuarded:
             self.displayBattleButtons['attack'].setText(f"Player guarded!")
-        
+
         # Displays dialogue for when the player uses potion.
-        elif self.skillUsed == 'Potion' or self.skillUsed == "Potion":
+        elif self.skillUsed == 'Potion' or self.skillPlayerUsed == 'Potion':
             print("Potion was used probably.")
-            self.displayBattleButtons['attack'].setText("Player used potion!")
+            self.displayBattleButtons['attack'].setText(f"Player used potion!")
+            self.skillUsed = "None"
+            
+            
+        # Displays the dialogue for the player's skill used.
+        else:
+                
+            # Indicates in the battle UI text box who is performing the skill.
+            # Has to be enemy turn as true because the player's skill is used.
+            if  self.isEnemyTurn or self.playerDialougeOffsetted:
+                print(f"Player is performing an action that is not guarding or using a potion.")
+                # Indicates that the player is attacking or using a skill in the dialouge.
+                self.displayBattleButtons['attack'].setText(f"Player used {self.skillUsed} which inflicted {self.skillDamage} damage!")
+                self.playerDialougeOffsetted = False
+            elif not self.isEnemyTurn:
+                # Indicates the enemy is attacking or using a skill in the dialouge.
+
+                print(f"Enemy is performing an action that is not guarding.")
+                self.displayBattleButtons['attack'].setText(f"{self.currentEnemy[self.currentEnemyIndex].name} used {self.skillUsed} which inflicted {self.skillDamage} damage!")
+
+       
+        
+        
         
 
     # Uses the potion if avaible to heal player's healt.
@@ -383,9 +396,8 @@ class Game:
             self.skillUsed = 'Potion'
         else:
             pass
+
             
-
-
     # Returns a copy of the enemy sprite with different shade of color 
     # to create a blinking effect.
     def colorize(self, image, new_color):
@@ -684,7 +696,6 @@ class Game:
                         if self.gameStates['itemReward']:
                             if self.itemRewardOptions['Continue'].rect.collidepoint(mousePos):
                                 self.item += 1
-                                print(F" Have {self.item} number of items.")
                                 self.gameStates['itemReward'] = False
                                 self.gameStates['prebattle'] = True
                         
@@ -912,7 +923,7 @@ class Game:
                 # Changes the background when the intro exposition starts.
                 self.screen.fill((0,0,0))
 
-                dt = clock.tick(60) / 1  # Time in seconds since last frame.
+                dt = clock.tick(600) / 1  # Time in seconds since last frame.
 
                 # Picks the intro dialogue and starts the typing animation.
                 self.dialogue.startDialogue('intro')
@@ -1055,6 +1066,7 @@ class Game:
                     button.isHovered = button.rect.collidepoint(mousePos)
 
 
+
             elif self.gameStates['displayBattle']:
                 self.screen.fill((0,0,0))
 
@@ -1076,7 +1088,7 @@ class Game:
 
                 # Render textbox for the skill used in the display battle screen.
 
-                dt = clock.tick(60) / 1  # Time in seconds since last frame.
+                dt = clock.tick(600) / 1  # Time in seconds since last frame.
 
                 # Continue to display the battle dialouge with the skills being used 
                 # by the player and the enemy when the enemy's health is above zero.
@@ -1105,9 +1117,27 @@ class Game:
                             # with all of the skills.
                             if not self.dialogue.current_dialogue.isTyping():
                                 self.gameStates['displayBattle'] = False
-                                if self.isEnemeyTurn:
+
+
+                                # If the enemy is defeated, the game will
+                                # proceed to the next floor which includes the intermission state.
+                                if self.enemyDefeated:
+                                    self.currentFloor += 1
+                                    self.enemyDefeated = False
+                                    self.gameStates['intermission'] = True
+                                    self.skillDialogueSet = False
+                                    self.skillUsed = "None"
+                                    self.isEnemyTurn = False
+
+
+
+                                # Transitions from the display battle screen to 
+                                # enemyTurn state to allow the enemy to attack.
+                                elif self.isEnemyTurn:
                                     self.gameStates['enemyTurn'] = True
-                                else:
+
+                                # If the enemy is not defeated, the game will return to the battle screen.
+                                elif not self.enemyDefeated:
                                     # Transitions to the game over screen if
                                     # the player health hits zero.
                                     if self.player.currentHp <= 0:
@@ -1122,8 +1152,13 @@ class Game:
                                         self.gameStates['gameOver'] = True
                                     else:
                                         self.gameStates['battle'] = True
+                                
+                                
+                                    
                                 # self.skillUsed = "None"
                                 self.skillDialogueSet = False
+
+                
 
                             # If the text is still typing, the user can skip the typing animation
                             # by clicking on the screen.
@@ -1131,7 +1166,7 @@ class Game:
                                 self.dialogue.current_dialogue.skipTyping()
                                 
             elif self.gameStates['enemyTurn']:
-                self.isEnemeyTurn = False   
+                self.isEnemyTurn = False   
                 self.enemyTurn()
                 
                 self.gameStates['enemyTurn'] = False
@@ -1164,11 +1199,29 @@ class Game:
 
             elif self.gameStates['battle']:
                 # Background for battle
+                self.screen.blit(self.assets['arena'], (0, 0))
+                self.isFirstTurn = False
+                enemy1 = pygame.transform.flip(self.assets['enemy1'], self.flipSprites, False)
+                enemy2 = pygame.transform.flip(self.assets['enemy2'], self.flipSprites, False)
+
+
+                # Display enemy sprites on the display battle screen.
+                self.screen.blit(enemy1, self.playerPos)
+                self.screen.blit(enemy2, self.enemyPos)
+
+                # Health Bar and SP bar for the player and enemies.
+                self.drawBars()
 
                 # Checks if the player has defeated the enemy and displays the winning dialouge if so.
                 if self.currentEnemy[self.currentEnemyIndex].currentHp <= 0:
                     self.winDialogue()
                     self.enemyDefeated = True
+                    self.skillUsed = "None"
+                    self.skillPlayerUsed = "None"
+                    self.isEnemyTurn = False
+                    self.gameStates['battle'] = False
+                    self.gameStates['displayBattle'] = True
+                   
 
 
                 # Needs to check the upgrades have been applied to the player's stats.
@@ -1197,13 +1250,12 @@ class Game:
                 
                 # Allows the enemy to attack after the player's turn needed or the enemy will
                 # attack indefinitely.
-                self.isEnemeyTurn = True
+                self.isEnemyTurn = True
 
                 self.enemyGuarded = self.enemyWillGuard()
 
                 while not action_selected:
                     # Clear screen EVERY FRAME
-                    self.screen.fill((0, 0, 0))
 
                     # Update mouse position and hover states FIRST
                     mousePos = pygame.mouse.get_pos()
@@ -1442,7 +1494,7 @@ class Game:
                 
 
                 # Needed for the animated typing
-                dt = clock.tick(60) / 1 # Time in seconds since last frame.
+                dt = clock.tick(600) / 1 # Time in seconds since last frame.
 
                 # Updates the coin dialouge.
                 self.gameOverMenu['Coin'].update(dt)
