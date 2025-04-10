@@ -177,7 +177,7 @@ class Game:
 
         # Stores the Button objects for the battle menu.
         self.moves = {
-            'SkillsBack' : TextBox(self.screenWidth//2 - 300 //2, self.screenHeight - 300, 300, 300, text='', bgColor=(10, 10, 40, 5), borderColor=(255, 215, 0)),
+            'SkillsBack' : TextBox(self.screenWidth//2 - 300 //2, self.screenHeight - 300, 300, 300, text='', bgColor=(10, 10, 40, 5), borderColor=(255, 215, 0, 5)),
             'Skill0' : Button((self.screenWidth - 280) // 2, self.screenHeight - (self.screenHeight -440), 280, 50, self.player.Skills[0].name),
             'Skill1' : Button((self.screenWidth - 280) // 2, self.screenHeight - (self.screenHeight -510), 280, 50, self.player.Skills[1].name),
             'Skill2' : Button((self.screenWidth - 280) // 2, self.screenHeight - (self.screenHeight -580), 280, 50, self.player.Skills[2].name),
@@ -1374,8 +1374,9 @@ class Game:
                             elif current_menu == 'skills':
                                 # If the back button is clicked, return to the battle menu.
                                 if self.moves['Back'].rect.collidepoint(mousePos) :
-                                    self.moves['SkillsBack'].isVisible(False)
                                     self.screen.fill((0,0,0))
+                                    self.moves['SkillsBack'].isVisible(False)
+                                    self.moves['SkillsBack'].isVisible(False)
                                     self.screen.blit(self.assets['arena'], (0, 0))
                                     self.isFirstTurn = False
                                      # Display enemy sprites on the display battle screen.
@@ -1384,11 +1385,13 @@ class Game:
 
                                     # Health Bar and SP bar for the player and enemies.
                                     self.drawBars()
-                                    
+
                                     self.drawMenu(self.battle)  # Redraw battle menu
                                     self.drawMenu(self.moves)  # Redraw skills menu
+                                    
                                     current_menu = 'battle'
-                                
+
+
                                 # If a skill button is clicked, use the skill.
                                 elif self.moves['Skill0'].rect.collidepoint(mousePos) :
                                     action_selected = True
