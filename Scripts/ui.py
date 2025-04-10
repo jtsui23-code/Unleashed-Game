@@ -50,6 +50,15 @@ class TextBox:
 
         self.text_to_render = ''
 
+    def isVisible(self, visible):
+        if(visible):
+            self.boxColor = (40, 40, 60, 5)
+            self.borderColor = GOLD
+        if(not visible):
+            self.boxColor = (0, 0, 0, 0)
+            self.borderColor = (0, 0, 0, 0)
+        
+
     def setText(self, newText):
         self.text = newText
         self.animated_text = ''

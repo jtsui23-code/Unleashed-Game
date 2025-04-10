@@ -37,6 +37,8 @@ class Game:
         # 1 - second enemy
         self.hoveredEnemy = None
 
+        self.keys = pygame.key.get_pressed()
+
         self.turnNum = 1
         
         # Stores all of the enemies on each floor and replaces with the old ones.
@@ -175,11 +177,11 @@ class Game:
 
         # Stores the Button objects for the battle menu.
         self.moves = {
-            'Text': TextBox(200, 75, 900, 600, text=''),
-            'Skill0' : Button(500, 400, 280, 50, self.player.Skills[0].name),
-            'Skill1' : Button(500, 475, 280, 50, self.player.Skills[1].name),
-            'Skill2' : Button(500, 550, 280, 50, self.player.Skills[2].name),
-            'Back': Button(20, 620, 140, 50, 'Back')      
+            'SkillsBack' : TextBox(self.screenWidth//2 - 300 //2, self.screenHeight - 300, 300, 300, text='', bgColor=(10, 10, 40, 5), borderColor=(255, 215, 0)),
+            'Skill0' : Button((self.screenWidth - 280) // 2, self.screenHeight - (self.screenHeight -440), 280, 50, self.player.Skills[0].name),
+            'Skill1' : Button((self.screenWidth - 280) // 2, self.screenHeight - (self.screenHeight -510), 280, 50, self.player.Skills[1].name),
+            'Skill2' : Button((self.screenWidth - 280) // 2, self.screenHeight - (self.screenHeight -580), 280, 50, self.player.Skills[2].name),
+            'Back': Button((self.screenWidth - 280) // 2, self.screenHeight - (self.screenHeight -650), 280, 50, 'Back')      
         }
 
         # Store instances of enemies, not class references
@@ -624,6 +626,7 @@ class Game:
     def run(self):
         while True:
             clock = pygame.time.Clock() # Initiates clock
+            self.keys = pygame.key.get_pressed()
             
             # Plays the intermission song after the intro exposition.
             if self.gameStates['intermission'] and not self.intermissionMusicPlaying:
@@ -694,7 +697,7 @@ class Game:
 
                         # Handle itemReward state mouse click - simplified to just check for Continue button
                         if self.gameStates['itemReward']:
-                            if self.itemRewardOptions['Continue'].rect.collidepoint(mousePos):
+                            if self.itemRewardOptions['Continue'].rect.collidepoint(mousePos) :
                                 self.item += 1
                                 self.gameStates['itemReward'] = False
                                 self.gameStates['prebattle'] = True
@@ -703,7 +706,7 @@ class Game:
                             # Contains which enemy the player clicks on to infect.
                                 enemyIndex = None
                                 for i, rect in enumerate(self.enemyRect):
-                                    if rect.collidepoint(mousePos):
+                                    if rect.collidepoint(mousePos) :
                                         enemyIndex = i
                                         break
 
@@ -737,15 +740,15 @@ class Game:
                             
 
                             # Checks if the fight button was clicked on the prebattle screen.
-                            if self.preBattle['fight'].rect.collidepoint(mousePos):
+                            if self.preBattle['fight'].rect.collidepoint(mousePos) :
                                 print("Fight button clicked")  # Debug print
                                 self.gameStates['prebattle'] = False
                                 self.gameStates['battle'] = True
-                                self.currentBattle = Battle(self.player, self.currentEnemy[0])
+                                # self.currentBattle = Battle(self.player, self.currentEnemy[0])
 
 
                             # Checks if the infect button was clicked ont the prebattle screen.
-                            elif self.preBattle['infect'].rect.collidepoint(mousePos):
+                            elif self.preBattle['infect'].rect.collidepoint(mousePos) :
 
                                 # if enemyIndex is not None:
                                 #     self.player.infect(self.currentEnemy[enemyIndex])
@@ -762,7 +765,7 @@ class Game:
 
                                 self.gameStates['prebattle'] = False
                                 self.gameStates['infectMode'] = True
-                                self.currentBattle = Battle(self.player, self.currentEnemy[0])
+                                # self.currentBattle = Battle(self.player, self.currentEnemy[0])
 
 
                         # After pressing left or right button, create a 50% chance for a battle and a 50% chance for a bonus intermission
@@ -771,7 +774,7 @@ class Game:
                             # If the player clicks on the right button,
                             # there is a 50% chance to go to the prebattle state or to get
                             # an item.
-                            if self.intermission['right'].rect.collidepoint(mousePos):
+                            if self.intermission['right'].rect.collidepoint(mousePos) :
                                 if random.random() < .5:
                                     self.gameStates['intermission'] = False
                                     self.gameStates['prebattle'] = True
@@ -782,7 +785,7 @@ class Game:
                             # If the player clicks on the left button, 
                             # there is a 50% chance to go to the prebattle state or to get
                             # an item.
-                            elif self.intermission['left'].rect.collidepoint(mousePos):
+                            elif self.intermission['left'].rect.collidepoint(mousePos) :
                                 if random.random() < .5:
                                     self.gameStates['intermission'] = False
                                     self.gameStates['prebattle'] = True
@@ -793,14 +796,14 @@ class Game:
                         elif self.gameStates['inventory']:
 
                             # Uses potion if player has any.
-                            if self.item > 0 and self.inventoryMenu['Potion'].rect.collidepoint(mousePos):
+                            if self.item > 0 and self.inventoryMenu['Potion'].rect.collidepoint(mousePos) :
                                 self.usePotion()
                                 self.gameStates['inventory'] = False
                                 self.gameStates['displayBattle'] = True
                                 print("Clicked on Potion")
                             
                             # Goes back to the skills menu.
-                            elif self.inventoryMenu['Back'].rect.collidepoint(mousePos):
+                            elif self.inventoryMenu['Back'].rect.collidepoint(mousePos) :
                                 print("Clicked on back button")
                                 self.gameStates['inventory'] = False
                                 self.gameStates['battle'] = True
@@ -810,19 +813,19 @@ class Game:
                         # Switches to the shop menu when the shop button is clicked.
                         elif self.gameStates['main']:
 
-                            if self.mainMenuOptions['Shop'].rect.collidepoint(mousePos):
+                            if self.mainMenuOptions['Shop'].rect.collidepoint(mousePos) :
                                 self.gameStates['main'] = False
                                 self.gameStates['shop'] = True
 
                                 self.titleMusicPlaying = False
 
                             # Exits the game when the exit button is clicked.
-                            if self.mainMenuOptions['Exit'].rect.collidepoint(mousePos):
+                            if self.mainMenuOptions['Exit'].rect.collidepoint(mousePos) :
                                 pygame.quit()
                                 sys.exit()
 
                             # Starts game when start button is hit.
-                            if self.mainMenuOptions['Start'].rect.collidepoint(mousePos):
+                            if self.mainMenuOptions['Start'].rect.collidepoint(mousePos) :
                                 self.gameStates['startGame'] = True
                                 self.gameStates['main'] = False
                                 self.gameStates['shop'] = False
@@ -837,7 +840,7 @@ class Game:
 
                             # Checks if the player clicks on the back button in the shop menu.
                             # If so, return back to the title screen.
-                            if self.shopOptions['Back'].rect.collidepoint(mousePos):
+                            if self.shopOptions['Back'].rect.collidepoint(mousePos) :
                                 self.gameStates['shop'] = False
                                 self.gameStates['main'] = True
                                 self.intermissionMusicPlaying = False
@@ -845,7 +848,7 @@ class Game:
 
                             # Checks if the player has clicked on the attack upgrade button.
                             # If so, upgrade the player's attack and updates cost.
-                            elif self.shopOptions['Attack'].rect.collidepoint(mousePos):
+                            elif self.shopOptions['Attack'].rect.collidepoint(mousePos) :
                                 if self.upgrades['Attack'] < 5 and self.totalCoin >= self.cost['Attack']:
                                     self.upgrades['Attack']+= 1
 
@@ -862,7 +865,7 @@ class Game:
 
                             # Checks if the player has clicked on the infection upgrade button.
                             # If so, upgrade the player's infection rate and updates cost.
-                            elif self.shopOptions['Infection'].rect.collidepoint(mousePos):
+                            elif self.shopOptions['Infection'].rect.collidepoint(mousePos) :
                                 if self.upgrades['Infection'] < 3 and self.totalCoin >= self.cost['Infect']:
                                     self.upgrades['Infection'] += 1
 
@@ -878,7 +881,7 @@ class Game:
 
                             # Checks if the player has clicked on the SP upgrade button.
                             # If so, upgrade the player's SP and updates cost.
-                            elif self.shopOptions['SP'].rect.collidepoint(mousePos):
+                            elif self.shopOptions['SP'].rect.collidepoint(mousePos) :
                                 if self.upgrades['SP'] < 5 and self.totalCoin >= self.cost['SP']:
                                     self.upgrades['SP']+= 1
 
@@ -894,7 +897,7 @@ class Game:
 
                             # Checks if the player has clicked on the heal upgrade button.
                             # If so, gives player free heal and updates cost.
-                            elif self.shopOptions['FullHeal'].rect.collidepoint(mousePos):
+                            elif self.shopOptions['FullHeal'].rect.collidepoint(mousePos) :
                                 if self.upgrades['FullHeal'] < 2 and self.totalCoin >= self.cost['Heal']:
                                     self.upgrades['FullHeal'] += 1
 
@@ -907,6 +910,7 @@ class Game:
                                     
                                     # Updates the display of the Heal price upgrades.
                                     self.shopOptions['HealCost'].text = f'{self.cost['Heal']}'
+
 
             # main state    
             if self.gameStates['main']:
@@ -988,6 +992,9 @@ class Game:
                 # Create rects based on where the images are drawn and their size
                 enemy_rect1 = pygame.Rect(200, 100, enemy1_image.get_width(), enemy1_image.get_height())
                 enemy_rect2 = pygame.Rect(700, 100, enemy2_image.get_width(), enemy2_image.get_height())
+
+                instruction = Text(self.screenWidth//2 - 70//2, self.screenHeight - (self.screenHeight - 50), 70, 25, 'Infect an Enemy', self.fonts['fanta'], self.titleColor)
+
                 self.enemyRect = [enemy_rect1, enemy_rect2]
                 
                 # Handle hover effect on the buttons
@@ -998,9 +1005,9 @@ class Game:
                 self.hoveredEnemy = None
 
                 # Checks if the mouse is hovering over an enemy to apply the blinking effect.
-                if enemy_rect1.collidepoint(mousePos):
+                if enemy_rect1.collidepoint(mousePos) :
                     self.hoveredEnemy = 0
-                elif enemy_rect2.collidepoint(mousePos):
+                elif enemy_rect2.collidepoint(mousePos) :
                     self.hoveredEnemy = 1
                 
                 # Flip the enemy on the left side or the enemy will be facing the wrong
@@ -1008,6 +1015,8 @@ class Game:
 
                 self.screen.blit(self.assets['enemy1'], (200, 100))
                 self.screen.blit(self.assets['enemy2'], (700, 100))
+
+                instruction.draw(self.screen)
 
                 if self.hoveredEnemy is not None:
                     self.blinkEnemySprite(self.hoveredEnemy)
@@ -1199,6 +1208,7 @@ class Game:
 
             elif self.gameStates['battle']:
                 # Background for battle
+                self.screen.fill((0,0,0))
                 self.screen.blit(self.assets['arena'], (0, 0))
                 self.isFirstTurn = False
                 enemy1 = pygame.transform.flip(self.assets['enemy1'], self.flipSprites, False)
@@ -1268,6 +1278,7 @@ class Game:
 
                         self.drawMenu(self.battle)  # Redraw battle menu
 
+
                     elif current_menu == 'skills':
                         for item in self.moves.values():
                             if isinstance(item, Button):
@@ -1285,7 +1296,7 @@ class Game:
                             if current_menu == 'battle':
 
 
-                                if self.battle['Attack'].rect.collidepoint(mousePos):
+                                if self.battle['Attack'].rect.collidepoint(mousePos) :
                                     action_selected = True
                                     self.hasUsedSkill = True
 
@@ -1316,7 +1327,10 @@ class Game:
                                     self.gameStates['displayBattle'] = True
 
                                 # If the skill button is clicked, switch to the skills menu.
-                                elif self.battle['Skill'].rect.collidepoint(mousePos):
+                                elif self.battle['Skill'].rect.collidepoint(mousePos) :
+                                    self.moves['SkillsBack'].isVisible(True)
+                                    
+
 
                                     for i in range(3):  # Assuming 3 skills
                                         if self.player.Skills[i].currentCD > 0:
@@ -1328,7 +1342,7 @@ class Game:
                                     current_menu = 'skills'
                                 
                                 # If the guard button is clicked, set the action to guard.
-                                elif self.battle['Inventory'].rect.collidepoint(mousePos):
+                                elif self.battle['Inventory'].rect.collidepoint(mousePos) :
                                     action_selected = True
                                     self.skillUsed = 'Potion'
                                     self.gameStates['inventory'] = True
@@ -1337,7 +1351,7 @@ class Game:
 
                                 
                                 # If the guard button is clicked, set the action to guard.
-                                elif self.battle['Guard'].rect.collidepoint(mousePos):
+                                elif self.battle['Guard'].rect.collidepoint(mousePos) :
                                     action_selected = True
                                     move = 0
 
@@ -1359,11 +1373,24 @@ class Game:
 
                             elif current_menu == 'skills':
                                 # If the back button is clicked, return to the battle menu.
-                                if self.moves['Back'].rect.collidepoint(mousePos):
+                                if self.moves['Back'].rect.collidepoint(mousePos) :
+                                    self.moves['SkillsBack'].isVisible(False)
+                                    self.screen.fill((0,0,0))
+                                    self.screen.blit(self.assets['arena'], (0, 0))
+                                    self.isFirstTurn = False
+                                     # Display enemy sprites on the display battle screen.
+                                    self.screen.blit(enemy1, self.playerPos)
+                                    self.screen.blit(enemy2, self.enemyPos)
+
+                                    # Health Bar and SP bar for the player and enemies.
+                                    self.drawBars()
+                                    
+                                    self.drawMenu(self.battle)  # Redraw battle menu
+                                    self.drawMenu(self.moves)  # Redraw skills menu
                                     current_menu = 'battle'
                                 
                                 # If a skill button is clicked, use the skill.
-                                elif self.moves['Skill0'].rect.collidepoint(mousePos):
+                                elif self.moves['Skill0'].rect.collidepoint(mousePos) :
                                     action_selected = True
                                     move = self.player.Skills[0]
 
@@ -1399,7 +1426,7 @@ class Game:
                                         self.gameStates['displayBattle'] = True
 
                                 # If a skill button is clicked, use the skill.
-                                elif self.moves['Skill1'].rect.collidepoint(mousePos):
+                                elif self.moves['Skill1'].rect.collidepoint(mousePos) :
                                     action_selected = True
                                     move = self.player.Skills[1]
 
@@ -1437,7 +1464,7 @@ class Game:
                                         self.gameStates['displayBattle'] = True
 
                                 # If a skill button is clicked, use the skill.
-                                elif self.moves['Skill2'].rect.collidepoint(mousePos):
+                                elif self.moves['Skill2'].rect.collidepoint(mousePos) :
                                     action_selected = True
                                     move = self.player.Skills[2]
 
@@ -1516,6 +1543,9 @@ class Game:
 
                             else:
                                 self.dialogue.current_dialogue.skipTyping()
+
+    
+                        
                 
 
                 # # Handle post-battle logic
