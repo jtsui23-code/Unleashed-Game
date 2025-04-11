@@ -56,7 +56,8 @@ class TextBox:
             self.borderColor = GOLD
         if(not visible):
             self.boxColor = (0, 0, 0, 0)
-            self.borderColor = (0, 0, 0, 0)
+            self.hasBorder = False
+            # self.borderColor = (0, 0, 0, 0)
         
 
     def setText(self, newText):
