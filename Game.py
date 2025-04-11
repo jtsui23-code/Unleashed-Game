@@ -1328,7 +1328,7 @@ class Game:
 
                                 # If the skill button is clicked, switch to the skills menu.
                                 elif self.battle['Skill'].rect.collidepoint(mousePos) :
-                                    self.moves['SkillsBack'].isVisible(True)
+                                    self.moves['SkillsBack'].isVisible(visible=True)
                                     
 
 
@@ -1375,10 +1375,8 @@ class Game:
                                 # If the back button is clicked, return to the battle menu.
                                 if self.moves['Back'].rect.collidepoint(mousePos) :
                                     self.screen.fill((0,0,0))
-                                    self.moves['SkillsBack'].isVisible(False)
-                                    self.moves['SkillsBack'].isVisible(False)
+                                    self.moves['SkillsBack'].isVisible(visible=False)
                                     self.screen.blit(self.assets['arena'], (0, 0))
-                                    self.isFirstTurn = False
                                      # Display enemy sprites on the display battle screen.
                                     self.screen.blit(enemy1, self.playerPos)
                                     self.screen.blit(enemy2, self.enemyPos)
