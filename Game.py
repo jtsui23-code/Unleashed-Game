@@ -1332,7 +1332,7 @@ class Game:
                                 # If the skill button is clicked, switch to the skills menu.
                                 elif self.battle['Skill'].rect.collidepoint(mousePos) :
                                     self.moves['SkillsBack'].isVisible(visible=True)
-                                    self.drawMenu(self.moves)  # Redraw skills menu
+                                    self.drawMenu(self.battle)  # Redraw skills menu
 
 
                                     for i in range(3):  # Assuming 3 skills
@@ -1379,15 +1379,15 @@ class Game:
                                 if self.moves['Back'].rect.collidepoint(mousePos) :
                                     # self.screen.fill((0,0,0))
                                     self.moves['SkillsBack'].isVisible(visible=False)
-                                    # self.screen.blit(self.assets['arena'], (0, 0))
+                                    self.screen.blit(self.assets['arena'], (0, 0))
                                     # #  # Display enemy sprites on the display battle screen.
-                                    # self.screen.blit(enemy1, self.playerPos)
-                                    # self.screen.blit(enemy2, self.enemyPos)
+                                    self.screen.blit(enemy1, self.playerPos)
+                                    self.screen.blit(enemy2, self.enemyPos)
 
-                                    # # # Health Bar and SP bar for the player and enemies.
-                                    # self.drawBars()
+                                    # # Health Bar and SP bar for the player and enemies.
+                                    self.drawBars()
 
-                                    # self.drawMenu(self.battle)  # Redraw battle menu
+                                    self.drawMenu(self.battle)  # Redraw battle menu
                                     
                                     current_menu = 'battle'
 
