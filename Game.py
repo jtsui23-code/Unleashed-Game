@@ -184,6 +184,13 @@ class Game:
             'Back': Button((self.screenWidth - 280) // 2, self.screenHeight - (self.screenHeight -650), 280, 50, 'Back')      
         }
 
+        # Contains the inventory menu components.
+        self.inventoryMenu = {
+            'InventoryBack' : TextBox(self.screenWidth//2 - 300 //2, self.screenHeight - 300, 300, 300, text='', bgColor=(10, 10, 40, 5), borderColor=(255, 215, 0, 5)),
+            'Potion' : Button((self.screenWidth - 280) // 2, self.screenHeight - (self.screenHeight -440), 280, 50, ""),
+            'Back': Button((self.screenWidth - 280) // 2, self.screenHeight - (self.screenHeight -650), 280, 50, 'Back')      
+        }
+
         # Store instances of enemies, not class references
         self.enemies = {
             'soldier': RSoldier(self, (0, 0), (100, 100)),  # Create an instance of RSoldier
@@ -243,12 +250,7 @@ class Game:
 
         }
 
-        # Contains the inventory menu components.
-        self.inventoryMenu = {
-            'Text': TextBox(200, 75, 900, 600, text=''),
-            'Potion' : Button(250, 100, 200, 50, "", borderColor=self.black),
-            'Back': Button(20, 620, 140, 50, 'Back'),     
-        }
+      
 
         
         # Maintains the game state to determine which menu to display.
@@ -1185,12 +1187,11 @@ class Game:
             # Displays the inventory of the player.
             elif self.gameStates['inventory']:
                 # Displays the inventory menu to the player.
-                self.screen.fill((0,0,0))
 
                 # Drawing the individual components of the inventory 
                 # menu because the potions button will not be rendered 
                 # if the player has zero potions.
-                self.inventoryMenu['Text'].draw(self.screen)
+                self.inventoryMenu['InventoryBack'].draw(self.screen)
                 self.inventoryMenu['Back'].draw(self.screen)
 
                 if self.item > 0:
@@ -1266,6 +1267,8 @@ class Game:
 
                 while not action_selected:
                     # Clear screen EVERY FRAME
+                    
+
 
                     # Update mouse position and hover states FIRST
                     mousePos = pygame.mouse.get_pos()
@@ -1329,7 +1332,7 @@ class Game:
                                 # If the skill button is clicked, switch to the skills menu.
                                 elif self.battle['Skill'].rect.collidepoint(mousePos) :
                                     self.moves['SkillsBack'].isVisible(visible=True)
-                                    
+                                    self.drawMenu(self.moves)  # Redraw skills menu
 
 
                                     for i in range(3):  # Assuming 3 skills
@@ -1374,18 +1377,17 @@ class Game:
                             elif current_menu == 'skills':
                                 # If the back button is clicked, return to the battle menu.
                                 if self.moves['Back'].rect.collidepoint(mousePos) :
-                                    self.screen.fill((0,0,0))
+                                    # self.screen.fill((0,0,0))
                                     self.moves['SkillsBack'].isVisible(visible=False)
-                                    self.screen.blit(self.assets['arena'], (0, 0))
-                                    #  # Display enemy sprites on the display battle screen.
-                                    self.screen.blit(enemy1, self.playerPos)
-                                    self.screen.blit(enemy2, self.enemyPos)
+                                    # self.screen.blit(self.assets['arena'], (0, 0))
+                                    # #  # Display enemy sprites on the display battle screen.
+                                    # self.screen.blit(enemy1, self.playerPos)
+                                    # self.screen.blit(enemy2, self.enemyPos)
 
-                                    # # Health Bar and SP bar for the player and enemies.
-                                    self.drawBars()
+                                    # # # Health Bar and SP bar for the player and enemies.
+                                    # self.drawBars()
 
-                                    self.drawMenu(self.battle)  # Redraw battle menu
-                                    self.drawMenu(self.moves)  # Redraw skills menu
+                                    # self.drawMenu(self.battle)  # Redraw battle menu
                                     
                                     current_menu = 'battle'
 
