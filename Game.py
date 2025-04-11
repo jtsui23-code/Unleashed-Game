@@ -1377,11 +1377,11 @@ class Game:
                                     self.screen.fill((0,0,0))
                                     self.moves['SkillsBack'].isVisible(visible=False)
                                     self.screen.blit(self.assets['arena'], (0, 0))
-                                     # Display enemy sprites on the display battle screen.
+                                    #  # Display enemy sprites on the display battle screen.
                                     self.screen.blit(enemy1, self.playerPos)
                                     self.screen.blit(enemy2, self.enemyPos)
 
-                                    # Health Bar and SP bar for the player and enemies.
+                                    # # Health Bar and SP bar for the player and enemies.
                                     self.drawBars()
 
                                     self.drawMenu(self.battle)  # Redraw battle menu

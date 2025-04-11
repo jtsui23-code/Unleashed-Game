@@ -53,6 +53,7 @@ class TextBox:
     def isVisible(self, visible):
         if(visible):
             self.boxColor = (40, 40, 60, 5)
+            self.hasBorder = True
             self.borderColor = GOLD
         if(not visible):
             self.boxColor = (0, 0, 0, 0)
