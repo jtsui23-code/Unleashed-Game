@@ -1082,6 +1082,15 @@ class Game:
                 self.screen.fill((0,0,0))
 
                 self.hasUsedSkill = False
+                # If the enemy is defeated, the game will
+                # proceed to the next floor which includes the intermission state.
+                if self.enemyDefeated:
+                    self.currentFloor += 1
+                    self.enemyDefeated = False
+                    self.gameStates['intermission'] = True
+                    self.skillDialogueSet = False
+                    self.skillUsed = "None"
+                    self.isEnemyTurn = False
                 
                 # Display the battle screen background.
                 self.screen.blit(self.assets['arena'], (0, 0))
