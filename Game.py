@@ -697,6 +697,11 @@ class Game:
                     if event.button == 1:
                         mousePos = pygame.mouse.get_pos()
 
+                        # Handles the input for the text box display during the battle screen.
+                        # If the player clicks on the text box, it will skip the typing animation.
+                        # If this logic is not place here, there will be input lag where the player 
+                        # has to either wait or click on the screen severals times to proceed through the 
+                        # display battle dialogue.
                         if self.gameStates['displayBattle']:
                             # If the text has finsihed typing, 
                             # and the user clicks the screen, switch the battle screen
@@ -968,6 +973,34 @@ class Game:
                                     # Updates the display of the Heal price upgrades.
                                     self.shopOptions['HealCost'].text = f'{self.cost['Heal']}'
 
+                        # Handles the input regarding the start game screen.
+                        # If this logic is not place here, there will be input lag on the 
+                        # intro dialogue where the player has to click several times to 
+                        # proceed to the next screen.
+                        elif self.gameStates['startGame']:
+                             # If the text has finished typing, 
+                            # and the user clicks the screen, the game will
+                            # move to the intermission state.
+                            if not self.dialogue.current_dialogue.isTyping():
+                                self.gameStates['startGame'] = False
+                                self.gameStates['intermission'] = True
+                            # If the text is typing, the user can skip the typing animation 
+                            # by clicking on the screen.
+                            else:
+                                self.dialogue.current_dialogue.skipTyping()
+
+                        # Handles the input regarding the game over screen.
+                        elif self.gameStates['gameOver']:
+                            # If the text has finsihed typing, 
+                            # and the user clicks the screen, switch the main menu screen
+                            if not self.dialogue.current_dialogue.isTyping():
+                                self.gameStates['gameOver'] = False
+                                self.gameStates['main'] = True
+
+                            else:
+                                self.dialogue.current_dialogue.skipTyping()
+
+
 
             # main state    
             if self.gameStates['main']:
@@ -995,19 +1028,19 @@ class Game:
                 # Draw the text box
                 self.dialogue.draw(self.screen)  
 
-                for event in pygame.event.get():
-                    if event.type == pygame.MOUSEBUTTONDOWN:
-                        if event.button == 1:
-                            # If the text has finished typing, 
-                            # and the user clicks the screen, the game will
-                            # move to the intermission state.
-                            if not self.dialogue.current_dialogue.isTyping():
-                                self.gameStates['startGame'] = False
-                                self.gameStates['intermission'] = True
-                            # If the text is typing, the user can skip the typing animation 
-                            # by clicking on the screen.
-                            else:
-                                self.dialogue.current_dialogue.skipTyping()
+                # for event in pygame.event.get():
+                #     if event.type == pygame.MOUSEBUTTONDOWN:
+                #         if event.button == 1:
+                #             # If the text has finished typing, 
+                #             # and the user clicks the screen, the game will
+                #             # move to the intermission state.
+                #             if not self.dialogue.current_dialogue.isTyping():
+                #                 self.gameStates['startGame'] = False
+                #                 self.gameStates['intermission'] = True
+                #             # If the text is typing, the user can skip the typing animation 
+                #             # by clicking on the screen.
+                #             else:
+                #                 self.dialogue.current_dialogue.skipTyping()
 
                                 
             
