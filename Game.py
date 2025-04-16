@@ -629,6 +629,7 @@ class Game:
         while True:
             clock = pygame.time.Clock() # Initiates clock
             self.keys = pygame.key.get_pressed()
+         
             
             # Plays the intermission song after the intro exposition.
             if self.gameStates['intermission'] and not self.intermissionMusicPlaying:
@@ -1017,7 +1018,7 @@ class Game:
                 # Changes the background when the intro exposition starts.
                 self.screen.fill((0,0,0))
 
-                dt = clock.tick(600) / 1  # Time in seconds since last frame.
+                dt = clock.tick(60) / 1  # Time in seconds since last frame.
 
                 # Picks the intro dialogue and starts the typing animation.
                 self.dialogue.startDialogue('intro')
@@ -1028,19 +1029,7 @@ class Game:
                 # Draw the text box
                 self.dialogue.draw(self.screen)  
 
-                # for event in pygame.event.get():
-                #     if event.type == pygame.MOUSEBUTTONDOWN:
-                #         if event.button == 1:
-                #             # If the text has finished typing, 
-                #             # and the user clicks the screen, the game will
-                #             # move to the intermission state.
-                #             if not self.dialogue.current_dialogue.isTyping():
-                #                 self.gameStates['startGame'] = False
-                #                 self.gameStates['intermission'] = True
-                #             # If the text is typing, the user can skip the typing animation 
-                #             # by clicking on the screen.
-                #             else:
-                #                 self.dialogue.current_dialogue.skipTyping()
+               
 
                                 
             
@@ -1172,13 +1161,13 @@ class Game:
                 self.hasUsedSkill = False
                 # If the enemy is defeated, the game will
                 # proceed to the next floor which includes the intermission state.
-                if self.enemyDefeated:
-                    self.currentFloor += 1
-                    self.enemyDefeated = False
-                    self.gameStates['intermission'] = True
-                    self.skillDialogueSet = False
-                    self.skillUsed = "None"
-                    self.isEnemyTurn = False
+                # if self.enemyDefeated:
+                #     self.currentFloor += 1
+                #     self.enemyDefeated = False
+                #     self.gameStates['intermission'] = True
+                #     self.skillDialogueSet = False
+                #     self.skillUsed = "None"
+                #     self.isEnemyTurn = False
                 
                 # Display the battle screen background.
                 self.screen.blit(self.assets['arena'], (0, 0))
@@ -1196,7 +1185,7 @@ class Game:
 
                 # Render textbox for the skill used in the display battle screen.
 
-                dt = clock.tick(600) / 1  # Time in seconds since last frame.
+                dt = clock.tick(60) / 1  # Time in seconds since last frame.
 
                 # Continue to display the battle dialouge with the skills being used 
                 # by the player and the enemy when the enemy's health is above zero.
@@ -1215,63 +1204,7 @@ class Game:
                     self.displayBattleButtons['result'].update(dt)
                     self.displayBattleButtons['result'].draw(self.screen)
                 
-                # Waits for the user to click the screen to exit the display battle screen.
-                # Also returns to the battle screen with all of the skills available.
-                # for event in pygame.event.get():
-                #     if event.type == pygame.MOUSEBUTTONDOWN:
-                #         if event.button == 1:
-                #             # If the text has finsihed typing, 
-                #             # and the user clicks the screen, switch the battle screen
-                #             # with all of the skills.
-                #             if not self.dialogue.current_dialogue.isTyping():
-                #                 self.gameStates['displayBattle'] = False
-
-
-                #                 # If the enemy is defeated, the game will
-                #                 # proceed to the next floor which includes the intermission state.
-                #                 if self.enemyDefeated:
-                #                     self.currentFloor += 1
-                #                     self.enemyDefeated = False
-                #                     self.gameStates['intermission'] = True
-                #                     self.skillDialogueSet = False
-                #                     self.skillUsed = "None"
-                #                     self.isEnemyTurn = False
-
-
-
-                #                 # Transitions from the display battle screen to 
-                #                 # enemyTurn state to allow the enemy to attack.
-                #                 elif self.isEnemyTurn:
-                #                     self.gameStates['enemyTurn'] = True
-
-                #                 # If the enemy is not defeated, the game will return to the battle screen.
-                #                 elif not self.enemyDefeated:
-                #                     # Transitions to the game over screen if
-                #                     # the player health hits zero.
-                #                     if self.player.currentHp <= 0:
-
-                #                         # Calculates the coins earned on this round based on number of enemies defeated and the 
-                #                         # current enemy's remaining health.
-                #                         self.currentCoin = int(0.5 * self.currentFloor + self.currentEnemy[self.currentEnemyIndex].maxHp - self.currentEnemy[self.currentEnemyIndex].currentHp + 2 + self.clearFloorCoin()) // 2
-                #                         self.totalCoin += self.currentCoin
-                                        
-                #                         self.coinDialogue()
-                #                         self.gameStates['enemyTurn'] = False
-                #                         self.gameStates['gameOver'] = True
-                #                     else:
-                #                         self.gameStates['battle'] = True
-                                
-                                
-                                    
-                #                 # self.skillUsed = "None"
-                #                 self.skillDialogueSet = False
-
                 
-
-                #             # If the text is still typing, the user can skip the typing animation
-                #             # by clicking on the screen.
-                #             else:
-                #                 self.dialogue.current_dialogue.skipTyping()
                                 
             elif self.gameStates['enemyTurn']:
                 self.isEnemyTurn = False   
@@ -1621,7 +1554,7 @@ class Game:
                 
 
                 # Needed for the animated typing
-                dt = clock.tick(600) / 1 # Time in seconds since last frame.
+                dt = clock.tick(60) / 1 # Time in seconds since last frame.
 
                 # Updates the coin dialouge.
                 self.gameOverMenu['Coin'].update(dt)
@@ -1631,22 +1564,7 @@ class Game:
                 self.drawMenu(self.gameOverMenu)
                 self.gameOverMenu['Coin'].draw(self.screen)
                 
-                # Waits for the user to click the screen to exit the game over screen.
-                for event in pygame.event.get():
-                    if event.type == pygame.MOUSEBUTTONDOWN:
-                        if event.button == 1:
-                            # If the text has finsihed typing, 
-                            # and the user clicks the screen, switch the main menu screen
-                            if not self.dialogue.current_dialogue.isTyping():
-                                self.gameStates['gameOver'] = False
-                                self.gameStates['main'] = True
-
-                            else:
-                                self.dialogue.current_dialogue.skipTyping()
-
-    
-                        
-                
+           
 
                 # # Handle post-battle logic
                 # result = self.currentBattle.fight(move)
