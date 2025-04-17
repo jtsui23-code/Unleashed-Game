@@ -1018,7 +1018,7 @@ class Game:
                 # Changes the background when the intro exposition starts.
                 self.screen.fill((0,0,0))
 
-                dt = clock.tick(60) / 1  # Time in seconds since last frame.
+                dt = clock.tick(400) / 1  # Time in seconds since last frame.
 
                 # Picks the intro dialogue and starts the typing animation.
                 self.dialogue.startDialogue('intro')
@@ -1185,7 +1185,7 @@ class Game:
 
                 # Render textbox for the skill used in the display battle screen.
 
-                dt = clock.tick(60) / 1  # Time in seconds since last frame.
+                dt = clock.tick(400) / 1  # Time in seconds since last frame.
 
                 # Continue to display the battle dialouge with the skills being used 
                 # by the player and the enemy when the enemy's health is above zero.
@@ -1554,7 +1554,7 @@ class Game:
                 
 
                 # Needed for the animated typing
-                dt = clock.tick(60) / 1 # Time in seconds since last frame.
+                dt = clock.tick(400) / 1 # Time in seconds since last frame.
 
                 # Updates the coin dialouge.
                 self.gameOverMenu['Coin'].update(dt)
