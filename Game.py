@@ -267,6 +267,7 @@ class Game:
             'displayBattle': False,
             'enemyTurn': False,
             'inventory': False,
+            'skills': False,
             
         }
         
@@ -1001,6 +1002,143 @@ class Game:
                             else:
                                 self.dialogue.current_dialogue.skipTyping()
 
+                        elif self.gameStates['skills']:
+                         
+                            if self.moves['Back'].rect.collidepoint(mousePos):
+                                self.gameStates['skills'] = False
+                                self.gameStates['battle'] = True
+
+                            for i in range(3):  # Assuming 3 skills
+                                if self.player.Skills[i].currentCD > 0:
+                                    self.moves[f'Skill{i}'].text = str(self.player.Skills[i].currentCD)
+
+                                else:
+                                    self.moves[f'Skill{i}'].text = self.player.Skills[i].name
+                            # If a skill button is clicked, use the skill.
+                            if self.moves['Skill0'].rect.collidepoint(mousePos) :
+                                action_selected = True
+                                move = self.player.Skills[0]
+
+                                if move.is_available() and self.player.sp >= move.get_sp_cost():
+                                    self.player.sp -= move.get_sp_cost()
+                                    action_selected = True
+
+                                    # Apply attack upgrade to player's attack.
+                                    if self.upgrades['Attack'] > 0:
+                                        damage = int(move.use() * (1.05 + self.upgrades['Attack'] * 0.05))
+                                    else:
+                                        damage = int(move.use())
+
+
+                                    # If the enemy is guarding, the damage dealt is halved.
+                                    if self.enemyGuarded:
+                                        damage = damage // 2
+
+                                    self.skillDamage = damage
+
+                                    self.currentEnemy[self.currentEnemyIndex].currentHp -= damage
+                                    
+                                    
+                                    self.hasUsedSkill = True
+
+                                    # Saves the skill used as a string to display in the display battle screen.
+                                    self.skillUsed = self.player.Skills[0].name
+
+                                    # Needed for when the enemy guards since the 
+                                    self.skillPlayerUsed = self.player.Skills[0].name
+
+                                    self.gameStates['skills'] = False
+                                    self.gameStates['displayBattle'] = True
+
+                            # If a skill button is clicked, use the skill.
+                            elif self.moves['Skill1'].rect.collidepoint(mousePos) :
+                                action_selected = True
+                                move = self.player.Skills[1]
+
+                                # Checks if the 2nd skill is available and the
+                                # player has enough SP to use it.
+                                if move.is_available() and self.player.sp >= move.get_sp_cost():
+                                    self.player.sp -= move.get_sp_cost()
+                                    action_selected = True
+                                    
+                                    # Apply attack upgrade to player's attack.
+                                    if self.upgrades['Attack'] > 0:
+                                        damage = int(move.use() * (1.05 + self.upgrades['Attack'] * 0.05))
+                                    else:
+                                        damage = int(move.use())
+
+                                    # If the enemy is guarding, the damage dealt is halved.
+                                    if self.enemyGuarded:
+                                        damage = damage // 2
+
+                                    self.skillDamage = damage
+
+                                    self.hasUsedSkill = True
+
+                                    self.currentEnemy[self.currentEnemyIndex].currentHp -= damage
+                                    
+
+                                    # Saves the skill used as a string to display in the display battle screen.
+                                    self.skillUsed = self.player.Skills[1].name
+
+                                    # Needed for when the enemy guards since the 
+                                    # enemy and player both share self.skillUsed.
+                                    self.skillPlayerUsed = self.player.Skills[1].name
+
+                                    self.gameStates['skills'] = False
+                                    self.gameStates['displayBattle'] = True
+
+                            # If a skill button is clicked, use the skill.
+                            elif self.moves['Skill2'].rect.collidepoint(mousePos) :
+                                action_selected = True
+                                move = self.player.Skills[2]
+
+                                # Checks if the 3rd skill is available and the 
+                                # player has enough SP to use it.
+                                if move.is_available() and self.player.sp >= move.get_sp_cost():
+                                    self.player.sp -= move.get_sp_cost()
+                                    action_selected = True
+
+                                    # Apply attack upgrade to player's attack.
+                                    if self.upgrades['Attack'] > 0:
+                                        damage = int(move.use() * (1.05 + self.upgrades['Attack'] * 0.05))
+                                    else:
+                                        damage = int(move.use())
+                                    
+                                    # If the enemy is guarding, the damage dealt is halved.
+                                    if self.enemyGuarded:
+                                        damage = damage // 2
+
+                                    self.skillDamage = damage
+
+                                    self.hasUsedSkill = True
+
+                                    self.currentEnemy[self.currentEnemyIndex].currentHp -= damage
+                                    
+                                    # Saves the skill used as a string to display in the display battle screen.
+                                    self.skillUsed = self.player.Skills[2].name
+
+                                    # Needed for when the enemy guards since the 
+                                    # enemy and player both share self.skillUsed.
+                                    self.skillPlayerUsed = self.player.Skills[2].name
+
+                                    self.gameStates['skills'] = False
+                                    self.gameStates['displayBattle'] = True
+                            # Checks if the player has taken an action before reducing the cooldowns of skills.
+                            # Otherwise the cooldowns will be reduced by toggling back and forth between the
+                            # Skills menu.
+                            if self.hasUsedSkill:
+                                # Reduces the cooldown of skills only after the player has 
+                                # selected a viable action. Otherwise the cooldown for 
+                                # skills will be reduced every frame.
+                                # Reduce cooldowns for all skills.
+                                for i in range(3):
+                                    self.player.Skills[i].reduceCD()
+
+
+
+                  
+
 
 
             # main state    
@@ -1317,20 +1455,11 @@ class Game:
 
 
                     elif current_menu == 'skills':
-                        # # Want to delete the battle UI buttons Here so they do not overlap with the skills menu.
-                        for i in range(4):
-                            self.moves['SkillsBack'].draw(self.screen)  # Redraw skills menu
 
-                        self.moves['Skill0'].draw(self.screen)  # Redraw skills menu
-                        self.moves['Skill1'].draw(self.screen)  # Redraw skills menu
-                        self.moves['Skill2'].draw(self.screen)  # Redraw skills menu
-                        self.moves['Back'].draw(self.screen)  # Redraw skills menu
-
-
-
-                        for item in self.moves.values():
-                            if isinstance(item, Button):
-                                item.isHovered = item.rect.collidepoint(mousePos)
+                        self.gameStates['battle'] = False
+                        self.gameStates['skills'] = True
+                        break
+           
                                 
 
                     # Handle events
@@ -1417,135 +1546,8 @@ class Game:
                                     self.gameStates['battle'] = False
                                     self.gameStates['displayBattle'] = True
 
-                            elif current_menu == 'skills':
-                                # If the back button is clicked, return to the battle menu.
-                                if self.moves['Back'].rect.collidepoint(mousePos) :
-                                    # self.screen.fill((0,0,0))
-                                    self.moves['SkillsBack'].isVisible(visible=False)
-                                    self.screen.blit(self.assets['arena'], (0, 0))
-                                    # #  # Display enemy sprites on the display battle screen.
-                                    self.screen.blit(enemy1, self.playerPos)
-                                    self.screen.blit(enemy2, self.enemyPos)
 
-                                    # # Health Bar and SP bar for the player and enemies.
-                                    self.drawBars()
-
-                                    self.drawMenu(self.battle)  # Redraw battle menu
-                                    
-                                    current_menu = 'battle'
-
-
-                                # If a skill button is clicked, use the skill.
-                                elif self.moves['Skill0'].rect.collidepoint(mousePos) :
-                                    action_selected = True
-                                    move = self.player.Skills[0]
-
-                                    if move.is_available() and self.player.sp >= move.get_sp_cost():
-                                        self.player.sp -= move.get_sp_cost()
-                                        action_selected = True
-
-                                        # Apply attack upgrade to player's attack.
-                                        if self.upgrades['Attack'] > 0:
-                                            damage = int(move.use() * (1.05 + self.upgrades['Attack'] * 0.05))
-                                        else:
-                                            damage = int(move.use())
-
-
-                                        # If the enemy is guarding, the damage dealt is halved.
-                                        if self.enemyGuarded:
-                                            damage = damage // 2
-
-                                        self.skillDamage = damage
-
-                                        self.currentEnemy[self.currentEnemyIndex].currentHp -= damage
-                                        
-                                        
-                                        self.hasUsedSkill = True
-
-                                        # Saves the skill used as a string to display in the display battle screen.
-                                        self.skillUsed = self.player.Skills[0].name
-
-                                        # Needed for when the enemy guards since the 
-                                        self.skillPlayerUsed = self.player.Skills[0].name
-
-                                        self.gameStates['battle'] = False
-                                        self.gameStates['displayBattle'] = True
-
-                                # If a skill button is clicked, use the skill.
-                                elif self.moves['Skill1'].rect.collidepoint(mousePos) :
-                                    action_selected = True
-                                    move = self.player.Skills[1]
-
-                                    # Checks if the 2nd skill is available and the
-                                    # player has enough SP to use it.
-                                    if move.is_available() and self.player.sp >= move.get_sp_cost():
-                                        self.player.sp -= move.get_sp_cost()
-                                        action_selected = True
-                                        
-                                        # Apply attack upgrade to player's attack.
-                                        if self.upgrades['Attack'] > 0:
-                                            damage = int(move.use() * (1.05 + self.upgrades['Attack'] * 0.05))
-                                        else:
-                                            damage = int(move.use())
-
-                                        # If the enemy is guarding, the damage dealt is halved.
-                                        if self.enemyGuarded:
-                                            damage = damage // 2
-
-                                        self.skillDamage = damage
-
-                                        self.hasUsedSkill = True
-
-                                        self.currentEnemy[self.currentEnemyIndex].currentHp -= damage
-                                        
-
-                                        # Saves the skill used as a string to display in the display battle screen.
-                                        self.skillUsed = self.player.Skills[1].name
-
-                                        # Needed for when the enemy guards since the 
-                                        # enemy and player both share self.skillUsed.
-                                        self.skillPlayerUsed = self.player.Skills[1].name
-
-                                        self.gameStates['battle'] = False
-                                        self.gameStates['displayBattle'] = True
-
-                                # If a skill button is clicked, use the skill.
-                                elif self.moves['Skill2'].rect.collidepoint(mousePos) :
-                                    action_selected = True
-                                    move = self.player.Skills[2]
-
-                                    # Checks if the 3rd skill is available and the 
-                                    # player has enough SP to use it.
-                                    if move.is_available() and self.player.sp >= move.get_sp_cost():
-                                        self.player.sp -= move.get_sp_cost()
-                                        action_selected = True
-
-                                        # Apply attack upgrade to player's attack.
-                                        if self.upgrades['Attack'] > 0:
-                                            damage = int(move.use() * (1.05 + self.upgrades['Attack'] * 0.05))
-                                        else:
-                                            damage = int(move.use())
-                                        
-                                        # If the enemy is guarding, the damage dealt is halved.
-                                        if self.enemyGuarded:
-                                            damage = damage // 2
-
-                                        self.skillDamage = damage
-
-                                        self.hasUsedSkill = True
-
-                                        self.currentEnemy[self.currentEnemyIndex].currentHp -= damage
-                                        
-                                        # Saves the skill used as a string to display in the display battle screen.
-                                        self.skillUsed = self.player.Skills[2].name
-
-                                        # Needed for when the enemy guards since the 
-                                        # enemy and player both share self.skillUsed.
-                                        self.skillPlayerUsed = self.player.Skills[2].name
-
-                                        self.gameStates['battle'] = False
-                                        self.gameStates['displayBattle'] = True
-
+                              
 
                         # Update display EVERY FRAME
                         pygame.display.flip()
@@ -1561,7 +1563,31 @@ class Game:
                     # Reduce cooldowns for all skills.
                     for i in range(3):
                         self.player.Skills[i].reduceCD()
-            
+
+            elif self.gameStates['skills']:
+                mousePos = pygame.mouse.get_pos()
+
+
+                # Need a for loop to speed up the fade transition effect of the
+                # skills menu. The longer the loop the faster the transition effect.
+                for i in range(3):
+                    self.moves['SkillsBack'].draw(self.screen)  # Redraw skills menu
+
+                self.moves['Skill0'].draw(self.screen)  # Redraw skills menu
+                self.moves['Skill1'].draw(self.screen)  # Redraw skills menu
+                self.moves['Skill2'].draw(self.screen)  # Redraw skills menu
+                self.moves['Back'].draw(self.screen)  # Redraw skills menu
+
+                for item in self.moves.values():
+                    if isinstance(item, Button):
+                        item.isHovered = item.rect.collidepoint(mousePos)
+
+                
+                
+                # Handle events - MOVED THIS TO EVENT LOOP
+                
+
+
             elif self.gameStates['gameOver']:
                 self.screen.fill((0,0,0))
                 
