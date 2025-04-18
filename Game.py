@@ -177,7 +177,7 @@ class Game:
 
         # Stores the Button objects for the battle menu.
         self.moves = {
-            'SkillsBack' : TextBox(self.screenWidth//2 - 300 //2, self.screenHeight - 300, 300, 300, text='', bgColor=(10, 10, 40, 255), borderColor=(255, 215, 0, 255)),
+            'SkillsBack' : TextBox(self.screenWidth//2 - 300 //2, self.screenHeight - 300, 300, 300, text='', bgColor=(10, 10, 40, 160), borderColor=(255, 215, 0, 255)),
             'Skill0' : Button((self.screenWidth - 280) // 2, self.screenHeight - (self.screenHeight -440), 280, 50, self.player.Skills[0].name),
             'Skill1' : Button((self.screenWidth - 280) // 2, self.screenHeight - (self.screenHeight -510), 280, 50, self.player.Skills[1].name),
             'Skill2' : Button((self.screenWidth - 280) // 2, self.screenHeight - (self.screenHeight -580), 280, 50, self.player.Skills[2].name),
@@ -1313,9 +1313,10 @@ class Game:
 
 
                     elif current_menu == 'skills':
-                        # Want to delete the battle UI buttons Here so they do not overlap with the skills menu.
+                        # # Want to delete the battle UI buttons Here so they do not overlap with the skills menu.
                         self.moves['SkillsBack'].draw(self.screen)  # Redraw skills menu
                         self.drawMenu(self.moves)  # Redraw skills menu
+
                         for item in self.moves.values():
                             if isinstance(item, Button):
                                 item.isHovered = item.rect.collidepoint(mousePos)
@@ -1364,7 +1365,6 @@ class Game:
                                 # If the skill button is clicked, switch to the skills menu.
                                 elif self.battle['Skill'].rect.collidepoint(mousePos) :
                                     self.moves['SkillsBack'].isVisible(visible=True)
-                                    self.drawMenu(self.battle)  # Redraw skills menu
 
 
                                     for i in range(3):  # Assuming 3 skills
