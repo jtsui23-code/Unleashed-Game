@@ -177,7 +177,7 @@ class Game:
 
         # Stores the Button objects for the battle menu.
         self.moves = {
-            'SkillsBack' : TextBox(self.screenWidth//2 - 300 //2, self.screenHeight - 300, 300, 300, text='', bgColor=(10, 10, 40, 160), borderColor=(255, 215, 0, 255)),
+            'SkillsBack' : TextBox(self.screenWidth//2 - 300 //2, self.screenHeight - 300, 300, 300, text='', bgColor=(10, 10, 40, 5), borderColor=(255, 215, 0, 5)),
             'Skill0' : Button((self.screenWidth - 280) // 2, self.screenHeight - (self.screenHeight -440), 280, 50, self.player.Skills[0].name),
             'Skill1' : Button((self.screenWidth - 280) // 2, self.screenHeight - (self.screenHeight -510), 280, 50, self.player.Skills[1].name),
             'Skill2' : Button((self.screenWidth - 280) // 2, self.screenHeight - (self.screenHeight -580), 280, 50, self.player.Skills[2].name),
@@ -1221,8 +1221,12 @@ class Game:
                 # Drawing the individual components of the inventory 
                 # menu because the potions button will not be rendered 
                 # if the player has zero potions.
-                self.inventoryMenu['InventoryBack'].draw(self.screen)
-                self.inventoryMenu['Back'].draw(self.screen)
+
+                # Need this for loop to speed up the fade transition effect of the 
+                # inventory menu. The longer the loop the faster the transition effect.
+                for i in range(4):
+                    self.inventoryMenu['InventoryBack'].draw(self.screen)
+                    self.inventoryMenu['Back'].draw(self.screen)
 
                 if self.item > 0:
                     self.inventoryMenu['Potion'].draw(self.screen)
@@ -1314,8 +1318,15 @@ class Game:
 
                     elif current_menu == 'skills':
                         # # Want to delete the battle UI buttons Here so they do not overlap with the skills menu.
-                        self.moves['SkillsBack'].draw(self.screen)  # Redraw skills menu
-                        self.drawMenu(self.moves)  # Redraw skills menu
+                        for i in range(4):
+                            self.moves['SkillsBack'].draw(self.screen)  # Redraw skills menu
+
+                        self.moves['Skill0'].draw(self.screen)  # Redraw skills menu
+                        self.moves['Skill1'].draw(self.screen)  # Redraw skills menu
+                        self.moves['Skill2'].draw(self.screen)  # Redraw skills menu
+                        self.moves['Back'].draw(self.screen)  # Redraw skills menu
+
+
 
                         for item in self.moves.values():
                             if isinstance(item, Button):
