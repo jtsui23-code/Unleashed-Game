@@ -1602,6 +1602,25 @@ class Game:
                 # animation of dialouge or the animation will not work.
                 self.drawMenu(self.gameOverMenu)
                 self.gameOverMenu['Coin'].draw(self.screen)
+
+                # Resets all of the SP, HP, and cooldowns of the player and enemy.
+                # Otherwise the game will not reset properly.
+
+                self.player.currentHp = self.player.maxHp
+                self.player.sp = self.player.maxSp
+                self.player.Skills[0].currentCD = 0
+                self.player.Skills[1].currentCD = 0
+                self.player.Skills[2].currentCD = 0
+                self.player.isGuarded = False
+                
+                self.currentFloor = 1
+
+                self.currentCoin = 0
+                self.currentEnemy[self.currentEnemyIndex].currentHp = self.currentEnemy[self.currentEnemyIndex].maxHp
+                self.currentEnemy[self.currentEnemyIndex].currentSp = self.currentEnemy[self.currentEnemyIndex].maxSp
+                self.currentEnemy[self.currentEnemyIndex].Skills[0].currentCD = 0
+                self.currentEnemy[self.currentEnemyIndex].Skills[1].currentCD = 0
+                self.currentEnemy[self.currentEnemyIndex].isGuarded = False
                 
            
 
