@@ -11,7 +11,8 @@ class Enemy(Character):
         self.gold = 10
 
         self.attackstat = 0.8
-        self.sp = 100
+        self.maxSp = 100
+        self.sp = self.maxSp
 
         # How much the attack 
         self.attackDmg = 10
