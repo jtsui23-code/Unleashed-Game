@@ -991,6 +991,7 @@ class Game:
                             else:
                                 self.dialogue.current_dialogue.skipTyping()
 
+
                         # Handles the input regarding the game over screen.
                         elif self.gameStates['gameOver']:
                             # If the text has finsihed typing, 
