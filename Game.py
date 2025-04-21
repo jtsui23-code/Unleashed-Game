@@ -1000,6 +1000,10 @@ class Game:
                                 self.gameStates['gameOver'] = False
                                 self.gameStates['main'] = True
 
+                                # Need to reset the intro dialogue otherwise there will be no 
+                                # typing animation for the prologue when the game is restarted.
+                                self.dialogue.resetDialogue('intro')
+
                             else:
                                 self.dialogue.current_dialogue.skipTyping()
 
