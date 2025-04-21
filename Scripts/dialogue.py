@@ -10,6 +10,13 @@ class DialogueManager:
         # Add a dialogue to the manager.
         self.dialogues[name] = textBox
 
+    def resetDialogue(self, name):
+    # Reset a specific dialogue so it replays with typing animation
+        if name in self.dialogues:
+            text_box = self.dialogues[name]
+            text_box.setText(text_box.text)  # Reset to same text to re-init animation
+
+
     def startDialogue(self, name):
         
         # Start a specific dialogue by name.
