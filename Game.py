@@ -1575,7 +1575,9 @@ class Game:
 
                 # Need a for loop to speed up the fade transition effect of the
                 # skills menu. The longer the loop the faster the transition effect.
-                for i in range(3):
+                # Leaving the for loop for now in case want to change the speed of the fade effect
+                # however as of right now the for loop is not needed.
+                for i in range(1):
                     self.moves['SkillsBack'].draw(self.screen)  # Redraw skills menu
 
                 self.moves['Skill0'].draw(self.screen)  # Redraw skills menu
