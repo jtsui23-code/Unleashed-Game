@@ -342,7 +342,10 @@ class Game:
 
             self.enemyGuarded = False
             self.playerGuarded = False
-            self.isEnemyTurn = False
+
+            # Have to set the enemy turn to be true or the next skill used by player's
+            # will display as the enemy is using it.
+            self.isEnemyTurn = True
             self.playerDialougeOffsetted = not self.playerDialougeOffsetted
 
 
