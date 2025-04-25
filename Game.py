@@ -23,6 +23,8 @@ class Game:
         self.screenWidth = 1280
         self.screenHeight = 720
 
+        self.debug = 0
+
         # Creating a screen variable with the window dimension variables set above
         # when setting window dimensions have to do .set_mode( (_,_) )
         # Treat the (_,_) as order pairs inside of ( (_,_) ).
@@ -1333,6 +1335,12 @@ class Game:
 
                 dt = clock.tick(400) / 1  # Time in seconds since last frame.
 
+                # If the enemy is defeated show the winning dialouge right after the 
+                # dialogue which displays the skill used by the player to defeat the enemy.
+                if self.enemyDefeated:
+                    self.displayBattleButtons['result'].update(dt)
+                    self.displayBattleButtons['result'].draw(self.screen)
+                    
                 # Continue to display the battle dialouge with the skills being used 
                 # by the player and the enemy when the enemy's health is above zero.
                 if not self.enemyDefeated:
@@ -1345,10 +1353,8 @@ class Game:
                     self.displayBattleButtons['attack'].update(dt)
                     self.displayBattleButtons['attack'].draw(self.screen)
                 
-                # If the enemy's health is zero, display the winning dialogue.
-                else:
-                    self.displayBattleButtons['result'].update(dt)
-                    self.displayBattleButtons['result'].draw(self.screen)
+                
+                    
                 
                 
                                 
@@ -1395,6 +1401,9 @@ class Game:
                 enemy1 = pygame.transform.flip(self.assets['enemy1'], self.flipSprites, False)
                 enemy2 = pygame.transform.flip(self.assets['enemy2'], self.flipSprites, False)
 
+                self.debug += 1
+
+                print(f"You have entered the battle state {self.debug} number of times")
 
                 # Display enemy sprites on the display battle screen.
                 self.screen.blit(enemy1, self.playerPos)
