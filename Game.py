@@ -53,6 +53,8 @@ class Game:
 
         self.enemyDefeated = False
 
+        self.bothGuarded = False
+
         # Tracks number of potions the player has.
         self.item = 0
 
@@ -344,6 +346,7 @@ class Game:
 
             self.enemyGuarded = False
             self.playerGuarded = False
+            self.bothGuarded = True
 
             # Have to set the enemy turn to be true or the next skill used by player's
             # will display as the enemy is using it.
@@ -1346,12 +1349,15 @@ class Game:
                 if not self.enemyDefeated:
                     # Sets the recently used skill by the player or the 
                     # enemy to the dialouge so it can be displayed.
-                    if self.skillDialogueSet == False:
-                        self.skillDialogue(self.skillUsed)
-                        self.skillDialogueSet = True
+                    if not self.bothGuarded:
+                        if self.skillDialogueSet == False:
+                            self.skillDialogue(self.skillUsed)
+                            self.skillDialogueSet = True
 
-                    self.displayBattleButtons['attack'].update(dt)
-                    self.displayBattleButtons['attack'].draw(self.screen)
+                        self.displayBattleButtons['attack'].update(dt)
+                        self.displayBattleButtons['attack'].draw(self.screen)
+                    else:
+                        self.bothGuarded = False
                 
                 
                     
