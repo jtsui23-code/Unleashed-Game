@@ -42,6 +42,8 @@ class Game:
         self.keys = pygame.key.get_pressed()
 
         self.turnNum = 1
+
+        self.isPlayerSprite = False
         
         # Stores all of the enemies on each floor and replaces with the old ones.
         self.currentEnemy = []
@@ -304,7 +306,8 @@ class Game:
             'shopBackground': pygame.transform.scale(loadImage('/background/shop.png'), (1280, 720)),
             'enemy1': pygame.transform.scale(loadImage('/enemies/Knight.png').convert_alpha(), (400, 500)),
             'enemy2': pygame.transform.scale(loadImage('/enemies/Ghost.png').convert_alpha(), (400, 300)),
-            'arena': pygame.transform.scale(loadImage('/background/Arena.png').convert_alpha(), (1280, 720))
+            'arena': pygame.transform.scale(loadImage('/background/Arena.png').convert_alpha(), (1280, 720)),
+            'player': pygame.transform.scale(loadImage('/player/1.png').convert_alpha(), (150, 175)),
         }
 
         # Stores the buttons for the intermission screen.
@@ -347,6 +350,8 @@ class Game:
             self.enemyGuarded = False
             self.playerGuarded = False
             self.bothGuarded = True
+            self.skillUsed = "None"
+            self.skillPlayerUsed = "None"   
 
             # Have to set the enemy turn to be true or the next skill used by player's
             # will display as the enemy is using it.
@@ -775,6 +780,9 @@ class Game:
                                 self.gameStates['prebattle'] = True
                         
                         elif self.gameStates['infectMode']:
+                                # Checks if the player is currently using the default 
+                                # parasite sprite.
+                                self.isPlayerSprite = False
                             # Contains which enemy the player clicks on to infect.
                                 enemyIndex = None
                                 for i, rect in enumerate(self.enemyRect):
@@ -805,7 +813,7 @@ class Game:
                                     # Move to battle state
                                     self.gameStates['infectMode'] = False
                                     self.gameStates['battle'] = True
-                                    self.currentBattle = Battle(self.player, self.currentEnemy[0])
+                                    # self.currentBattle = Battle(self.player, self.currentEnemy[0])
 
                         # Handles the player's choice to fight or infect the enemies.
                         elif self.gameStates['prebattle']:
@@ -814,6 +822,7 @@ class Game:
                             # Checks if the fight button was clicked on the prebattle screen.
                             if self.preBattle['fight'].rect.collidepoint(mousePos) :
                                 print("Fight button clicked")  # Debug print
+                                self.isPlayerSprite = True
                                 self.gameStates['prebattle'] = False
                                 self.gameStates['battle'] = True
                                 # self.currentBattle = Battle(self.player, self.currentEnemy[0])
@@ -1358,6 +1367,8 @@ class Game:
                         self.displayBattleButtons['attack'].draw(self.screen)
                     else:
                         self.bothGuarded = False
+                        self.skillUsed =  "None"
+                        self.skillPlayerUsed = "None"
                 
                 
                     
@@ -1369,7 +1380,15 @@ class Game:
                 self.enemyTurn()
                 
                 self.gameStates['enemyTurn'] = False
-                self.gameStates['displayBattle'] = True
+
+                if not self.bothGuarded:
+                    self.gameStates['displayBattle'] = True
+                else:
+                    print("Both players guarded now leave the display battle screen")
+                    self.bothGuarded = False
+                    self.skillUsed =  "None"
+                    self.skillPlayerUsed = "None"
+                    self.gameStates['battle'] = True
 
 
             # Displays the inventory of the player.
@@ -1411,8 +1430,17 @@ class Game:
 
                 print(f"You have entered the battle state {self.debug} number of times")
 
-                # Display enemy sprites on the display battle screen.
-                self.screen.blit(enemy1, self.playerPos)
+                # Checks if the player infected the enemy on the first floor. #
+                # If the user did not infect the enemy, the player will be the default
+                # parasite sprite instead of an enemy sprite.
+                # Since the parasite sprite is smaller than the enemy sprite, the player will be
+                # displayed lower on the screen.
+                if self.isPlayerSprite:
+                    playerSprite = pygame.transform.flip(self.assets['player'], True, False)
+                    self.screen.blit(playerSprite, (self.playerPos[0], self.playerPos[1] + 200))
+                else:
+                    # Display enemy sprites on the display battle screen.
+                    self.screen.blit(enemy1, self.playerPos)
                 self.screen.blit(enemy2, self.enemyPos)
 
                 # Health Bar and SP bar for the player and enemies.
