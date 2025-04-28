@@ -6,7 +6,7 @@ from Scripts.upgrade import Slab
 from Scripts.util import loadImage
 from Scripts.dialogue import DialogueManager
 from Scripts.allDialogues import dialogues
-from Scripts.battle import Battle
+# from Scripts.battle import Battle
 from Scripts.character import Player
 from Scripts.enemies import RSoldier, Orc, Rat, FFaith, Ghoul, Carrion, wiz
 
@@ -295,19 +295,19 @@ class Game:
 
         # Stores battle music
         self.assets = {
-            'titleBackground':pygame.transform.scale(loadImage('/background/otherTitle.png').convert_alpha(), (1280, 720)),
-            'intermission': pygame.transform.scale(loadImage('/background/intermission.png').convert_alpha(), (1280, 720)),
-            'itemRewardBackground':pygame.transform.scale(loadImage('/background/Arena.png').convert_alpha(), (1280, 720)),
+            'titleBackground':pygame.transform.smoothscale(loadImage('/background/otherTitle.png').convert_alpha(), (1280, 720)),
+            'intermission': pygame.transform.smoothscale(loadImage('/background/intermission.png').convert_alpha(), (1280, 720)),
+            'itemRewardBackground':pygame.transform.smoothscale(loadImage('/background/Arena.png').convert_alpha(), (1280, 720)),
             'intermissionSong': pygame.mixer.Sound('Media/Music/intermission.wav'),
             'titleSong': pygame.mixer.Sound('Media/Music/title.wav'),
             'battleSong': pygame.mixer.Sound('Media/Music/battle.wav'),
             'midBossSong': pygame.mixer.Sound('Media/Music/carrion.wav'),
             'finalBossSong': pygame.mixer.Sound('Media/Music/harbinger.wav'),
-            'shopBackground': pygame.transform.scale(loadImage('/background/shop.png'), (1280, 720)),
-            'enemy1': pygame.transform.scale(loadImage('/enemies/Knight.png').convert_alpha(), (400, 500)),
-            'enemy2': pygame.transform.scale(loadImage('/enemies/Ghost.png').convert_alpha(), (400, 300)),
-            'arena': pygame.transform.scale(loadImage('/background/Arena.png').convert_alpha(), (1280, 720)),
-            'player': pygame.transform.scale(loadImage('/player/1.png').convert_alpha(), (150, 175)),
+            'shopBackground': pygame.transform.smoothscale(loadImage('/background/shop.png'), (1280, 720)),
+            'enemy1': pygame.transform.smoothscale(loadImage('/enemies/Knight.png').convert_alpha(), (400, 500)),
+            'enemy2': pygame.transform.smoothscale(loadImage('/enemies/Ghost.png').convert_alpha(), (400, 300)),
+            'arena': pygame.transform.smoothscale(loadImage('/background/Arena.png').convert_alpha(), (1280, 720)),
+            'player': pygame.transform.smoothscale(loadImage('/player/1.png').convert_alpha(), (150, 175)),
         }
 
         # Stores the buttons for the intermission screen.
@@ -1335,9 +1335,14 @@ class Game:
                 enemy1 = pygame.transform.flip(self.assets['enemy1'], self.flipSprites, False)
                 enemy2 = pygame.transform.flip(self.assets['enemy2'], self.flipSprites, False)
 
-
-                # Display enemy sprites on the display battle screen.
-                self.screen.blit(enemy1, self.playerPos)
+                # Need this or the player parasite sprite will disappear when the dialogue displays for the
+                # battle screen.
+                if self.isPlayerSprite:
+                    playerSprite = pygame.transform.flip(self.assets['player'], True, False)
+                    self.screen.blit(playerSprite, (self.playerPos[0], self.playerPos[1] + 200))
+                else:
+                    # Display enemy sprites on the display battle screen.
+                    self.screen.blit(enemy1, self.playerPos)
                 self.screen.blit(enemy2, self.enemyPos)
 
                 # Health Bar and SP bar for the player and enemies.
