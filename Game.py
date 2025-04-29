@@ -357,6 +357,7 @@ class Game:
             # will display as the enemy is using it.
             self.isEnemyTurn = True
             self.playerDialougeOffsetted = not self.playerDialougeOffsetted
+            return
 
 
         elif self.enemyGuarded:
@@ -1382,9 +1383,6 @@ class Game:
                                 
             elif self.gameStates['enemyTurn']:
                 self.isEnemyTurn = False   
-                self.enemyTurn()
-                
-                self.gameStates['enemyTurn'] = False
 
                 if not self.bothGuarded:
                     self.gameStates['displayBattle'] = True
@@ -1394,6 +1392,12 @@ class Game:
                     self.skillUsed =  "None"
                     self.skillPlayerUsed = "None"
                     self.gameStates['battle'] = True
+                    
+                self.enemyTurn()
+                
+                self.gameStates['enemyTurn'] = False
+
+               
 
 
             # Displays the inventory of the player.
@@ -1450,6 +1454,9 @@ class Game:
 
                 # Health Bar and SP bar for the player and enemies.
                 self.drawBars()
+
+                 # If the enemy is defeated, the game will
+                # proceed to the next floor which includes the intermission state.
 
                 # Checks if the player has defeated the enemy and displays the winning dialouge if so.
                 if self.currentEnemy[self.currentEnemyIndex].currentHp <= 0:
@@ -1516,8 +1523,6 @@ class Game:
                         self.gameStates['skills'] = True
                         break
            
-                                
-
                     # Handle events
                     for event in pygame.event.get():
                         if event.type == pygame.QUIT:
@@ -1526,7 +1531,6 @@ class Game:
                             
                         if event.type == pygame.MOUSEBUTTONDOWN:
                             if current_menu == 'battle':
-
 
                                 if self.battle['Attack'].rect.collidepoint(mousePos) :
                                     action_selected = True
@@ -1541,6 +1545,7 @@ class Game:
                                         damage = int(self.player.basicAttack())
                                     self.skillDamage = damage
                                     
+
                                     # If the enemy is guarding, the damage dealt is halved.
                                     if self.enemyGuarded:
                                         self.skillDamage = damage // 2
@@ -1597,6 +1602,10 @@ class Game:
                                     # Needed for when the enemy guards since the 
                                     # enemy and player both share self.skillUsed.
                                     self.skillPlayerUsed = "Guard"
+
+                                    if self.enemyGuarded:
+                                        self.bothGuarded = True
+                                        
 
                                     # Transitions to the display battle screen.
                                     self.gameStates['battle'] = False
@@ -1679,6 +1688,8 @@ class Game:
                 self.currentEnemy[self.currentEnemyIndex].Skills[0].currentCD = 0
                 self.currentEnemy[self.currentEnemyIndex].Skills[1].currentCD = 0
                 self.currentEnemy[self.currentEnemyIndex].isGuarded = False
+
+     
                 
            
 
