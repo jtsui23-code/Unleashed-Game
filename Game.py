@@ -346,10 +346,11 @@ class Game:
         # If this is not accounted for, the player's next skill will be displayed as "Guard".
         if self.enemyGuarded and self.playerGuarded:
             self.displayBattleButtons['attack'].setText(f"Player and {self.currentEnemy[self.currentEnemyIndex].name} both guarded!")
-
+            print("Both GuardedBoth GuardedBoth GuardedBoth GuardedBoth GuardedBoth GuardedBoth GuardedBoth GuardedBoth GuardedBoth Guarded")
             self.enemyGuarded = False
             self.playerGuarded = False
             self.bothGuarded = True
+            print(f"bothguard is ", self.bothGuarded)
             self.skillUsed = "None"
             self.skillPlayerUsed = "None"   
 
@@ -499,6 +500,13 @@ class Game:
         # Checks if the enemy has been defeated.
         if self.currentEnemy[self.currentEnemyIndex].currentHp <= 0:
             print(f"{self.currentEnemy[self.currentEnemyIndex].name} has been defeated.")
+            self.winDialogue()
+            self.enemyDefeated = True
+            self.skillUsed = "None"
+            self.skillPlayerUsed = "None"
+            self.isEnemyTurn = False
+            self.gameStates['battle'] = False
+            self.gameStates['displayBattle'] = True
             return 0
 
         # Prioties the use of the highr skills becasue they are probably stronger.
@@ -1365,16 +1373,18 @@ class Game:
                     # Sets the recently used skill by the player or the 
                     # enemy to the dialouge so it can be displayed.
                     if not self.bothGuarded:
+                        print(f"We shouldn't execute because ",{ self.bothGuarded})
                         if self.skillDialogueSet == False:
                             self.skillDialogue(self.skillUsed)
                             self.skillDialogueSet = True
 
                         self.displayBattleButtons['attack'].update(dt)
                         self.displayBattleButtons['attack'].draw(self.screen)
-                    else:
-                        self.bothGuarded = False
+                    elif self.bothGuarded:
                         self.skillUsed =  "None"
                         self.skillPlayerUsed = "None"
+                        self.bothGuarded = False
+
                 
                 
                     
@@ -1603,8 +1613,8 @@ class Game:
                                     # enemy and player both share self.skillUsed.
                                     self.skillPlayerUsed = "Guard"
 
-                                    if self.enemyGuarded:
-                                        self.bothGuarded = True
+                                    # if self.enemyGuarded:
+                                    #     self.bothGuarded = True
                                         
 
                                     # Transitions to the display battle screen.
