@@ -344,7 +344,10 @@ class Game:
 
         # Need to account for if the player is also guarding. 
         # If this is not accounted for, the player's next skill will be displayed as "Guard".
-        if self.enemyGuarded and self.playerGuarded:
+        if self.skillUsed == 'Both Guard':
+            self.displayBattleButtons['attack'].setText(f"Player and {self.currentEnemy[self.currentEnemyIndex].name} both guarded!")
+
+        elif self.enemyGuarded and self.playerGuarded:
             self.displayBattleButtons['attack'].setText(f"Player and {self.currentEnemy[self.currentEnemyIndex].name} both guarded!")
             print("Both GuardedBoth GuardedBoth GuardedBoth GuardedBoth GuardedBoth GuardedBoth GuardedBoth GuardedBoth GuardedBoth Guarded")
             self.enemyGuarded = False
@@ -727,11 +730,16 @@ class Game:
                         # has to either wait or click on the screen severals times to proceed through the 
                         # display battle dialogue.
                         if self.gameStates['displayBattle']:
+
+
+                            
+
                             # If the text has finsihed typing, 
                             # and the user clicks the screen, switch the battle screen
                             # with all of the skills.
                             if not self.dialogue.current_dialogue.isTyping():
                                 self.gameStates['displayBattle'] = False
+                                
 
 
                                 # If the enemy is defeated, the game will
@@ -778,6 +786,7 @@ class Game:
                             # If the text is still typing, the user can skip the typing animation
                             # by clicking on the screen.
                             else:
+
                                 self.dialogue.current_dialogue.skipTyping()
                         
 
@@ -830,7 +839,6 @@ class Game:
 
                             # Checks if the fight button was clicked on the prebattle screen.
                             if self.preBattle['fight'].rect.collidepoint(mousePos) :
-                                print("Fight button clicked")  # Debug print
                                 self.isPlayerSprite = True
                                 self.gameStates['prebattle'] = False
                                 self.gameStates['battle'] = True
@@ -890,11 +898,11 @@ class Game:
                                 self.usePotion()
                                 self.gameStates['inventory'] = False
                                 self.gameStates['displayBattle'] = True
-                                print("Clicked on Potion")
+
                             
                             # Goes back to the skills menu.
                             elif self.inventoryMenu['Back'].rect.collidepoint(mousePos) :
-                                print("Clicked on back button")
+
                                 self.gameStates['inventory'] = False
                                 self.gameStates['battle'] = True
 
@@ -1381,9 +1389,9 @@ class Game:
                         self.displayBattleButtons['attack'].update(dt)
                         self.displayBattleButtons['attack'].draw(self.screen)
                     elif self.bothGuarded:
-                        self.skillUsed =  "None"
-                        self.skillPlayerUsed = "None"
-                        self.bothGuarded = False
+
+                        self.skillUsed =  "Both Guarded"
+                        self.skillPlayerUsed = "Both Guarded"
 
                 
                 
@@ -1394,14 +1402,8 @@ class Game:
             elif self.gameStates['enemyTurn']:
                 self.isEnemyTurn = False   
 
-                if not self.bothGuarded:
-                    self.gameStates['displayBattle'] = True
-                else:
-                    print("Both players guarded now leave the display battle screen")
-                    self.bothGuarded = False
-                    self.skillUsed =  "None"
-                    self.skillPlayerUsed = "None"
-                    self.gameStates['battle'] = True
+                self.gameStates['displayBattle'] = True
+               
                     
                 self.enemyTurn()
                 
@@ -1454,6 +1456,9 @@ class Game:
                 # parasite sprite instead of an enemy sprite.
                 # Since the parasite sprite is smaller than the enemy sprite, the player will be
                 # displayed lower on the screen.
+                if self.bothGuarded:
+                    self.bothGuarded = False
+                    
                 if self.isPlayerSprite:
                     playerSprite = pygame.transform.flip(self.assets['player'], True, False)
                     self.screen.blit(playerSprite, (self.playerPos[0], self.playerPos[1] + 200))
@@ -1492,7 +1497,6 @@ class Game:
                 # Switches to the game over screen if the player loses all of their
                 # health.
                 if self.player.currentHp < 1:
-                    print("Player is defeated!")
                     self.gameStates['battle'] = False
                     self.gameStates['gameOver'] = True
 
