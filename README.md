@@ -1,6 +1,29 @@
-# Unleashed - (Python, Pygame)
-## Description:
-A turn-based roguelike game using Python and Pygame developed by Jack Tsui, Zachary Barrentine, Zach Lewis, Daniel Prince and Gage Ahlmark. The inital plan was for the game to be a small prototype, the game has grown into a larger project.
+# 🎮 Unleashed - Turn-Based Roguelike (Python, Pygame)
+
+## 📝 Description
+
+**Unleashed** is a turn-based roguelike game developed in Python using Pygame, created by **Jack Tsui**, **Zachary Barrentine**, **Zach Lewis**, **Daniel Prince**, and **Gage Ahlmark**. Originally a small prototype, the game has evolved into a more substantial collaborative project with character progression, resource upgrades, and dynamic menu-driven battles.
+
+---
+
+## 🚀 Features
+
+### ✅ Implemented
+- Turn-based combat with enemy encounters
+- Skill system and cooldown management
+- Upgrade shop with coin-based economy
+- Interactive dialogue system
+- Inventory with usable items (e.g., potions)
+- Multiple game states: main menu, shop, battle, game over
+- Modular code structure using OOP principles
+
+### 🔜 Work In Progress
+- Procedural level generation
+- Save/load functionality
+- Smarter enemy behavior and basic AI logic
+- Additional enemies and boss mechanics
+- Sound effect integration and polish
+
 
 
 ### The following game file contents can be accessed below:
