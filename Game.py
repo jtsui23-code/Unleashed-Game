@@ -20,6 +20,8 @@ class Game:
         # Sets the name of the window icon to "Rogue-like"
         pygame.display.set_caption("Unleashed")
 
+        self.testingMode = True
+
         self.guardOver = 0
 
         self.screenWidth = 1280
@@ -388,7 +390,7 @@ class Game:
             # Indicates in the battle UI text box who is performing the skill.
             # Has to be enemy turn as true because the player's skill is used.
             if  self.isEnemyTurn or self.playerDialougeOffsetted:
-                if self.guardOver == 0:
+
                     self.guardOver = 0
                     print(f"Player is performing an action that is not guarding or using a potion.")
                     # Indicates that the player is attacking or using a skill in the dialouge.
@@ -709,7 +711,8 @@ class Game:
             elif (self.gameStates['battle'] or self.gameStates['prebattle']) and not self.battleMusicPlaying:
                 self.assets['intermissionSong'].stop()
                 self.assets['titleSong'].stop()
-                self.assets['battleSong'].play(-1)
+                if not self.testingMode:
+                    self.assets['battleSong'].play(-1)
                 self.battleMusicPlaying = True
                 self.titleMusicPlaying = False
                 self.intermissionMusicPlaying = False
@@ -1388,6 +1391,11 @@ class Game:
                     if not self.bothGuarded:
                         if not self.guardOver == True:
                             if self.skillDialogueSet == False:
+                                if self.skillUsed == "Devilish Rage" or self.skillUsed == "Claw Strike" or self.skillUsed == "Parasitic Rage":
+                                    print(f"You used ", {self.skillUsed})
+                                else:
+                                    print(f"The opponent used ", {self.skillUsed})
+
                                 self.skillDialogue(self.skillUsed)
                                 self.skillDialogueSet = True
 
