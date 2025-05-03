@@ -18,7 +18,6 @@
 - Modular code structure using OOP principles
 
 ### 🔜 Work In Progress
-- Procedural level generation
 - Save/load functionality
 - Smarter enemy behavior and basic AI logic
 - Additional enemies and boss mechanics
