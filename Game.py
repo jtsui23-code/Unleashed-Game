@@ -351,12 +351,10 @@ class Game:
 
         elif self.enemyGuarded and self.playerGuarded:
             self.displayBattleButtons['attack'].setText(f"Player and {self.currentEnemy[self.currentEnemyIndex].name} both guarded!")
-            print("Both GuardedBoth GuardedBoth GuardedBoth GuardedBoth GuardedBoth GuardedBoth GuardedBoth GuardedBoth GuardedBoth Guarded")
             self.guardOver = True
             self.enemyGuarded = False
             self.playerGuarded = False
             self.bothGuarded = True
-            print(f"bothguard is ", self.bothGuarded)
             self.skillUsed = "None"
             self.skillPlayerUsed = "None"   
 
@@ -1389,7 +1387,6 @@ class Game:
                     # enemy to the dialouge so it can be displayed.
                     if not self.bothGuarded:
                         if not self.guardOver == True:
-                            print(f"We shouldn't execute because ",{ self.bothGuarded})
                             if self.skillDialogueSet == False:
                                 self.skillDialogue(self.skillUsed)
                                 self.skillDialogueSet = True
