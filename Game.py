@@ -1389,7 +1389,7 @@ class Game:
                         self.displayBattleButtons['attack'].update(dt)
                         self.displayBattleButtons['attack'].draw(self.screen)
                     elif self.bothGuarded:
-
+                        self.bothGuarded = False
                         self.skillUsed =  "Both Guarded"
                         self.skillPlayerUsed = "Both Guarded"
 
