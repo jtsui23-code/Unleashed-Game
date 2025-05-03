@@ -20,6 +20,8 @@ class Game:
         # Sets the name of the window icon to "Rogue-like"
         pygame.display.set_caption("Unleashed")
 
+        self.testingMode = True
+
         self.guardOver = 0
 
         self.screenWidth = 1280
@@ -346,17 +348,15 @@ class Game:
 
         # Need to account for if the player is also guarding. 
         # If this is not accounted for, the player's next skill will be displayed as "Guard".
-        if self.skillUsed == 'Both Guard':
-            self.displayBattleButtons['attack'].setText(f"Player and {self.currentEnemy[self.currentEnemyIndex].name} both guarded!")
+       # if self.skillUsed == 'Both Guard':
+        #    self.displayBattleButtons['attack'].setText(f"Player and {self.currentEnemy[self.currentEnemyIndex].name} both guarded!")
 
-        elif self.enemyGuarded and self.playerGuarded:
+        if self.enemyGuarded and self.playerGuarded:
             self.displayBattleButtons['attack'].setText(f"Player and {self.currentEnemy[self.currentEnemyIndex].name} both guarded!")
-            print("Both GuardedBoth GuardedBoth GuardedBoth GuardedBoth GuardedBoth GuardedBoth GuardedBoth GuardedBoth GuardedBoth Guarded")
             self.guardOver = True
             self.enemyGuarded = False
             self.playerGuarded = False
             self.bothGuarded = True
-            print(f"bothguard is ", self.bothGuarded)
             self.skillUsed = "None"
             self.skillPlayerUsed = "None"   
 
@@ -390,7 +390,7 @@ class Game:
             # Indicates in the battle UI text box who is performing the skill.
             # Has to be enemy turn as true because the player's skill is used.
             if  self.isEnemyTurn or self.playerDialougeOffsetted:
-                if self.guardOver == 0:
+
                     self.guardOver = 0
                     print(f"Player is performing an action that is not guarding or using a potion.")
                     # Indicates that the player is attacking or using a skill in the dialouge.
@@ -711,7 +711,8 @@ class Game:
             elif (self.gameStates['battle'] or self.gameStates['prebattle']) and not self.battleMusicPlaying:
                 self.assets['intermissionSong'].stop()
                 self.assets['titleSong'].stop()
-                self.assets['battleSong'].play(-1)
+                if not self.testingMode:
+                    self.assets['battleSong'].play(-1)
                 self.battleMusicPlaying = True
                 self.titleMusicPlaying = False
                 self.intermissionMusicPlaying = False
@@ -1389,8 +1390,12 @@ class Game:
                     # enemy to the dialouge so it can be displayed.
                     if not self.bothGuarded:
                         if not self.guardOver == True:
-                            print(f"We shouldn't execute because ",{ self.bothGuarded})
                             if self.skillDialogueSet == False:
+                                if self.skillUsed == "Devilish Rage" or self.skillUsed == "Claw Strike" or self.skillUsed == "Parasitic Rage":
+                                    print(f"You used ", {self.skillUsed})
+                                else:
+                                    print(f"The opponent used ", {self.skillUsed})
+
                                 self.skillDialogue(self.skillUsed)
                                 self.skillDialogueSet = True
 
@@ -1398,8 +1403,8 @@ class Game:
                         self.displayBattleButtons['attack'].draw(self.screen)
                     elif self.bothGuarded:
                         self.bothGuarded = False
-                        self.skillUsed =  "Both Guarded"
-                        self.skillPlayerUsed = "Both Guarded"
+                        self.skillUsed =  "None"
+                        self.skillPlayerUsed = "None"
 
                 
                 
