@@ -59,3 +59,12 @@
    ```bash
    git clone https://github.com/jtsui23-code/Unleashed-Game.git
    cd Unleashed-Game
+   ```
+2. Download Pygame:
+   ```
+   pip install pygame
+   ```
+3. Run the game:
+   ```
+   Python Game.py
+   ```
