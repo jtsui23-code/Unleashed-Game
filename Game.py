@@ -348,10 +348,10 @@ class Game:
 
         # Need to account for if the player is also guarding. 
         # If this is not accounted for, the player's next skill will be displayed as "Guard".
-        if self.skillUsed == 'Both Guard':
-            self.displayBattleButtons['attack'].setText(f"Player and {self.currentEnemy[self.currentEnemyIndex].name} both guarded!")
+       # if self.skillUsed == 'Both Guard':
+        #    self.displayBattleButtons['attack'].setText(f"Player and {self.currentEnemy[self.currentEnemyIndex].name} both guarded!")
 
-        elif self.enemyGuarded and self.playerGuarded:
+        if self.enemyGuarded and self.playerGuarded:
             self.displayBattleButtons['attack'].setText(f"Player and {self.currentEnemy[self.currentEnemyIndex].name} both guarded!")
             self.guardOver = True
             self.enemyGuarded = False
@@ -1403,8 +1403,8 @@ class Game:
                         self.displayBattleButtons['attack'].draw(self.screen)
                     elif self.bothGuarded:
                         self.bothGuarded = False
-                        self.skillUsed =  "Both Guarded"
-                        self.skillPlayerUsed = "Both Guarded"
+                        self.skillUsed =  "None"
+                        self.skillPlayerUsed = "None"
 
                 
                 
