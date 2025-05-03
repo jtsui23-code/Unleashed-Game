@@ -24,19 +24,38 @@
 - Additional enemies and boss mechanics
 - Sound effect integration and polish
 
+---
 
+## 📁 Project Structure
 
-### The following game file contents can be accessed below:
+| #   | File / Directory | Description |
+|-----|------------------|-------------|
+| 1   | [Game.py](https://github.com/jtsui23-code/Unleashed-Game/blob/main/Game.py) | Main game loop and state manager |
+| 2   | [`Scripts/character.py`](https://github.com/jtsui23-code/Unleashed-Game/blob/main/Scripts/character.py) | Character and skill class definitions |
+| 3   | [`Scripts/enemies.py`](https://github.com/jtsui23-code/Unleashed-Game/blob/main/Scripts/enemies.py) | Enemy class implementations |
+| 4   | [`Scripts/saveStates.py`](https://github.com/jtsui23-code/Unleashed-Game/blob/main/Scripts/saveStates.py) | Save/load system |
+| 5   | [`Scripts/ui.py`](https://github.com/jtsui23-code/Unleashed-Game/blob/main/Scripts/ui.py) | Buttons, text boxes, and UI elements |
+| 6   | [`Scripts/upgrade.py`](https://github.com/jtsui23-code/Unleashed-Game/blob/main/Scripts/upgrade.py) | Upgrade mechanics and UI bars |
+| 7   | [`Scripts/util.py`](https://github.com/jtsui23-code/Unleashed-Game/blob/main/Scripts/util.py) | Asset loading and helper functions |
+| 8   | [`Scripts/dialogue.py`](https://github.com/jtsui23-code/Unleashed-Game/blob/main/Scripts/dialogue.py) | Dialogue manager and text typing |
+| 9   | [`Scripts/allDialogues.py`](https://github.com/jtsui23-code/Unleashed-Game/blob/main/Scripts/allDialogues.py) | Static dialogue strings |
+| 10  | [`Media/`](https://github.com/jtsui23-code/Unleashed-Game/tree/main/Media) | Game assets: sprites, fonts, music |
 
-|   #   | Game Files             | Description                                        |
-| :---: | ---------------- | -------------------------------------------------- |
-|   1   | [Game.py](https://github.com/jtsui23-code/Unleashed-Game/blob/main/Game.py)         | The main script that runs the game.      |
-|   2  | [character.py](https://github.com/jtsui23-code/Unleashed-Game/blob/main/Scripts/character.py)         | This script is for the character and skill class.      |
-|   3   | [enemies.py](https://github.com/jtsui23-code/Unleashed-Game/blob/main/Scripts/enemies.py)         | This script contains the classes for the enemies.      |
-|   4   | [saveStates.py](https://github.com/jtsui23-code/Unleashed-Game/blob/main/Scripts/saveStates.py)         | The script is for the save feature.      |
-|   5   | [ui.py](https://github.com/jtsui23-code/Unleashed-Game/blob/main/Scripts/ui.py)         | The script is for the UI elements in the game.      |
-|   6   | [upgrade.py](https://github.com/jtsui23-code/Unleashed-Game/blob/main/Scripts/upgrade.py)         | The script is for the upgrade UI indicator.      |
-|   7   | [util.py](https://github.com/jtsui23-code/Unleashed-Game/blob/main/Scripts/util.py)         | This script is for loading assets and animations.      |
-|   8   | [dialogue.py](https://github.com/jtsui23-code/Unleashed-Game/blob/main/Scripts/allDialogues.py)         | This script is for managing all of the dialogue throughout the game.      |
-|   9   | [allDialogues.py](https://github.com/jtsui23-code/Unleashed-Game/blob/main/Game.py)         | This script contains all of the dialogue throughout the game.      |
-|   10   | [Media](https://github.com/jtsui23-code/Unleashed-Game/tree/main/Media) | This folder contains all of the assets and music for the game. |
+---
+
+## 🧠 What We’re Learning
+
+- Game state management using object-oriented programming
+- UI/UX design within a game engine framework (Pygame)
+- Modular design and teamwork using GitHub
+- Turn-based battle mechanics and logic flow
+- Planning and iterating on game systems
+
+---
+
+## ▶️ How to Run
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/jtsui23-code/Unleashed-Game.git
+   cd Unleashed-Game
